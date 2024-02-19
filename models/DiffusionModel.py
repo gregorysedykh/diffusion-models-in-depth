@@ -19,12 +19,18 @@ class DiffusionModel(nn.Module):
         """
         f = utils.cosine_scheduler
         s = 0.008
-        alpha_prod = f(0, self.timesteps, s) / f(self.timesteps, self.timesteps, s)
+        alpha_prod = f(self.timesteps, self.timesteps, s) / f(0, self.timesteps, s)
+        alpha_prod = torch.tensor(alpha_prod, dtype=torch.float32)
 
-        x_t = np.random.normal(
-            np.sqrt(alpha_prod) * x_0, (1 - alpha_prod) * np.eye(x_0.shape)
-        )
-        x_t = (torch.tensor(x_t, dtype=torch.float32)).to(self.device)
+        # Check device for x_0
+        if x_0.device != self.device:
+            x_0 = x_0.to(self.device)
+
+        mu = torch.sqrt(alpha_prod) * x_0
+        noise = torch.sqrt(1 - alpha_prod) * torch.randn_like(x_0)
+
+        x_t = mu + noise
+
         return x_t
     
     def display_forward(self, x_0):

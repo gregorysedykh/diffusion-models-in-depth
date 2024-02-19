@@ -1,0 +1,89 @@
+\documentclass{report}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry} % Add geometry package here
+\geometry{margin=1in} % Set the margin size here
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{pgfplots}
+\usepackage{biblatex}
+
+\addbibresource{sources.bib}
+
+\pgfplotsset{compat=1.16}
+
+\graphicspath{ {./images/} }
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    pdfpagemode=FullScreen,
+}
+
+\definecolor{code-gray}{RGB}{220, 220, 220}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[LE,RO]{\thepage}
+
+\lstset{
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  frame=single,
+  breaklines=true,
+  showstringspaces=false,
+  backgroundcolor=\color{code-gray}
+}
+
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\footrulewidth}{1pt}
+
+
+\begin{document}
+
+\begin{titlepage}
+  \begin{center}
+      \vspace*{1cm}
+
+      \LARGE
+      \textbf{Diffusion Models in Depth: From a Theoretical and a Practical Perspective}
+
+      \vspace{1.5cm}
+
+      \Large
+      \textbf{Gregory Sedykh}
+      \vspace{0.8cm}
+
+      \normalsize
+      June 28th 2024
+
+      \vfill
+
+      \includegraphics[width=0.4\textwidth]{images/fac_sc_dep_informatique.png} \\
+
+      Bachelor thesis for the degree of Bachelor of Science in Computer Science \\
+      Supervised by Prof. Stéphane Marchand-Maillet     
+
+      \vspace{0.8cm}
+    
+           
+           
+  \end{center}
+\end{titlepage}
+
+
+\newpage
+\tableofcontents
+\pagenumbering{arabic}
+
+%% ----------------------- Content goes here ----------------------- %%
+
+%% ----------------------------------------------------------------- %%
+
+
+\printbibliography
+
+\end{document}

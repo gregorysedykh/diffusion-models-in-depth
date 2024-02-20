@@ -16,5 +16,236 @@
   {}
 \endgroup
 
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global}
+    \entry{videoworldsimulators2024}{article}{}
+      \name{author}{13}{}{%
+        {{hash=fc86624ab341f287c6199bcbb2ac1686}{%
+           family={Brooks},
+           familyi={B\bibinitperiod},
+           given={Tim},
+           giveni={T\bibinitperiod}}}%
+        {{hash=e3551d037b853b52f4e910036181379f}{%
+           family={Peebles},
+           familyi={P\bibinitperiod},
+           given={Bill},
+           giveni={B\bibinitperiod}}}%
+        {{hash=234ed40e0b0dfc3bc9dd04704b04baf4}{%
+           family={Homes},
+           familyi={H\bibinitperiod},
+           given={Connor},
+           giveni={C\bibinitperiod}}}%
+        {{hash=161bb1ac283bc63ee7917e700c4ac8ee}{%
+           family={DePue},
+           familyi={D\bibinitperiod},
+           given={Will},
+           giveni={W\bibinitperiod}}}%
+        {{hash=3c7f944a6c53318606f82d927465c06c}{%
+           family={Guo},
+           familyi={G\bibinitperiod},
+           given={Yufei},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=e185e98ee3d0228730eb44d3476c64be}{%
+           family={Jing},
+           familyi={J\bibinitperiod},
+           given={Li},
+           giveni={L\bibinitperiod}}}%
+        {{hash=05a6c97c1fa9883b17ac3b01e9102b37}{%
+           family={Schnurr},
+           familyi={S\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+        {{hash=7efd2d0850a6fe8ffa5e008f8905c921}{%
+           family={Taylor},
+           familyi={T\bibinitperiod},
+           given={Joe},
+           giveni={J\bibinitperiod}}}%
+        {{hash=01718a4c6e83e4173f93fe766f492c8f}{%
+           family={Luhman},
+           familyi={L\bibinitperiod},
+           given={Troy},
+           giveni={T\bibinitperiod}}}%
+        {{hash=9b002e581979e05fcc9dab2c4be77f11}{%
+           family={Luhman},
+           familyi={L\bibinitperiod},
+           given={Eric},
+           giveni={E\bibinitperiod}}}%
+        {{hash=c199f59a36d6d4a286b65a81a5a0b910}{%
+           family={Ng},
+           familyi={N\bibinitperiod},
+           given={Clarence\bibnamedelimb Wing\bibnamedelima Yin},
+           giveni={C\bibinitperiod\bibinitdelim W\bibinitperiod\bibinitdelim Y\bibinitperiod}}}%
+        {{hash=1b87fb184638f559e9ceeb22239d460c}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Ricky},
+           giveni={R\bibinitperiod}}}%
+        {{hash=82063a12702e7b2c026ae0ff03b8f102}{%
+           family={Ramesh},
+           familyi={R\bibinitperiod},
+           given={Aditya},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{241f4b2623df0a18be2129354fb6b3c8}
+      \strng{fullhash}{4710d82d639b4abe1035f98eeb045cac}
+      \strng{bibnamehash}{241f4b2623df0a18be2129354fb6b3c8}
+      \strng{authorbibnamehash}{241f4b2623df0a18be2129354fb6b3c8}
+      \strng{authornamehash}{241f4b2623df0a18be2129354fb6b3c8}
+      \strng{authorfullhash}{4710d82d639b4abe1035f98eeb045cac}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Video generation models as world simulators}
+      \field{year}{2024}
+      \verb{urlraw}
+      \verb https://openai.com/research/video-generation-models-as-world-simulators
+      \endverb
+      \verb{url}
+      \verb https://openai.com/research/video-generation-models-as-world-simulators
+      \endverb
+    \endentry
+    \entry{dhariwal2021diffusion}{misc}{}
+      \name{author}{2}{}{%
+        {{hash=4164e43d8cf919f5e3f8d80f5ea23f36}{%
+           family={Dhariwal},
+           familyi={D\bibinitperiod},
+           given={Prafulla},
+           giveni={P\bibinitperiod}}}%
+        {{hash=fc19c0dc057e2a02419916b39da6895b}{%
+           family={Nichol},
+           familyi={N\bibinitperiod},
+           given={Alex},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{04ec986932b1c7c54e6fc336705bf30a}
+      \strng{fullhash}{04ec986932b1c7c54e6fc336705bf30a}
+      \strng{bibnamehash}{04ec986932b1c7c54e6fc336705bf30a}
+      \strng{authorbibnamehash}{04ec986932b1c7c54e6fc336705bf30a}
+      \strng{authornamehash}{04ec986932b1c7c54e6fc336705bf30a}
+      \strng{authorfullhash}{04ec986932b1c7c54e6fc336705bf30a}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.LG}
+      \field{eprinttype}{arXiv}
+      \field{title}{Diffusion Models Beat GANs on Image Synthesis}
+      \field{year}{2021}
+      \verb{eprint}
+      \verb 2105.05233
+      \endverb
+    \endentry
+    \entry{ho2020denoising}{misc}{}
+      \name{author}{3}{}{%
+        {{hash=2ac2ca10b22e4d13af1767e87495412f}{%
+           family={Ho},
+           familyi={H\bibinitperiod},
+           given={Jonathan},
+           giveni={J\bibinitperiod}}}%
+        {{hash=31ac0835ffc3ba6d612252522a6a2011}{%
+           family={Jain},
+           familyi={J\bibinitperiod},
+           given={Ajay},
+           giveni={A\bibinitperiod}}}%
+        {{hash=e28d4ee199593959d8c29980a64f1974}{%
+           family={Abbeel},
+           familyi={A\bibinitperiod},
+           given={Pieter},
+           giveni={P\bibinitperiod}}}%
+      }
+      \strng{namehash}{1ef17e0fed8d834b029ebb1c6adf76b4}
+      \strng{fullhash}{1ef17e0fed8d834b029ebb1c6adf76b4}
+      \strng{bibnamehash}{1ef17e0fed8d834b029ebb1c6adf76b4}
+      \strng{authorbibnamehash}{1ef17e0fed8d834b029ebb1c6adf76b4}
+      \strng{authornamehash}{1ef17e0fed8d834b029ebb1c6adf76b4}
+      \strng{authorfullhash}{1ef17e0fed8d834b029ebb1c6adf76b4}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.LG}
+      \field{eprinttype}{arXiv}
+      \field{title}{Denoising Diffusion Probabilistic Models}
+      \field{year}{2020}
+      \verb{eprint}
+      \verb 2006.11239
+      \endverb
+    \endentry
+    \entry{nichol2021improved}{misc}{}
+      \name{author}{2}{}{%
+        {{hash=fc19c0dc057e2a02419916b39da6895b}{%
+           family={Nichol},
+           familyi={N\bibinitperiod},
+           given={Alex},
+           giveni={A\bibinitperiod}}}%
+        {{hash=4164e43d8cf919f5e3f8d80f5ea23f36}{%
+           family={Dhariwal},
+           familyi={D\bibinitperiod},
+           given={Prafulla},
+           giveni={P\bibinitperiod}}}%
+      }
+      \strng{namehash}{b4c3cea6f8fe6a592dcfe3186e1ddbc6}
+      \strng{fullhash}{b4c3cea6f8fe6a592dcfe3186e1ddbc6}
+      \strng{bibnamehash}{b4c3cea6f8fe6a592dcfe3186e1ddbc6}
+      \strng{authorbibnamehash}{b4c3cea6f8fe6a592dcfe3186e1ddbc6}
+      \strng{authornamehash}{b4c3cea6f8fe6a592dcfe3186e1ddbc6}
+      \strng{authorfullhash}{b4c3cea6f8fe6a592dcfe3186e1ddbc6}
+      \field{sortinit}{N}
+      \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.LG}
+      \field{eprinttype}{arXiv}
+      \field{title}{Improved Denoising Diffusion Probabilistic Models}
+      \field{year}{2021}
+      \verb{eprint}
+      \verb 2102.09672
+      \endverb
+    \endentry
+    \entry{sohldickstein2015deep}{misc}{}
+      \name{author}{4}{}{%
+        {{hash=529bdf392a3471f000ce33ec88c41bd5}{%
+           family={Sohl-Dickstein},
+           familyi={S\bibinithyphendelim D\bibinitperiod},
+           given={Jascha},
+           giveni={J\bibinitperiod}}}%
+        {{hash=8b4a541c45705890d9759e0bbd2dfd0d}{%
+           family={Weiss},
+           familyi={W\bibinitperiod},
+           given={Eric\bibnamedelima A.},
+           giveni={E\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=24b3062319f458bd1a60642d737d4aea}{%
+           family={Maheswaranathan},
+           familyi={M\bibinitperiod},
+           given={Niru},
+           giveni={N\bibinitperiod}}}%
+        {{hash=05b3e391388084df874ede60f2210c12}{%
+           family={Ganguli},
+           familyi={G\bibinitperiod},
+           given={Surya},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{ba6e625a46287ebf30dd9d9f3c07087b}
+      \strng{fullhash}{fcce41a9178ec20258209817b78f08ac}
+      \strng{bibnamehash}{ba6e625a46287ebf30dd9d9f3c07087b}
+      \strng{authorbibnamehash}{ba6e625a46287ebf30dd9d9f3c07087b}
+      \strng{authornamehash}{ba6e625a46287ebf30dd9d9f3c07087b}
+      \strng{authorfullhash}{fcce41a9178ec20258209817b78f08ac}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.LG}
+      \field{eprinttype}{arXiv}
+      \field{title}{Deep Unsupervised Learning using Nonequilibrium Thermodynamics}
+      \field{year}{2015}
+      \verb{eprint}
+      \verb 1503.03585
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
 \endinput
 

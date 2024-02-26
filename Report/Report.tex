@@ -75,7 +75,7 @@
   \end{center}
 \end{titlepage}
 
-
+\pagenumbering{roman}
 \newpage
 \section*{Abstract}
 
@@ -115,7 +115,7 @@ The forward process is a Markov process that starts from the original image $x_0
 \\\\
 Formally, we obtain:
 \begin{gather}
-  q(x_{1}, ... x_{T} | x_0) = \prod_{t = 1}^T{q(x_t | x_{t - 1})} \label{eq:1} \\
+  q(x_{1},..., x_{T} | x_0) = \prod_{t = 1}^T{q(x_t | x_{t - 1})} \label{eq:1} \\
   q(x_t | x_{t-1}) = \mathcal{N}(x_t; \sqrt{1 - \beta_t}x_{t-1}, \beta_t I) \label{eq:2}
 \end{gather}
 \\\\
@@ -177,11 +177,40 @@ We now also know that $1 - \bar{\alpha}_t$ is the variance of the noise added at
 \\\\
 Choosing the variances $\beta_t$ is an important step when developing the forward process. \\
 Ho et al. \cite{ho2020denoising} chose to use a linear schedule starting from $\beta_1 = 10^{-4}$ and increasing linearly until $\beta_T = 0.02$ in order for them to be small compared to the pixel values that were in $[-1, 1]$. \cite{ho2020denoising} \\
-However we will see in section 2.3 that this is not the best choice, as this destroyed the images too quickly closer to the end of the process while providing little to sample quality, which made the model be sub-optimal for $64 \times 64$ and $32 \times 32$ images. \cite{nichol2021improved}
+However we will see in section 3 that this is not the best choice, as this destroyed the images too quickly closer to the end of the process while providing little to sample quality, which made the model be sub-optimal for $64 \times 64$ and $32 \times 32$ images. \cite{nichol2021improved}
 \\\\
 Finally, Ho et al. \cite{ho2020denoising} chose $T = 1000$ in order to be able to compare their model with Sohl et al.'s \cite{sohldickstein2015deep} model, which also used $T = 1000$ for most image experiments. \\
-We will again see in section 2.3 that so many steps can make the sampling slow and that there are better choices. \cite{nichol2021improved}
+We will again see in section 3 that so many steps can make the sampling slow and that there are better choices. \cite{nichol2021improved}
 \subsection{Reverse Process}
+
+As mentioned previously, with a correct choice of $\beta_t$, $x_T$ will become a sample of an isotropic Gaussian distribution as $T \rightarrow \infty$. \cite{nichol2021improved, sohldickstein2015deep} \\
+This should mean that we can take a sample $x_T \sim \mathcal{N}(0, I)$ and reverse the forward process to obtain the original image $x_0$. 
+However, this means that we need to use the entire dataset in order to figure out $q(x_{t-1} | x_t)$, which in practice cannot be done. \cite{nichol2021improved} \\
+Therefore, an estimation is found using a neural network. \cite{nichol2021improved}
+\\\\
+The reverse process is defined as follows \cite{ho2020denoising}:
+\begin{gather}
+  p_{\theta}(x_0, ..., x_T) = p(x_T) \: \prod_{t=1}^T p_{\theta}(x_{t-1} | x_t) \label{eq:5} \\
+  p_{\theta}(x_{t-1} | x_t) = \mathcal{N}(x_{t-1}; \mu_{\theta}(x_t, t), \Sigma_{\theta}(x_t, t)) \label{eq:6}
+\end{gather}
+\\\\
+Equation \ref{eq:5} gives us the full reverse process, starting from the final image $x_T$ to the original image $x_0$. \\
+Equation \ref{eq:6} gives us the reverse process at step $t$, where we estimate the noise that was added to the image at step $t$ of the forward process in order to find the image $x_{t-1}$. \\
+Two parameters must be estimated to find the reverse process at step $t$: the mean $\mu_{\theta}(x_t, t)$ and the variance $\Sigma_{\theta}(x_t, t)$. \\
+At first, Ho et al. \cite{ho2020denoising} used neural networks to estimate both the mean and the variance, but explain that estimating the variance was not necessary as there was little difference between the estimated variance $\sigma_t^2 = \tilde{\beta}_t = \frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t}$ and the actual values $\sigma_t^2 = \beta_t$ \cite{ho2020denoising}. Thus they set $\Sigma_{\theta}(x_t, t) = \sigma_t^2 I$. \\
+As for the mean, it is estimated using a neural network trained to optimise a variational lower bound ($VLB$) of the negative log likelihood $\mathbb{E}[- \log p_{\theta} (x_0)]$ \cite{ho2020denoising}
+
+\subsubsection{Variational Lower Bound}
+In order to find the negative log likelihood $\mathbb{E}[- \log p_{\theta} (x_0)]$, we would need to know $p_{\theta} (x_0)$ which means going through $T$ steps, which is computationally expensive. \\
+Subsequently, Ho et al. \cite{ho2020denoising} use a variational lower bound ($VLB$) to estimate the negative log likelihood \cite{ho2020denoising,sohldickstein2015deep}.
+The variational lower bound given by Dederik et al. \cite{kingma2022autoencoding} leads us to:
+
+
+
+\subsubsection{Simplified training objective}
+
+\subsubsection{U-Net}
+
 
 \subsection{Comparison with other diffusion models}
 

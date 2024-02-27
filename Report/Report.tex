@@ -142,7 +142,7 @@ From this, we can apply it again to $x_{t-1}$ and obtain:
 \\\\
 Therefore, we get:
 \begin{gather*}
-  x_t = \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \sqrt{\alpha_t(1 - \alpha_{t-1})} \epsilon_{t - 2} + \sqrt{1 - \alpha_t} \epsilon_{t - 1} \label{eq:8}
+  x_t = \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \sqrt{\alpha_t(1 - \alpha_{t-1})} \epsilon_{t - 2} + \sqrt{1 - \alpha_t} \epsilon_{t - 1}
 \end{gather*}
 \\\\
 Using the reparametrisation trick again, we can write:
@@ -202,8 +202,56 @@ As for the mean, it is estimated using a neural network trained to optimise a va
 
 \subsubsection{Variational Lower Bound}
 In order to find the negative log likelihood $\mathbb{E}[- \log p_{\theta} (x_0)]$, we would need to know $p_{\theta} (x_0)$ which means going through $T$ steps, which is computationally expensive. \\
-Subsequently, Ho et al. \cite{ho2020denoising} use a variational lower bound ($VLB$) to estimate the negative log likelihood \cite{ho2020denoising,sohldickstein2015deep}.
+Thus, Ho et al. \cite{ho2020denoising} use a variational lower bound ($VLB$) to estimate the negative log likelihood \cite{ho2020denoising,sohldickstein2015deep}.
 The variational lower bound given by Dederik et al. \cite{kingma2022autoencoding} leads us to:
+\begin{gather}
+  VLB = \log p_{\theta}(x_0) - D_{KL}(q(x_{1:T}|x_0) \| p_{\theta}(x_{1:T}|x_0)) \label{eq:7}
+\end{gather}
+Since we need to minimise the loss with the negative log likelihood, we can write:
+\begin{gather}
+  - VLB = - \log p_{\theta}(x_0) + D_{KL}(q(x_{1:T}|x_0) \| p_{\theta}(x_{1:T}|x_0)) \label{eq:8}
+\end{gather}
+We know that the Kullback-Leibler divergence $D_{KL}$ is non-negative, which means that we can write:
+\begin{gather}
+  - \log p_{\theta}(x_0) \leq - \log p_{\theta}(x_0) + D_{KL}(q(x_{1:T}|x_0) \| p_{\theta}(x_{1:T}|x_0)) \label{eq:9} \\
+  = - \log p_{\theta}(x_0) + \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{p_{\theta}(x_{1:T}|x_0)}] \label{eq:10} \\
+  = - \log p_{\theta}(x_0) + \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{\frac{p_{\theta}(x_0 | x_{1:T}) p_{\theta}(x_{1:T})}{p_{\theta}(x_0)}}] \label{eq:11} \\
+  = - \log p_{\theta}(x_0) + \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{\frac{p_{\theta}(x_0, x_{1:T})}{p_{\theta}(x_0)}}] \label{eq:12} \\
+  = - \log p_{\theta}(x_0) + \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{\frac{p_{\theta}(x_{0:T})}{p_{\theta}(x_0)}}] \label{eq:13} \\
+  = - \log p_{\theta}(x_0) + \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{p_{\theta}(x_{0:T})} + \log {p_{\theta}(x_0)}] \label{eq:14} \\
+  = \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{p_{\theta}(x_{0:T})}] \label{eq:15}
+\end{gather}
+We can subsequently define $L_{VLB}$ as the loss to be minimised:
+\begin{gather}
+  L_{VLB} = \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{p_{\theta}(x_{0:T})}] \label{eq:16}
+\end{gather}
+Ho et al. \cite{ho2020denoising} reformulate the loss in order to reduce variance:
+\begin{gather}
+  L_{VLB} = \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{p_{\theta}(x_{0:T})}] \label{eq:17} \\
+  = \mathbb{E}_q [\log \frac{\prod_{t \geq 1} q(x_t | x_{t-1})}{p(x_T) \prod_{t \geq 1} p_{\theta}(x_{t-1} | x_t)}] \label{eq:18} \\
+  = \mathbb{E}_q [-\log(p_{\theta}(x_T)) + \log \frac{\prod_{t \geq 1} q(x_t | x_{t-1})}{\prod_{t \geq 1} p_{\theta}(x_{t-1} | x_t)}] \label{eq:19} \\
+  = \mathbb{E}_q [-\log(p_{\theta}(x_T)) + \sum_{t \geq 1} \log \frac{q(x_t | x_{t-1})}{p_{\theta}(x_{t-1} | x_t)}] \label{eq:20} \\
+  = \mathbb{E}_q [-\log(p_{\theta}(x_T)) + \log \frac{q(x_1 | x_0)}{p_{\theta}(x_0 | x_1)} + \sum_{t \geq 2} \log \frac{q(x_t | x_{t-1})}{p_{\theta}(x_{t-1} | x_t)}] \label{eq:21} \\
+  = \mathbb{E}_q [-\log(p_{\theta}(x_T)) + \log \frac{q(x_1 | x_0)}{p_{\theta}(x_0 | x_1)} + \sum_{t \geq 2} \log \frac{q(x_{t-1} | x_t, x_0) q(x_t | x_0)}{{q(x_{t-1} | x_0)} p_{\theta}(x_{t-1} | x_t)}] \label{eq:22} \\
+  = \mathbb{E}_q [-\log(p_{\theta}(x_T)) + \log \frac{q(x_1 | x_0)}{p_{\theta}(x_0 | x_1)} + \sum_{t \geq 2} \log \frac{q(x_{t-1} | x_t, x_0)}{p_{\theta}(x_{t-1} | x_t)} + \sum_{k \geq 2} \log \frac{q(x_t | x_0)}{q(x_{t-1} | x_0)}] \label{eq:23} \\
+  = \mathbb{E}_q [-\log(p_{\theta}(x_T)) + \log \frac{q(x_1 | x_0)}{p_{\theta}(x_0 | x_1)} + \log \frac{q(x_T | x_0)}{q(x_1 | x_0)} + \sum_{t \geq 2} \log \frac{q(x_{t-1} | x_t, x_0)}{p_{\theta}(x_{t-1} | x_t)}] \label{eq:24} \\
+  = \mathbb{E}_q [-\log(p_{\theta}(x_T)) + \log \frac{q(x_T | x_0)}{p_{\theta}(x_0 | x_1)} + \sum_{t \geq 2} \log \frac{q(x_{t-1} | x_t, x_0)}{p_{\theta}(x_{t-1} | x_t)}] \label{eq:25} \\
+  = \mathbb{E}_q [- \log(p_{\theta}(x_0 | x_1)) + \log \frac{q(x_T | x_0)}{p_{\theta}(x_T)} + \sum_{t \geq 2} \log \frac{q(x_{t-1} | x_t, x_0)}{p_{\theta}(x_{t-1} | x_t)}] \label{eq:26} \\
+  = \mathbb{E}_q [ D_{KL}(q(x_T | x_0) \| p(x_T)) + \sum_{t \geq 2} D_{KL}(q(x_{t-1} | x_t, x_0) \| p_{\theta}(x_{t-1} | x_t)) - \log(p_{\theta}(x_0 | x_1))] \label{eq:27}
+\end{gather}
+This formulation of the loss can be split up into 3 parts:
+$$ L_T := D_{KL}(q(x_T | x_0) \| p(x_T)) $$
+$$ L_{1:T-1} = \sum_{t \geq 2} D_{KL}(q(x_{t-1} | x_t, x_0) \| p_{\theta}(x_{t-1} | x_t))$$
+$$ L_0 =  - \log(p_{\theta}(x_0 | x_1))$$
+\\\\
+It is worth noting that at equation \ref{eq:22}, the terms of $q$ are conditioned on $x_0$; this is in order to be able to easily compute the forward process posteriors, as they are much easier to find given the original image $x_0$. \\
+Another important point is that $L_T$ can be omitted since $q$ has no learnable parameters and with the fact that it will almost become a Gaussian distribution, the $D_{KL}(q(x_T | x_0) \| p(x_T))$ (Kullback-Leibler Divergence between a nearly Gaussian distribution and a Gaussian distribution $p(x_T) = \mathcal{N}(x_t; 0, I)$) will be close to 0. \cite{ho2020denoising} \\
+We thus find ourselves with:
+\begin{gather}
+  L_{VLB} = \mathbb{E}_q[ \sum_{t \geq 2} D_{KL}(q(x_{t-1} | x_t, x_0) \| p_{\theta}(x_{t-1} | x_t)) - \log(p_{\theta}(x_0 | x_1)) ] \label{eq:28}
+\end{gather}
+
+
 
 
 

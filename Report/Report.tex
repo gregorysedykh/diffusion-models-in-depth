@@ -1,7 +1,7 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{geometry} % Add geometry package here
-\geometry{margin=1.5in} % Set the margin size here
+\geometry{margin=1.2in} % Set the margin size here
 \usepackage{listings}
 \usepackage{fancyhdr}
 \usepackage{amssymb}
@@ -111,27 +111,27 @@ The reverse process' objective is to "reverse" the forward process, starting fro
 
 \subsection{Forward Process}
 
-The forward process is a Markov process that starts from the original image $x_0$ and adds Gaussian noise during $T$ steps, where each step $i \in [1, T]$ has a size $\beta_i \in \{ \beta_1, ..., \beta_T \}$, which results in a more noisy image $x_i$. \cite{ho2020denoising}
+The forward process is a Markov process that starts from the original image $x_0$ and adds Gaussian noise during $T$ steps, where each step $i \in \left[1, T\right]$ has a size $\beta_i \in \{ \beta_1, ..., \beta_T \}$, which results in a more noisy image $x_i$. \cite{ho2020denoising}
 \\\\
 Formally, we obtain:
 \begin{gather}
-  q(x_{1},..., x_{T} | x_0) = \prod_{t = 1}^T{q(x_t | x_{t - 1})} \label{eq:1} \\
-  q(x_t | x_{t-1}) = \mathcal{N}(x_t; \sqrt{1 - \beta_t}x_{t-1}, \beta_t I) \label{eq:2}
+  q\left(x_{1},..., x_{T} | x_0\right) = \prod_{t = 1}^T{q\left(x_t | x_{t - 1}\right)} \label{eq:1} \\
+  q\left(x_t | x_{t-1}\right) = \mathcal{N}\left(x_t; \sqrt{1 - \beta_t}x_{t-1}, \beta_t I\right) \label{eq:2}
 \end{gather}
 \\\\
 Equation \ref{eq:2} gives us a single step forward: given the previous image $x_{t-1}$, we add noise from a Gaussian distribution with mean $\sqrt{1 - \beta_t}x_{t-1}$ and variance $\beta_t I$ to obtain the next image $x_t$. \\
 Equation \ref{eq:1} gives us the full forward process from the original image $x_0$ to the final image $x_T$.
 \\\\
-It is important to note that as $T \rightarrow \infty$ and with a correct choice of $\beta_t$,  $x_T$ will become a sample of an isotropic Gaussian distribution ($\mathcal{N}(0, I)$). \cite{nichol2021improved} \cite{sohldickstein2015deep}. \\
-This is important for the reverse process, as it will allow us to take a sample $x_T \sim \mathcal{N}(0, I)$ and reverse the forward process to obtain the original image $x_0$ (however this cannot be done so simply, as seen in section 3) \cite{nichol2021improved}.
+It is important to note that as $T \rightarrow \infty$ and with a correct choice of $\beta_t$,  $x_T$ will become a sample of an isotropic Gaussian distribution ($\mathcal{N}\left(0, I\right)$). \cite{nichol2021improved} \cite{sohldickstein2015deep}. \\
+This is important for the reverse process, as it will allow us to take a sample $x_T \sim \mathcal{N}\left(0, I\right)$ and reverse the forward process to obtain the original image $x_0$ (however this cannot be done so simply, as seen in section 3) \cite{nichol2021improved}.
 \\\\
-The reparametrisation trick says that for a univariate Gaussian distribution where $z \sim p(z | x) = \mathcal{N}(\mu, \sigma^2)$, a valid reparametrisation would be $z = \mu + \sigma \epsilon$ where $\epsilon \sim \mathcal{N}(0, 1)$ is just noise. \cite{kingma2022autoencoding} \\
+The reparametrisation trick says that for a univariate Gaussian distribution where $z \sim p\left(z | x\right) = \mathcal{N}\left(\mu, \sigma^2\right)$, a valid reparametrisation would be $z = \mu + \sigma \epsilon$ where $\epsilon \sim \mathcal{N}\left(0, 1\right)$ is just noise. \cite{kingma2022autoencoding} \\
 Ho et al. \cite{ho2020denoising} use this trick to be able to sample $x_t$ at any arbitrary step $t$ of the forward process.
 \\\\
 Let $\alpha_t = 1 - \beta_t$, then:
 \begin{gather*}
-  x_t \sim \mathcal{N}(\sqrt{1 - \beta_t} x_{t-1}, \beta_t I) \\
-  x_t = \sqrt{1 - \beta_t} x_{t-1} + \sqrt{\beta_t I} \epsilon_{t-1} \qquad \epsilon_{t - 1} \sim \mathcal{N}(0, I) \\
+  x_t \sim \mathcal{N}\left(\sqrt{1 - \beta_t} x_{t-1}, \beta_t I\right) \\
+  x_t = \sqrt{1 - \beta_t} x_{t-1} + \sqrt{\beta_t I} \epsilon_{t-1} \qquad \epsilon_{t - 1} \sim \mathcal{N}\left(0, I\right) \\
   x_t = \sqrt{\alpha_t} x_{t-1} + \sqrt{1 - \alpha_t} \epsilon_{t - 1}
 \end{gather*}
 \\\\
@@ -142,20 +142,20 @@ From this, we can apply it again to $x_{t-1}$ and obtain:
 \\\\
 Therefore, we get:
 \begin{gather*}
-  x_t = \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \sqrt{\alpha_t(1 - \alpha_{t-1})} \epsilon_{t - 2} + \sqrt{1 - \alpha_t} \epsilon_{t - 1}
+  x_t = \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \sqrt{\alpha_t\left(1 - \alpha_{t-1}\right)} \epsilon_{t - 2} + \sqrt{1 - \alpha_t} \epsilon_{t - 1}
 \end{gather*}
 \\\\
 Using the reparametrisation trick again, we can write:
-$$\sqrt{\alpha_t(1 - \alpha_{t-1})} \epsilon_{t - 2}$$ 
+$$\sqrt{\alpha_t\left(1 - \alpha_{t-1}\right)} \epsilon_{t - 2}$$ 
 as 
-$$w \sim \mathcal{N}(0, \alpha_t(1 - \alpha_{t-1}))$$
+$$w \sim \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right)\right)$$
 and
 $$\sqrt{1 - \alpha_t} \epsilon_{t - 1}$$
 as
-$$z \sim \mathcal{N}(0, 1 - \alpha_t)$$
+$$z \sim \mathcal{N}\left(0, 1 - \alpha_t\right)$$
 \\\\
 Since the sum of two Gaussian distributions is also a Gaussian distribution, we can write:
-$$w + z \sim \mathcal{N}(0, (\alpha_t(1 - \alpha_{t-1}) + 1 - \alpha_t)I)$$
+$$w + z \sim \mathcal{N}\left(0, \left(\alpha_t\left(1 - \alpha_{t-1}\right) + 1 - \alpha_t\right)I\right)$$
 \\\\
 Which finally gives us:
 \begin{gather*}
@@ -168,15 +168,15 @@ Let $\bar{\alpha}_t = \prod_{i=0}^{t}{\alpha_i}$:
   x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon} \label{eq:3}
 \end{gather}
 \\\\
-This will give us a way to find a noisy image at step $t$ of the forward process, given the original image $x_0$ (we ignore the noise $\bar{\epsilon} \sim \mathcal{N}(0, I)$):
+This will give us a way to find a noisy image at step $t$ of the forward process, given the original image $x_0$ (we ignore the noise $\bar{\epsilon} \sim \mathcal{N}\left(0, I\right)$):
 \begin{gather}
-  q(x_t | x_0) = \mathcal{N}(\sqrt{\bar{\alpha}_t} x_0, (1 - \bar{\alpha}_t)I) \label{eq:4}
+  q\left(x_t | x_0\right) = \mathcal{N}\left(\sqrt{\bar{\alpha}_t} x_0, \left(1 - \bar{\alpha}_t\right)I\right) \label{eq:4}
 \end{gather}
 \\
 We now also know that $1 - \bar{\alpha}_t$ is the variance of the noise added at step $t$ of the forward process. \cite{nichol2021improved}
 \\\\
 Choosing the variances $\beta_t$ is an important step when developing the forward process. \\
-Ho et al. \cite{ho2020denoising} chose to use a linear schedule starting from $\beta_1 = 10^{-4}$ and increasing linearly until $\beta_T = 0.02$ in order for them to be small compared to the pixel values that were in $[-1, 1]$. \cite{ho2020denoising} \\
+Ho et al. \cite{ho2020denoising} chose to use a linear schedule starting from $\beta_1 = 10^{-4}$ and increasing linearly until $\beta_T = 0.02$ in order for them to be small compared to the pixel values that were in $\left[-1, 1\right]$. \cite{ho2020denoising} \\
 However we will see in section 3 that this is not the best choice, as this destroyed the images too quickly closer to the end of the process while providing little to sample quality, which made the model be sub-optimal for $64 \times 64$ and $32 \times 32$ images. \cite{nichol2021improved}
 \\\\
 Finally, Ho et al. \cite{ho2020denoising} chose $T = 1000$ in order to be able to compare their model with Sohl et al.'s \cite{sohldickstein2015deep} model, which also used $T = 1000$ for most image experiments. \\
@@ -184,74 +184,142 @@ We will again see in section 3 that so many steps can make the sampling slow and
 \subsection{Reverse Process}
 
 As mentioned previously, with a correct choice of $\beta_t$, $x_T$ will become a sample of an isotropic Gaussian distribution as $T \rightarrow \infty$. \cite{nichol2021improved, sohldickstein2015deep} \\
-This should mean that we can take a sample $x_T \sim \mathcal{N}(0, I)$ and reverse the forward process to obtain the original image $x_0$. 
-However, this means that we need to use the entire dataset in order to figure out $q(x_{t-1} | x_t)$, which in practice cannot be done. \cite{nichol2021improved} \\
+This should mean that we can take a sample $x_T \sim \mathcal{N}\left(0, I\right)$ and reverse the forward process to obtain the original image $x_0$. 
+However, this means that we need to use the entire dataset in order to figure out $q\left(x_{t-1} | x_t\right)$, which in practice cannot be done. \cite{nichol2021improved} \\
 Therefore, an estimation is found using a neural network. \cite{nichol2021improved}
 \\\\
 The reverse process is defined as follows \cite{ho2020denoising}:
 \begin{gather}
-  p_{\theta}(x_0, ..., x_T) = p(x_T) \: \prod_{t=1}^T p_{\theta}(x_{t-1} | x_t) \label{eq:5} \\
-  p_{\theta}(x_{t-1} | x_t) = \mathcal{N}(x_{t-1}; \mu_{\theta}(x_t, t), \Sigma_{\theta}(x_t, t)) \label{eq:6}
+  p_{\theta}\left(x_0, ..., x_T\right) = p\left(x_T\right) \: \prod_{t=1}^T p_{\theta}\left(x_{t-1} | x_t\right) \label{eq:5} \\
+  p_{\theta}\left(x_{t-1} | x_t\right) = \mathcal{N}\left(x_{t-1}; \mu_{\theta}\left(x_t, t\right), \Sigma_{\theta}\left(x_t, t\right)\right) \label{eq:6}
 \end{gather}
 \\\\
 Equation \ref{eq:5} gives us the full reverse process, starting from the final image $x_T$ to the original image $x_0$. \\
 Equation \ref{eq:6} gives us the reverse process at step $t$, where we estimate the noise that was added to the image at step $t$ of the forward process in order to find the image $x_{t-1}$. \\
-Two parameters must be estimated to find the reverse process at step $t$: the mean $\mu_{\theta}(x_t, t)$ and the variance $\Sigma_{\theta}(x_t, t)$. \\
-At first, Ho et al. \cite{ho2020denoising} used neural networks to estimate both the mean and the variance, but explain that estimating the variance was not necessary as there was little difference between the estimated variance $\sigma_t^2 = \tilde{\beta}_t = \frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t}$ and the actual values $\sigma_t^2 = \beta_t$ \cite{ho2020denoising}. Thus they set $\Sigma_{\theta}(x_t, t) = \sigma_t^2 I$. \\
-As for the mean, it is estimated using a neural network trained to optimise a variational lower bound ($VLB$) of the negative log likelihood $\mathbb{E}[- \log p_{\theta} (x_0)]$ \cite{ho2020denoising}
+Two parameters must be estimated to find the reverse process at step $t$: the mean $\mu_{\theta}\left(x_t, t\right)$ and the variance $\Sigma_{\theta}\left(x_t, t\right)$. \\
+At first, Ho et al. \cite{ho2020denoising} used neural networks to estimate both the mean and the variance, but explain that estimating the variance was not necessary as there was little difference between the estimated variance $\sigma_t^2 = \tilde{\beta}_t = \frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t}$ and the actual values $\sigma_t^2 = \beta_t$ \cite{ho2020denoising}. Thus they set $\Sigma_{\theta}\left(x_t, t\right) = \sigma_t^2 I$. \\
+As for the mean, it is estimated using a neural network trained to optimise a variational lower bound ($VLB$) of the negative log likelihood $\mathbb{E}\left[- \log p_{\theta} \left(x_0\right)\right]$ \cite{ho2020denoising}
 
 \subsubsection{Variational Lower Bound}
-In order to find the negative log likelihood $\mathbb{E}[- \log p_{\theta} (x_0)]$, we would need to know $p_{\theta} (x_0)$ which means going through $T$ steps, which is computationally expensive. \\
+In order to find the negative log likelihood $\mathbb{E}\left[- \log p_{\theta} \left(x_0\right)\right]$, we would need to know $p_{\theta} (x_0)$ which means going through $T$ steps, which is computationally expensive. \\
 Thus, Ho et al. \cite{ho2020denoising} use a variational lower bound ($VLB$) to estimate the negative log likelihood \cite{ho2020denoising,sohldickstein2015deep}.
 The variational lower bound given by Dederik et al. \cite{kingma2022autoencoding} leads us to:
 \begin{gather}
-  VLB = \log p_{\theta}(x_0) - D_{KL}(q(x_{1:T}|x_0) \| p_{\theta}(x_{1:T}|x_0)) \label{eq:7}
+  VLB = \log p_{\theta}\left(x_0\right) - D_{KL}\left(q\left(x_{1:T}|x_0\right) \| p_{\theta}\left(x_{1:T}|x_0\right)\right) \label{eq:7}
 \end{gather}
 Since we need to minimise the loss with the negative log likelihood, we can write:
 \begin{gather}
-  - VLB = - \log p_{\theta}(x_0) + D_{KL}(q(x_{1:T}|x_0) \| p_{\theta}(x_{1:T}|x_0)) \label{eq:8}
+  - VLB = - \log p_{\theta}\left(x_0\right) + D_{KL}\left(q\left(x_{1:T}|x_0\right) \| p_{\theta}\left(x_{1:T}|x_0\right)\right) \label{eq:8}
 \end{gather}
 We know that the Kullback-Leibler divergence $D_{KL}$ is non-negative, which means that we can write:
 \begin{gather}
-  - \log p_{\theta}(x_0) \leq - \log p_{\theta}(x_0) + D_{KL}(q(x_{1:T}|x_0) \| p_{\theta}(x_{1:T}|x_0)) \label{eq:9} \\
-  = - \log p_{\theta}(x_0) + \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{p_{\theta}(x_{1:T}|x_0)}] \label{eq:10} \\
-  = - \log p_{\theta}(x_0) + \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{\frac{p_{\theta}(x_0 | x_{1:T}) p_{\theta}(x_{1:T})}{p_{\theta}(x_0)}}] \label{eq:11} \\
-  = - \log p_{\theta}(x_0) + \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{\frac{p_{\theta}(x_0, x_{1:T})}{p_{\theta}(x_0)}}] \label{eq:12} \\
-  = - \log p_{\theta}(x_0) + \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{\frac{p_{\theta}(x_{0:T})}{p_{\theta}(x_0)}}] \label{eq:13} \\
-  = - \log p_{\theta}(x_0) + \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{p_{\theta}(x_{0:T})} + \log {p_{\theta}(x_0)}] \label{eq:14} \\
-  = \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{p_{\theta}(x_{0:T})}] \label{eq:15}
+  - \log p_{\theta}\left(x_0\right) \leq - \log p_{\theta}\left(x_0\right) + D_{KL}\left(q\left(x_{1:T}|x_0\right) \| p_{\theta}\left(x_{1:T}|x_0\right)\right) \label{eq:9} \\
+  = - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{1:T}|x_0\right)}\right] \label{eq:10} \\
+  = - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{\frac{p_{\theta}\left(x_0 | x_{1:T}\right) p_{\theta}\left(x_{1:T}\right)}{p_{\theta}\left(x_0\right)}}\right] \label{eq:11} \\
+  = - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{\frac{p_{\theta}\left(x_0, x_{1:T}\right)}{p_{\theta}\left(x_0\right)}}\right] \label{eq:12} \\
+  = - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{\frac{p_{\theta}\left(x_{0:T}\right)}{p_{\theta}\left(x_0\right)}}\right] \label{eq:13} \\
+  = - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{0:T}\right)} + \log {p_{\theta}\left(x_0\right)}\right] \label{eq:14} \\
+  = \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{0:T}\right)}\right] \label{eq:15}
 \end{gather}
 We can subsequently define $L_{VLB}$ as the loss to be minimised:
 \begin{gather}
-  L_{VLB} = \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{p_{\theta}(x_{0:T})}] \label{eq:16}
+  L_{VLB} = \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{0:T}\right)}\right] \label{eq:16}
 \end{gather}
 Ho et al. \cite{ho2020denoising} reformulate the loss in order to reduce variance:
 \begin{gather}
-  L_{VLB} = \mathbb{E}_q [\log \frac{q(x_{1:T}|x_0)}{p_{\theta}(x_{0:T})}] \label{eq:17} \\
-  = \mathbb{E}_q [\log \frac{\prod_{t \geq 1} q(x_t | x_{t-1})}{p(x_T) \prod_{t \geq 1} p_{\theta}(x_{t-1} | x_t)}] \label{eq:18} \\
-  = \mathbb{E}_q [-\log(p_{\theta}(x_T)) + \log \frac{\prod_{t \geq 1} q(x_t | x_{t-1})}{\prod_{t \geq 1} p_{\theta}(x_{t-1} | x_t)}] \label{eq:19} \\
-  = \mathbb{E}_q [-\log(p_{\theta}(x_T)) + \sum_{t \geq 1} \log \frac{q(x_t | x_{t-1})}{p_{\theta}(x_{t-1} | x_t)}] \label{eq:20} \\
-  = \mathbb{E}_q [-\log(p_{\theta}(x_T)) + \log \frac{q(x_1 | x_0)}{p_{\theta}(x_0 | x_1)} + \sum_{t \geq 2} \log \frac{q(x_t | x_{t-1})}{p_{\theta}(x_{t-1} | x_t)}] \label{eq:21} \\
-  = \mathbb{E}_q [-\log(p_{\theta}(x_T)) + \log \frac{q(x_1 | x_0)}{p_{\theta}(x_0 | x_1)} + \sum_{t \geq 2} \log \frac{q(x_{t-1} | x_t, x_0) q(x_t | x_0)}{{q(x_{t-1} | x_0)} p_{\theta}(x_{t-1} | x_t)}] \label{eq:22} \\
-  = \mathbb{E}_q [-\log(p_{\theta}(x_T)) + \log \frac{q(x_1 | x_0)}{p_{\theta}(x_0 | x_1)} + \sum_{t \geq 2} \log \frac{q(x_{t-1} | x_t, x_0)}{p_{\theta}(x_{t-1} | x_t)} + \sum_{k \geq 2} \log \frac{q(x_t | x_0)}{q(x_{t-1} | x_0)}] \label{eq:23} \\
-  = \mathbb{E}_q [-\log(p_{\theta}(x_T)) + \log \frac{q(x_1 | x_0)}{p_{\theta}(x_0 | x_1)} + \log \frac{q(x_T | x_0)}{q(x_1 | x_0)} + \sum_{t \geq 2} \log \frac{q(x_{t-1} | x_t, x_0)}{p_{\theta}(x_{t-1} | x_t)}] \label{eq:24} \\
-  = \mathbb{E}_q [-\log(p_{\theta}(x_T)) + \log \frac{q(x_T | x_0)}{p_{\theta}(x_0 | x_1)} + \sum_{t \geq 2} \log \frac{q(x_{t-1} | x_t, x_0)}{p_{\theta}(x_{t-1} | x_t)}] \label{eq:25} \\
-  = \mathbb{E}_q [- \log(p_{\theta}(x_0 | x_1)) + \log \frac{q(x_T | x_0)}{p_{\theta}(x_T)} + \sum_{t \geq 2} \log \frac{q(x_{t-1} | x_t, x_0)}{p_{\theta}(x_{t-1} | x_t)}] \label{eq:26} \\
-  = \mathbb{E}_q [ D_{KL}(q(x_T | x_0) \| p(x_T)) + \sum_{t \geq 2} D_{KL}(q(x_{t-1} | x_t, x_0) \| p_{\theta}(x_{t-1} | x_t)) - \log(p_{\theta}(x_0 | x_1))] \label{eq:27}
+  L_{VLB} = \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{0:T}\right)}\right] \label{eq:17} \\
+  = \mathbb{E}_q \left[\log \frac{\prod_{t \geq 1} q\left(x_t | x_{t-1}\right)}{p\left(x_T\right) \prod_{t \geq 1} p_{\theta}\left(x_{t-1} | x_t\right)}\right] \label{eq:18} \\
+  = \mathbb{E}_q \left[-\log\left(p_{\theta}\left(x_T\right)\right) + \log \frac{\prod_{t \geq 1} q\left(x_t | x_{t-1}\right)}{\prod_{t \geq 1} p_{\theta}\left(x_{t-1} | x_t\right)}\right] \label{eq:19} \\
+  = \mathbb{E}_q \left[-\log\left(p_{\theta}\left(x_T\right)\right) + \sum_{t \geq 1} \log \frac{q\left(x_t | x_{t-1}\right)}{p_{\theta}\left(x_{t-1} | x_t\right)}\right] \label{eq:20} \\
+  = \mathbb{E}_q \left[-\log\left(p_{\theta}\left(x_T\right)\right) + \log \frac{q\left(x_1 | x_0\right)}{p_{\theta}\left(x_0 | x_1\right)} + \sum_{t \geq 2} \log \frac{q\left(x_t | x_{t-1}\right)}{p_{\theta}\left(x_{t-1} | x_t\right)}\right] \label{eq:21} \\
+  = \mathbb{E}_q \left[-\log\left(p_{\theta}\left(x_T\right)\right) + \log \frac{q\left(x_1 | x_0\right)}{p_{\theta}\left(x_0 | x_1\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right) q\left(x_t | x_0\right)}{{q\left(x_{t-1} | x_0\right)} p_{\theta}\left(x_{t-1} | x_t\right)}\right] \label{eq:22} \\
+  = \mathbb{E}_q \left[-\log\left(p_{\theta}\left(x_T\right)\right) + \log \frac{q\left(x_1 | x_0\right)}{p_{\theta}\left(x_0 | x_1\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right)}{p_{\theta}\left(x_{t-1} | x_t\right)} + \sum_{k \geq 2} \log \frac{q\left(x_t | x_0\right)}{q\left(x_{t-1} | x_0\right)}\right] \label{eq:23} \\
+  = \mathbb{E}_q \left[-\log\left(p_{\theta}\left(x_T\right)\right) + \log \frac{q\left(x_1 | x_0\right)}{p_{\theta}\left(x_0 | x_1\right)} + \log \frac{q\left(x_T | x_0\right)}{q\left(x_1 | x_0\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right)}{p_{\theta}\left(x_{t-1} | x_t\right)}\right] \label{eq:24} \\
+  = \mathbb{E}_q \left[-\log\left(p_{\theta}\left(x_T\right)\right) + \log \frac{q\left(x_T | x_0\right)}{p_{\theta}\left(x_0 | x_1\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right)}{p_{\theta}\left(x_{t-1} | x_t\right)}\right] \label{eq:25} \\
+  = \mathbb{E}_q \left[- \log\left(p_{\theta}\left(x_0 | x_1\right)\right) + \log \frac{q\left(x_T | x_0\right)}{p_{\theta}\left(x_T\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right)}{p_{\theta}\left(x_{t-1} | x_t\right)}\right] \label{eq:26} \\
+  = \mathbb{E}_q \left[ D_{KL}\left(q\left(x_T | x_0\right) \| p\left(x_T\right)\right) + \sum_{t \geq 2} D_{KL}\left(q\left(x_{t-1} | x_t, x_0\right) \| p_{\theta}\left(x_{t-1} | x_t\right)\right) - \log\left(p_{\theta}\left(x_0 | x_1\right)\right)\right] \label{eq:27}
 \end{gather}
 This formulation of the loss can be split up into 3 parts:
-$$ L_T := D_{KL}(q(x_T | x_0) \| p(x_T)) $$
-$$ L_{1:T-1} = \sum_{t \geq 2} D_{KL}(q(x_{t-1} | x_t, x_0) \| p_{\theta}(x_{t-1} | x_t))$$
-$$ L_0 =  - \log(p_{\theta}(x_0 | x_1))$$
+$$ L_T := D_{KL}\left(q\left(x_T | x_0\right) \| p\left(x_T\right)\right) $$
+$$ L_{1:T-1} = \sum_{t \geq 2} D_{KL}\left(q\left(x_{t-1} | x_t, x_0\right) \| p_{\theta}\left(x_{t-1} | x_t\right)\right)$$
+$$ L_0 =  - \log\left(p_{\theta}\left(x_0 | x_1\right)\right)$$
 \\\\
 It is worth noting that at equation \ref{eq:22}, the terms of $q$ are conditioned on $x_0$; this is in order to be able to easily compute the forward process posteriors, as they are much easier to find given the original image $x_0$. \\
-Another important point is that $L_T$ can be omitted since $q$ has no learnable parameters and with the fact that it will almost become a Gaussian distribution, the $D_{KL}(q(x_T | x_0) \| p(x_T))$ (Kullback-Leibler Divergence between a nearly Gaussian distribution and a Gaussian distribution $p(x_T) = \mathcal{N}(x_t; 0, I)$) will be close to 0. \cite{ho2020denoising} \\
+Ho et al. \cite{ho2020denoising} define it as:
+\begin{gather}
+  q\left(x_{t-1} | x_t, x_0\right) = \mathcal{N}\left(x_{t-1}; \tilde{\mu}_t \left(x_t, x_0\right), \tilde{\beta_t} I\right) \label{eq:28}
+\end{gather}
+\\\\
+Using Bayes' theorem, we find:
+\begin{gather}
+  q\left(x_{t-1} | x_t, x_0\right) = q\left(x_t | x_{t-1}, x_0\right) \frac{q\left(x_{t-1}| x_0\right)}{q\left(x_t | x_0\right)} \label{eq:29} \\
+  = \mathcal{N}\left(x_t; \sqrt{1 - \beta_t}x_{t-1}, \beta_t I\right) \frac{\mathcal{N}\left(\sqrt{\bar{\alpha}_{t-1}} x_0, \left(1 - \bar{\alpha}_{t-1}\right)I\right)}{\mathcal{N}\left(\sqrt{\bar{\alpha}_t} x_0, \left(1 - \bar{\alpha}_t\right)I\right)} \\
+  = \frac{1}{\sqrt{2 \pi \left(1 - \bar{\alpha}_t\right) \left(1 - \bar{\alpha}_{t-1}\right) \left(\sqrt{1 - \beta_t}\right)}} e^{- \frac{1}{2} \left(\frac{\left(x_t - \sqrt{1 - \beta_t}x_{t-1}\right)^2}{\beta_t} + \frac{\left(x_{t-1} - \sqrt{\bar{\alpha}_{t-1}}x_0\right)^2}{1 - \bar{\alpha}_{t-1}} - \frac{\left(x_t - \sqrt{\alpha}_t x_0\right)^2}{1 - \bar{\alpha}_{t}}\right)}
+\end{gather}
+\\\\
+We rewrote $q\left(x_t | x_{t-1}, x_0\right)$ as $q\left(x_t | x_{t-1}\right)$ since $x_0$ adds no new information not already present in $x_{t-1}$. We can ignore the constant factor in front and thus obtain:
+\begin{gather}
+  = \exp\left(- \frac{1}{2} \left(\frac{x_t^2 - 2 \sqrt{\alpha_t} x_{t-1} x_t + \alpha_t x_{t-1}^2}{\beta_t} + \frac{x_{t-1}^2 - 2 \sqrt{\bar{\alpha}_{t-1}} x_0 x_{t-1} + \bar{\alpha}_{t-1} x_0^2}{ 1 - \bar{\alpha}_{t-1}} - \frac{\left(x_t - \sqrt{\alpha}_t x_0\right)^2}{1 - \bar{\alpha}_{t}}\right) \right) \\
+  = \exp\left(- \frac{1}{2} \left(\frac{x_t^2}{\beta_t} - \frac{2 \sqrt{\alpha_t} x_t x_{t-1}}{\beta_t} + \frac{\alpha_t x_{t-1}^2}{\beta_t} + \frac{x_{t-1}^2}{1 - \bar{\alpha}_{t-1}} - \frac{2 \sqrt{\bar{\alpha}_{t-1}} x_0 x_{t-1}}{1 - \bar{\alpha}_{t-1}} + \frac{\bar{\alpha}_{t-1} x_0^2}{1 - \bar{\alpha}_{t-1}} - \frac{\left(x_t - \sqrt{\alpha}_t x_0\right)^2}{1 - \bar{\alpha}_{t}}\right) \right) \\
+  = \exp\left(- \frac{1}{2} \left(x_{t-1}^2 \left(\frac{\alpha_t}{\beta_t} + \frac{1}{1 - \bar{\alpha}_{t-1}}\right) + x_{t-1} \left(\frac{-2 \sqrt{\alpha_t} x_t}{\beta_t} - \frac{2 \sqrt{\bar{\alpha}_{t-1}} x_0 }{1 - \bar{\alpha}_{t-1}}\right) + C\left(x_t, x_0\right)\right) \right) 
+\end{gather}
+where:
+\begin{gather}
+  C\left(x_t, x_0\right) = \frac{x_t^2}{\beta_t} + \frac{\bar{\alpha}_{t-1} x_0^2}{1 - \bar{\alpha}_{t-1}} - \frac{\left(x_t - \sqrt{\alpha}_t x_0\right)^2}{1 - \bar{\alpha}_{t}}
+\end{gather}
+Considering $\alpha_t = 1 - \beta_t$ and $\bar{\alpha}_t = \prod_{i=0}^{t}{\alpha_i}$, we can simplify the expression to:
+
+\begin{gather}
+  = \exp\left(- \frac{1}{2} \left(x_{t-1}^2 \left(\frac{\alpha_t}{1 - \alpha_t} + \frac{1}{1 - \bar{\alpha}_{t-1}}\right) - 2\left(\frac{\sqrt{\alpha_t} x_t}{1 - \alpha_t} + \frac{\sqrt{\bar{\alpha}_{t-1}} x_0}{1 - \bar{\alpha}_{t-1}}\right) x_{t-1} + C\left(x_t, x_0\right) \right) \right) \\
+  = \exp\left(- \frac{1}{2} \left(x_{t-1}^2 \left(\frac{\alpha_t \left(1 - \bar{\alpha}_{t-1}\right) + \left(1 - \alpha_t\right)}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}\right) - 2\left(\frac{\sqrt{\alpha_t} x_t}{1 - \alpha_t} + \frac{\sqrt{\bar{\alpha}_{t-1}} x_0}{1 - \bar{\alpha}_{t-1}}\right) x_{t-1} + C\left(x_t, x_0\right) \right) \right) \\
+  = \exp\left(- \frac{1}{2} \left(x_{t-1}^2 \left(\frac{\alpha_t - \alpha_t \bar{\alpha}_{t-1} + 1 - \alpha_t}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}\right) - 2\left(\frac{\sqrt{\alpha_t} x_t}{1 - \alpha_t} + \frac{\sqrt{\bar{\alpha}_{t-1}} x_0}{1 - \bar{\alpha}_{t-1}}\right) x_{t-1} + C\left(x_t, x_0\right) \right) \right) \\
+  = \exp\left(- \frac{1}{2} \left(x_{t-1}^2 \left(\frac{1 - \bar{\alpha}_{t-1}}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}\right) - 2\left(\frac{\sqrt{\alpha_t} x_t}{1 - \alpha_t} + \frac{\sqrt{\bar{\alpha}_{t-1}} x_0}{1 - \bar{\alpha}_{t-1}}\right) x_{t-1} + C\left(x_t, x_0\right) \right) \right) \\
+  = \exp\left(- \frac{1}{2} \left( \left(\frac{1 - \bar{\alpha}_{t-1}}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}\right) \left(x_{t-1}^2 - 2 \frac{\frac{\sqrt{\alpha_t}x_t}{1 - \alpha_t} + \frac{\sqrt{\bar{\alpha}_{t-1}} x_0}{1 - \bar{\alpha}_{t-1}}}{\frac{1 - \bar{\alpha}_{t-1}}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}} x_{t-1} + \frac{C\left(x_t, x_0\right)}{\frac{1 - \bar{\alpha}_{t-1}}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}}\right) \right) \right) \\
+  = \exp \left(- \frac{1}{2} \left( \left(\frac{1 - \bar{\alpha}_{t-1}}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}\right) \left(x_{t-1}^2 - 2 \frac{\sqrt{\alpha_t} \left(1 - \bar{\alpha}_{t-1}\right) x_t + \sqrt{\bar{\alpha}_{t-1}}\left(1 - \alpha_t\right) x_0}{1 - \bar{\alpha}_t} + \frac{C\left(x_t, x_0\right)}{\frac{1 - \bar{\alpha}_{t-1}}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}}\right) \right) \right)
+\end{gather}
+\\
+As for the final term, since:
+\begin{gather}
+  C \left(x_t, x_0\right) = \frac{x_t^2}{\beta_t} + \frac{\bar{\alpha}_{t-1} x_0^2}{1 - \bar{\alpha}_{t-1}} - \frac{\left(x_t - \sqrt{\alpha}_t x_0\right)^2}{1 - \bar{\alpha}_{t}} \\
+  = \frac{x_t^2}{1 - \alpha_t} + \frac{\bar{\alpha}_{t-1} x_0^2}{1 - \bar{\alpha}_{t-1}} - \frac{x_t^2 - 2 \sqrt{\alpha}_t x_t x_0 + \alpha_t x_0^2}{1 - \bar{\alpha}_{t}} \\
+\end{gather}
+We obtain:
+\begin{equation}
+  C\left(x_t, x_0\right) / \frac{1 - \bar{\alpha}_{t-1}}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)} 
+\end{equation}
+\begin{align}
+  & = \frac{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}{1 - \bar{\alpha}_{t-1}} \left( \frac{x_t^2}{1 - \alpha_t} + \frac{\bar{\alpha}_{t-1} x_0^2}{1 - \bar{\alpha}_{t-1}} - \frac{x_t^2 - 2 \sqrt{\alpha}_t x_t x_0 + \alpha_t x_0^2}{1 - \bar{\alpha}_{t}} \right) \\
+  \begin{split}
+    &= x_t^2 \left(\frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t} - \frac{\left(1 - \alpha_t\right) \left(1 - \bar{\alpha}_{t-1}\right)}{\left(1 - \bar{\alpha}_t\right)^2}\right) + x_0^2 \left( \frac{\left(1 - \alpha_t\right)\left(\bar{\alpha}_{t-1}\right)}{1 - \bar{\alpha}_t} - \frac{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)\bar{\alpha}_t}{\left(1 - \bar{\alpha}_t\right)^2} \right) \\
+    & \qquad + \frac{2 x_t x_0 \sqrt{\bar{\alpha}_t}\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}{\left(1 - \bar{\alpha}_{t}\right)^2}
+  \end{split} \\
+  \begin{split}
+    &= x_t^2 \left(\frac{ \left( 1 - \bar{\alpha}_t \right) \left( 1 - \bar{\alpha}_{t-1} \right) - \left(1 - \alpha_t\right) \left(1 - \bar{\alpha}_{t-1}\right)}{\left(1 - \bar{\alpha}_t\right)^2}\right) \\
+    & \qquad + x_0^2 \left( \frac{ \left( 1 - \bar{\alpha}_t \right) \left( 1 - \alpha_t \right) \bar{\alpha}_{t-1} - \left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)\bar{\alpha}_t}{\left(1 - \bar{\alpha}_t\right)^2} \right) \\
+    & \qquad + \frac{2 x_t x_0 \sqrt{\bar{\alpha}_t}\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}{\left(1 - \bar{\alpha}_{t}\right)^2}
+  \end{split} \\
+   &= x_t^2 \frac{ \left( 1 - \bar{\alpha}_{t-1} \right)^2 \alpha_t }{\left(1 - \bar{\alpha}_t\right)^2} + x_0^2 \frac{\left( 1 - \bar{\alpha}_{t} \right)^2 \bar{\alpha}_{t-1}}{\left(1 - \bar{\alpha}_t\right)^2} + \frac{2 x_t x_0 \sqrt{\bar{\alpha}_t}\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}{\left(1 - \bar{\alpha}_{t}\right)^2} \\
+   &= \frac{\left( x_t \sqrt{\alpha_t} \left( 1 - \bar{\alpha}_{t-1} \right) + x_0 \sqrt{\bar{\alpha}_{t-1}} \left( 1 - \bar{\alpha}_t \right) \right)^2}{\left(1 - \bar{\alpha}_{t}\right)^2} \\
+   &= \left(\frac{\left( x_t \sqrt{\alpha_t} \left( 1 - \bar{\alpha}_{t-1} \right) + x_0 \sqrt{\bar{\alpha}_{t-1}} \left( 1 - \bar{\alpha}_t \right) \right)}{\left(1 - \bar{\alpha}_{t}\right)} \right)^2
+\end{align}
+We can now replace this value into the original expression:
+\begin{equation}
+  \exp \left(- \frac{1}{2} \left( \left(\frac{1 - \bar{\alpha}_{t-1}}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}\right) \left(x_{t-1}^2 - 2 \frac{\sqrt{\alpha_t} \left(1 - \bar{\alpha}_{t-1}\right) x_t \\+ \sqrt{\bar{\alpha}_{t-1}}\left(1 - \alpha_t\right) x_0}{1 - \bar{\alpha}_t} + \left(\frac{\left( x_t \sqrt{\alpha_t} \left( 1 - \bar{\alpha}_{t-1} \right) + x_0 \sqrt{\bar{\alpha}_{t-1}} \left( 1 - \bar{\alpha}_t \right) \right)}{\left(1 - \bar{\alpha}_{t}\right)} \right)^2 \right) \right) \right)
+\end{equation}
+\begin{equation}
+  = \exp \left(- \frac{1}{2} \left(\frac{1 - \bar{\alpha}_{t-1}}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}\right) \left( x_{t-1} - \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + \sqrt{\bar{\alpha}_{t-1}}(1 - \alpha_t) x_0}{1 - \bar{\alpha}_t} \right)^2  \right)
+\end{equation}
+\begin{align}
+  &= \mathcal{N} \left(x_{t-1}; \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + \sqrt{\bar{\alpha}_{t-1}}(1 - \alpha_t) x_0}{1 - \bar{\alpha}_t} , \frac{1 - \bar{\alpha}_{t-1}}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)} I \right) \\
+  &= \mathcal{N} \left(x_{t-1}; \mu(x_t, x_0), \tilde{\beta}_t I \right)
+\end{align}
+We have therefore obtained $\mu(x_t, x_0)$ and $\tilde{\beta}_t$ mentioned in Ho et al.'s \cite{ho2020denoising} paper.
+\\\\
+Another important point is that $L_T$ can be omitted since $q$ has no learnable parameters and with the fact that it will almost become a Gaussian distribution, the $D_{KL}\left(q\left(x_T | x_0\right) \| p\left(x_T\right)\right)$ (the Kullback-Leibler Divergence between a nearly Gaussian distribution and a Gaussian distribution $p\left(x_T\right) = \mathcal{N}\left(x_t; 0, I\right)$) will be close to 0. \cite{ho2020denoising} \\
 We thus find ourselves with:
 \begin{gather}
-  L_{VLB} = \mathbb{E}_q[ \sum_{t \geq 2} D_{KL}(q(x_{t-1} | x_t, x_0) \| p_{\theta}(x_{t-1} | x_t)) - \log(p_{\theta}(x_0 | x_1)) ] \label{eq:28}
+  L_{VLB} = \mathbb{E}_q \left[ \sum_{t \geq 2} D_{KL}\left(q\left(x_{t-1} | x_t, x_0\right) \| p_{\theta}\left(x_{t-1} | x_t\right)\right) - \log\left(p_{\theta}\left(x_0 | x_1\right)\right) \right]
 \end{gather}
-
-
 
 
 

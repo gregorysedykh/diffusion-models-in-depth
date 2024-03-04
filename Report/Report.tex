@@ -304,16 +304,16 @@ We obtain:
 \end{align}
 We can now replace this value into the original expression:
 \begin{equation}
-  \exp \left(- \frac{1}{2} \left( \left(\frac{1 - \bar{\alpha}_{t-1}}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}\right) \left(x_{t-1}^2 - 2 \frac{\sqrt{\alpha_t} \left(1 - \bar{\alpha}_{t-1}\right) x_t \\+ \sqrt{\bar{\alpha}_{t-1}}\left(1 - \alpha_t\right) x_0}{1 - \bar{\alpha}_t} + \left(\frac{\left( x_t \sqrt{\alpha_t} \left( 1 - \bar{\alpha}_{t-1} \right) + x_0 \sqrt{\bar{\alpha}_{t-1}} \left( 1 - \bar{\alpha}_t \right) \right)}{\left(1 - \bar{\alpha}_{t}\right)} \right)^2 \right) \right) \right)
+  \exp \left(- \frac{1}{2} \left( \left(\frac{1}{\frac{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}{1 - \bar{\alpha}_{t-1}}}\right) \left(x_{t-1}^2 - 2 \frac{\sqrt{\alpha_t} \left(1 - \bar{\alpha}_{t-1}\right) x_t \\+ \sqrt{\bar{\alpha}_{t-1}}\left(1 - \alpha_t\right) x_0}{1 - \bar{\alpha}_t} + \left(\frac{\left( x_t \sqrt{\alpha_t} \left( 1 - \bar{\alpha}_{t-1} \right) + x_0 \sqrt{\bar{\alpha}_{t-1}} \left( 1 - \bar{\alpha}_t \right) \right)}{\left(1 - \bar{\alpha}_{t}\right)} \right)^2 \right) \right) \right)
 \end{equation}
 \begin{equation}
-  = \exp \left(- \frac{1}{2} \left(\frac{1 - \bar{\alpha}_{t-1}}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}\right) \left( x_{t-1} - \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + \sqrt{\bar{\alpha}_{t-1}}(1 - \alpha_t) x_0}{1 - \bar{\alpha}_t} \right)^2  \right)
+  = \exp \left(- \frac{1}{2} \left(\frac{1}{\frac{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}{1 - \bar{\alpha}_{t-1}}}\right) \left( x_{t-1} - \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + \sqrt{\bar{\alpha}_{t-1}}(1 - \alpha_t) x_0}{1 - \bar{\alpha}_t} \right)^2  \right)
 \end{equation}
 \begin{align}
-  &= \mathcal{N} \left(x_{t-1}; \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + \sqrt{\bar{\alpha}_{t-1}}(1 - \alpha_t) x_0}{1 - \bar{\alpha}_t} , \frac{1 - \bar{\alpha}_{t-1}}{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)} I \right) \\
-  &= \mathcal{N} \left(x_{t-1}; \mu(x_t, x_0), \tilde{\beta}_t I \right)
+  &= \mathcal{N} \left(x_{t-1}; \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + \sqrt{\bar{\alpha}_{t-1}}(1 - \alpha_t) x_0}{1 - \bar{\alpha}_t} , \frac{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}{1 - \bar{\alpha}_{t-1}} I \right) \\
+  &= \mathcal{N} \left(x_{t-1}; \tilde{\mu}(x_t, x_0), \tilde{\beta}_t I \right)
 \end{align}
-We have therefore obtained $\mu(x_t, x_0)$ and $\tilde{\beta}_t$ mentioned in Ho et al.'s \cite{ho2020denoising} paper.
+We have therefore obtained $\tilde{\mu}(x_t, x_0)$ and $\tilde{\beta}_t$ mentioned in Ho et al.'s \cite{ho2020denoising} paper.
 \\\\
 Another important point is that $L_T$ can be omitted since $q$ has no learnable parameters and with the fact that it will almost become a Gaussian distribution, the $D_{KL}\left(q\left(x_T | x_0\right) \| p\left(x_T\right)\right)$ (the Kullback-Leibler Divergence between a nearly Gaussian distribution and a Gaussian distribution $p\left(x_T\right) = \mathcal{N}\left(x_t; 0, I\right)$) will be close to 0. \cite{ho2020denoising} \\
 We thus find ourselves with:

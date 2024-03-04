@@ -313,15 +313,27 @@ We can now replace this value into the original expression:
   &= \mathcal{N} \left(x_{t-1}; \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + \sqrt{\bar{\alpha}_{t-1}}(1 - \alpha_t) x_0}{1 - \bar{\alpha}_t} , \frac{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}{1 - \bar{\alpha}_{t-1}} I \right) \\
   &= \mathcal{N} \left(x_{t-1}; \tilde{\mu}(x_t, x_0), \tilde{\beta}_t I \right)
 \end{align}
-We have therefore obtained $\tilde{\mu}(x_t, x_0)$ and $\tilde{\beta}_t$ mentioned in Ho et al.'s \cite{ho2020denoising} paper.
+We have therefore obtained $\tilde{\mu}(x_t, x_0)$ and $\tilde{\beta}_t$ mentioned in Ho et al.'s \cite{ho2020denoising} paper. \\
+The authors also rearrange $\tilde{\mu}(x_t, x_0)$ in order to remove the dependency on $x_0$:
+\begin{align}
+  x_t &= \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon} \\
+  \Leftrightarrow x_0 &= \frac{x_t - \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon}}{\sqrt{\bar{\alpha}_t}} \\
+  \Rightarrow \tilde{\mu}(x_t, t) &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + \sqrt{\bar{\alpha}_{t-1}}(1 - \alpha_t) \frac{x_t - \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon}}{\sqrt{\bar{\alpha}_t}}}{1 - \bar{\alpha}_t} \\
+  &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + (1 - \alpha_t) \left(x_t - \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon} \right) \frac{\sqrt{\bar{\alpha}_{t-1}}}{\sqrt{\bar{\alpha}_t}}}{1 - \bar{\alpha}_t} \\
+  &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t}{{1 - \bar{\alpha}_t}} + \frac{(1 - \alpha_t) \left(x_t - \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon} \right) \frac{1}{\sqrt{\alpha_t}}}{1 - \bar{\alpha}_t} \\
+  &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{{1 - \bar{\alpha}_t}} x_t + \frac{(1 - \alpha_t)}{(1 - \bar{\alpha}_t) \sqrt{\alpha_t}} x_t - \frac{(1 - \alpha_t)(\sqrt{1 - \bar{\alpha}_t})}{(1 - \bar{\alpha}_t)\sqrt{\alpha_t}} \bar{\epsilon} \\
+  &= \left( \frac{\sqrt{\alpha_t} \sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{\sqrt{\alpha_t} ({1 - \bar{\alpha}_t})}+ \frac{(1 - \alpha_t)}{(1 - \bar{\alpha}_t) \sqrt{\alpha_t}} \right) x_t - \frac{(1 - \alpha_t)(\sqrt{1 - \bar{\alpha}_t})}{\sqrt{(1 - \bar{\alpha}_t)}\sqrt{(1 - \bar{\alpha}_t)}\sqrt{\alpha_t}} \bar{\epsilon} \\
+  &= \left( \frac{\alpha_t (1 - \bar{\alpha}_{t-1}) + (1 - \alpha_t)}{\sqrt{\alpha_t} ({1 - \bar{\alpha}_t})} \right) x_t - \frac{(1 - \alpha_t)}{\sqrt{(1 - \bar{\alpha}_t)}\sqrt{\alpha_t}} \bar{\epsilon} \\
+  &= \left( \frac{\alpha_t - \bar{\alpha}_{t} + 1 - \alpha_t}{\sqrt{\alpha_t} ({1 - \bar{\alpha}_t})} \right) x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}\sqrt{\alpha_t}} \bar{\epsilon} \\
+  &= \frac{1}{\sqrt{\alpha_t}} x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}\sqrt{\alpha_t}} \bar{\epsilon} \\
+  &= \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} \bar{\epsilon} \right)
+\end{align}
 \\\\
 Another important point is that $L_T$ can be omitted since $q$ has no learnable parameters and with the fact that it will almost become a Gaussian distribution, the $D_{KL}\left(q\left(x_T | x_0\right) \| p\left(x_T\right)\right)$ (the Kullback-Leibler Divergence between a nearly Gaussian distribution and a Gaussian distribution $p\left(x_T\right) = \mathcal{N}\left(x_t; 0, I\right)$) will be close to 0. \cite{ho2020denoising} \\
 We thus find ourselves with:
 \begin{gather}
   L_{VLB} = \mathbb{E}_q \left[ \sum_{t \geq 2} D_{KL}\left(q\left(x_{t-1} | x_t, x_0\right) \| p_{\theta}\left(x_{t-1} | x_t\right)\right) - \log\left(p_{\theta}\left(x_0 | x_1\right)\right) \right]
 \end{gather}
-
-
 
 \subsubsection{Simplified training objective}
 

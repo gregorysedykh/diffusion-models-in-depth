@@ -10,7 +10,7 @@
 \usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{pgfplots}
-\usepackage{biblatex}
+\usepackage[backend=biber]{biblatex}
 
 \addbibresource{sources.bib}
 
@@ -337,6 +337,53 @@ We thus find ourselves with:
 
 \subsubsection{Simplified training objective}
 
+Ho et al. \cite{ho2020denoising} simplify the training objective by making several changes in order to obtain an easy quantity for minimising the loss. 
+\\\\
+First of all, $L_{1: T-1}$ can be written as such:
+\begin{align}
+  L_{1:T-1} &= D_{KL}\left(q\left(x_{t-1} | x_t, x_0\right) \| \: p_{\theta}\left(x_{t-1} | x_t\right)\right) \\
+  &= D_{KL}\left(\mathcal{N} (x_{t-1}; \tilde{\mu}_t \left(x_t, t \right), \sigma^2_t I ) \| \: \mathcal{N} \left( x_{t-1} ; \mu_{\theta}(x_t, t), \sigma^2_t I  \right) \right)
+\end{align}
+The Kullback-Leibler divergence between the two multivariate Gaussian distributions is given by:
+\begin{align}
+  & D_{KL}\left(\mathcal{N} (x_{t-1}; \tilde{\mu}_t \left(x_t, t \right), \sigma^2_t I ) \| \: \mathcal{N} \left( x_{t-1} ; \mu_{\theta}(x_t, t), \sigma^2_t I  \right) \right) \\
+  &= \frac{1}{2} \left( tr\left( (\sigma^2_t I)^{-1} (\sigma^2_t I) \right) - d + \left( \mu_{\theta} - \tilde{\mu}_t \right)^T (\sigma^2_t I)^{-1} \left( \mu_{\theta} - \tilde{\mu}_t \right) + \log \frac{\det(\sigma^2_t I)}{\det(\sigma^2_t I)} \right) \\
+  &= \frac{1}{2} \left( d - d + \left( \mu_{\theta} - \tilde{\mu}_t \right)^T (\sigma^2_t I)^{-1} \left( \mu_{\theta} - \tilde{\mu}_t \right) + \log 1 \right) \\
+  &= \frac{1}{2} \left( \left( \mu_{\theta} - \tilde{\mu}_t \right)^T (\sigma^2_t I)^{-1} \left( \mu_{\theta} - \tilde{\mu}_t \right) \right) \\
+  &= \frac{1}{2 \sigma^2_t} \left( \left( \mu_{\theta} - \tilde{\mu}_t \right)^T \left( \mu_{\theta} - \tilde{\mu}_t \right) \right) \\
+  &= \frac{1}{2 \sigma^2_t} \| \mu_{\theta} - \tilde{\mu}_t \|_2^2
+\end{align}
+However, Ho et al. \cite{ho2020denoising} rewrite this formula so that it depends only on the noise $\epsilon$:
+\begin{align}
+  & \frac{1}{2 \sigma^2_t} \| \mu_{\theta} - \tilde{\mu}_t \|_2^2 \\
+  &= \frac{1}{2 \sigma^2_t} \left\| \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} \bar{\epsilon} \right) - \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} \epsilon_\theta \right)\right\|_2^2 \\
+  &= \frac{1}{2 \sigma^2_t} \left\| \frac{1}{\sqrt{\alpha_t}} \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} (\bar{\epsilon} - \epsilon_\theta) \right\|_2^2 \\
+  &= \frac{1}{2 \sigma^2_t} \frac{1}{\alpha_t} \frac{(1 - \alpha_t)^2}{1 - \bar{\alpha}_t} \| \bar{\epsilon} - \epsilon_\theta \|_2^2 \\
+  &= \frac{\beta_t^2}{2 \sigma^2_t \alpha_t (1 - \bar{\alpha}_t)} \| \bar{\epsilon} - \epsilon_\theta \|_2^2
+\end{align}
+Furthermore, they found that simply ignoring the factor in front gave better results, giving us:
+\begin{equation}
+  L_{1:T-1} = \| \bar{\epsilon} - \epsilon_\theta \|_2^2
+\end{equation}
+\\\\
+As for the second term $L_0$, the authors defined $p_\theta(x_0 | x_1)$ as:
+\begin{align}
+  p_\theta(x_0 | x_1) &= \prod_{i=1}^{D} \int_{\delta_{-} (x_0^i)}^{\delta_{+} (x_0^i)} \mathcal{N}(x; \mu_\theta^i (x_1, 1), \sigma^2_1) \: dx \\
+  \delta_{+} (x) &= \begin{cases}
+    \infty & \text{if } x = 1 \\
+    x + \frac{1}{255} & \text{if } x < 1 
+  \end{cases}\\
+  \delta_{-} (x) &= \begin{cases}
+    - \infty & \text{if } x = - 1 \\
+    x - \frac{1}{255} & \text{if } x > -1 
+  \end{cases}
+\end{align}
+Where $D$ is the data dimensionality and $i$ is one coordinate from the image. \\
+This is a decoder for the last step in order to get pixel values between $\{0, 1, ..., 255 \}$ from the values between $[-1, 1]$ used for the neural network \cite{ho2020denoising,nichol2021improved} \\
+However the authors also ignored the entire term, giving us:
+\begin{equation}
+  L_{\text{simple}}(\theta) = \mathbb{E}_q \left[ \| \bar{\epsilon} - \epsilon_\theta \|_2^2 \right]
+\end{equation}
 \subsubsection{U-Net}
 
 

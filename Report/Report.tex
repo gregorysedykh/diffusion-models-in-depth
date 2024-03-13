@@ -336,10 +336,9 @@ We can now replace this value into the original expression:
   &= \mathcal{N} \left(x_{t-1}; \tilde{\mu}(x_t, x_0), \tilde{\beta}_t I \right)
 \end{align}
 {
-\allowdisplaybreaks
-  We have therefore obtained $\tilde{\mu}(x_t, x_0)$ and $\tilde{\beta}_t$ mentioned in Ho et al.'s \cite{ho2020denoising} paper. \\
-  The authors also rearrange $\tilde{\mu}(x_t, x_0)$ in order to remove the dependency on $x_0$:
-  \\
+\allowdisplaybreaks \\
+We have therefore obtained $\tilde{\mu}(x_t, x_0)$ and $\tilde{\beta}_t$ mentioned in Ho et al.'s \cite{ho2020denoising} paper. \\
+The authors also rearrange $\tilde{\mu}(x_t, x_0)$ in order to remove the dependency on $x_0$: \\
   \begin{align}
     x_t &= \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon} \\
     \Leftrightarrow x_0 &= \frac{x_t - \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon}}{\sqrt{\bar{\alpha}_t}} \\

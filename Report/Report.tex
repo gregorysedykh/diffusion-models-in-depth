@@ -55,7 +55,7 @@
       \vspace{1.5cm}
 
       \Large
-      \textbf{Gregory Sedykh}
+      \textbf{Gregory Igor Sedykh}
       \vspace{0.8cm}
 
       \normalsize
@@ -381,11 +381,10 @@ First of all, $L_{1: T-1}$ can be written as such:
     &= \frac{1}{2 \sigma^2_t} \left( \left( \mu_{\theta} - \tilde{\mu}_t \right)^T \left( \mu_{\theta} - \tilde{\mu}_t \right) \right) \\
     &= \frac{1}{2 \sigma^2_t} \| \mu_{\theta} - \tilde{\mu}_t \|_2^2
   \end{align}
-  \\\\
+  \\
   However, Ho et al. \cite{ho2020denoising} rewrite this formula so that it depends only on the noise $\epsilon$:
   \begin{align}
-    & \frac{1}{2 \sigma^2_t} \| \mu_{\theta} - \tilde{\mu}_t \|_2^2 \\
-    &= \frac{1}{2 \sigma^2_t} \left\| \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} \bar{\epsilon} \right) - \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} \epsilon_\theta \right)\right\|_2^2 \\
+    \frac{1}{2 \sigma^2_t} \| \mu_{\theta} - \tilde{\mu}_t \|_2^2 &= \frac{1}{2 \sigma^2_t} \left\| \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} \bar{\epsilon} \right) - \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} \epsilon_\theta \right)\right\|_2^2 \\
     &= \frac{1}{2 \sigma^2_t} \left\| \frac{1}{\sqrt{\alpha_t}} \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} (\bar{\epsilon} - \epsilon_\theta) \right\|_2^2 \\
     &= \frac{1}{2 \sigma^2_t} \frac{1}{\alpha_t} \frac{(1 - \alpha_t)^2}{1 - \bar{\alpha}_t} \| \bar{\epsilon} - \epsilon_\theta \|_2^2 \\
     &= \frac{\beta_t^2}{2 \sigma^2_t \alpha_t (1 - \bar{\alpha}_t)} \| \bar{\epsilon} - \epsilon_\theta \|_2^2
@@ -398,7 +397,10 @@ Furthermore, they found that simply ignoring the factor in front gave better res
 \\\\
 As for the second term $L_0$, the authors defined $p_\theta(x_0 | x_1)$ as:
 \begin{align}
-  p_\theta(x_0 | x_1) &= \prod_{i=1}^{D} \int_{\delta_{-} (x_0^i)}^{\delta_{+} (x_0^i)} \mathcal{N}(x; \mu_\theta^i (x_1, 1), \sigma^2_1) \: dx \\
+  p_\theta(x_0 | x_1) &= \prod_{i=1}^{D} \int_{\delta_{-} (x_0^i)}^{\delta_{+} (x_0^i)} \mathcal{N}(x; \mu_\theta^i (x_1, 1), \sigma^2_1) \: dx
+\end{align}
+\hspace{0.5cm} where $\delta_{+} (x)$ and $\delta_{-} (x)$ are defined as:
+\begin{align}
   \delta_{+} (x) &= \begin{cases}
     \infty & \text{if } x = 1 \\
     x + \frac{1}{255} & \text{if } x < 1 
@@ -408,8 +410,9 @@ As for the second term $L_0$, the authors defined $p_\theta(x_0 | x_1)$ as:
     x - \frac{1}{255} & \text{if } x > -1 
   \end{cases}
 \end{align}
-Where $D$ is the data dimensionality and $i$ is one coordinate from the image. \\
-This is a decoder for the last step in order to get pixel values between $\{0, 1, ..., 255 \}$ from the values between $[-1, 1]$ used for the neural network \cite{ho2020denoising,nichol2021improved} \\
+\hspace{0.5cm} with $D$ the data dimensionality and $i$ one coordinate from the image.
+\\\\
+This is a decoder for the last step in order to get pixel values between $\{0, 1, ..., 255 \}$ from the values in $[-1, 1]$ used for the neural network \cite{ho2020denoising,nichol2021improved} \\
 However the authors also ignored the entire term, giving us:
 \begin{equation}
   L_{\text{simple}}(\theta) = \mathbb{E}_q \left[ \| \bar{\epsilon} - \epsilon_\theta \|_2^2 \right]

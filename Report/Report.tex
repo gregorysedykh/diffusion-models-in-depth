@@ -11,6 +11,8 @@
 \usepackage{hyperref}
 \usepackage{pgfplots}
 \usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage[backend=biber]{biblatex}
 
 \addbibresource{sources.bib}
@@ -176,11 +178,12 @@ Which finally gives us:
 \begin{gather*}
   x_t = \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \sqrt{1 - \alpha_t \alpha_{t-1}} \bar{\epsilon}_{t - 2}
 \end{gather*}
+Where $\epsilon_{t - 1}, \epsilon_{t - 2}, \ldots \sim \mathcal{N}\left(0, I\right)$ and $\bar{\epsilon}_{t - 2}$ is the convolution of the noise $\epsilon_{t - 1}$ and $\epsilon_{t - 2}$.
 \\\\
 We can recursively apply this until $x_0$. \\
 Let $\bar{\alpha}_t = \prod_{i=0}^{t}{\alpha_i}$:
 \begin{gather}
-  x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon}
+  x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon
 \end{gather}
 \\\\
 This will give us a way to find a noisy image at step $t$ of the forward process, given the original image $x_0$ (we ignore the noise $\bar{\epsilon} \sim \mathcal{N}\left(0, I\right)$):
@@ -355,17 +358,17 @@ We can now replace this value into the original expression:
 We have therefore obtained $\tilde{\mu}(x_t, x_0)$ and $\tilde{\beta}_t$ mentioned in Ho et al.'s \cite{ho2020denoising} paper. \\
 The authors also rearrange $\tilde{\mu}(x_t, x_0)$ in order to remove the dependency on $x_0$: \\
   \begin{align}
-    x_t &= \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon} \\
-    \Leftrightarrow x_0 &= \frac{x_t - \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon}}{\sqrt{\bar{\alpha}_t}} \\
-    \Rightarrow \tilde{\mu}(x_t, t) &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + \sqrt{\bar{\alpha}_{t-1}}(1 - \alpha_t) \frac{x_t - \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon}}{\sqrt{\bar{\alpha}_t}}}{1 - \bar{\alpha}_t} \\
-    &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + (1 - \alpha_t) \left(x_t - \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon} \right) \frac{\sqrt{\bar{\alpha}_{t-1}}}{\sqrt{\bar{\alpha}_t}}}{1 - \bar{\alpha}_t} \\
-    &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t}{{1 - \bar{\alpha}_t}} + \frac{(1 - \alpha_t) \left(x_t - \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon} \right) \frac{1}{\sqrt{\alpha_t}}}{1 - \bar{\alpha}_t} \\
-    &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{{1 - \bar{\alpha}_t}} x_t + \frac{(1 - \alpha_t)}{(1 - \bar{\alpha}_t) \sqrt{\alpha_t}} x_t - \frac{(1 - \alpha_t)(\sqrt{1 - \bar{\alpha}_t})}{(1 - \bar{\alpha}_t)\sqrt{\alpha_t}} \bar{\epsilon} \\
-    &= \left( \frac{\sqrt{\alpha_t} \sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{\sqrt{\alpha_t} ({1 - \bar{\alpha}_t})}+ \frac{(1 - \alpha_t)}{(1 - \bar{\alpha}_t) \sqrt{\alpha_t}} \right) x_t - \frac{(1 - \alpha_t)(\sqrt{1 - \bar{\alpha}_t})}{\sqrt{(1 - \bar{\alpha}_t)}\sqrt{(1 - \bar{\alpha}_t)}\sqrt{\alpha_t}} \bar{\epsilon} \\
-    &= \left( \frac{\alpha_t (1 - \bar{\alpha}_{t-1}) + (1 - \alpha_t)}{\sqrt{\alpha_t} ({1 - \bar{\alpha}_t})} \right) x_t - \frac{(1 - \alpha_t)}{\sqrt{(1 - \bar{\alpha}_t)}\sqrt{\alpha_t}} \bar{\epsilon} \\
-    &= \left( \frac{\alpha_t - \bar{\alpha}_{t} + 1 - \alpha_t}{\sqrt{\alpha_t} ({1 - \bar{\alpha}_t})} \right) x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}\sqrt{\alpha_t}} \bar{\epsilon} \\
-    &= \frac{1}{\sqrt{\alpha_t}} x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}\sqrt{\alpha_t}} \bar{\epsilon} \\
-    &= \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} \bar{\epsilon} \right)
+    x_t &= \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon \\
+    \Leftrightarrow x_0 &= \frac{x_t - \sqrt{1 - \bar{\alpha}_t} \epsilon}{\sqrt{\bar{\alpha}_t}} \\
+    \Rightarrow \tilde{\mu}(x_t, t) &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + \sqrt{\bar{\alpha}_{t-1}}(1 - \alpha_t) \frac{x_t - \sqrt{1 - \bar{\alpha}_t} \epsilon}{\sqrt{\bar{\alpha}_t}}}{1 - \bar{\alpha}_t} \\
+    &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + (1 - \alpha_t) \left(x_t - \sqrt{1 - \bar{\alpha}_t} \epsilon \right) \frac{\sqrt{\bar{\alpha}_{t-1}}}{\sqrt{\bar{\alpha}_t}}}{1 - \bar{\alpha}_t} \\
+    &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t}{{1 - \bar{\alpha}_t}} + \frac{(1 - \alpha_t) \left(x_t - \sqrt{1 - \bar{\alpha}_t} \epsilon \right) \frac{1}{\sqrt{\alpha_t}}}{1 - \bar{\alpha}_t} \\
+    &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{{1 - \bar{\alpha}_t}} x_t + \frac{(1 - \alpha_t)}{(1 - \bar{\alpha}_t) \sqrt{\alpha_t}} x_t - \frac{(1 - \alpha_t)(\sqrt{1 - \bar{\alpha}_t})}{(1 - \bar{\alpha}_t)\sqrt{\alpha_t}} \epsilon \\
+    &= \left( \frac{\sqrt{\alpha_t} \sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{\sqrt{\alpha_t} ({1 - \bar{\alpha}_t})}+ \frac{(1 - \alpha_t)}{(1 - \bar{\alpha}_t) \sqrt{\alpha_t}} \right) x_t - \frac{(1 - \alpha_t)(\sqrt{1 - \bar{\alpha}_t})}{\sqrt{(1 - \bar{\alpha}_t)}\sqrt{(1 - \bar{\alpha}_t)}\sqrt{\alpha_t}} \epsilon \\
+    &= \left( \frac{\alpha_t (1 - \bar{\alpha}_{t-1}) + (1 - \alpha_t)}{\sqrt{\alpha_t} ({1 - \bar{\alpha}_t})} \right) x_t - \frac{(1 - \alpha_t)}{\sqrt{(1 - \bar{\alpha}_t)}\sqrt{\alpha_t}} \epsilon \\
+    &= \left( \frac{\alpha_t - \bar{\alpha}_{t} + 1 - \alpha_t}{\sqrt{\alpha_t} ({1 - \bar{\alpha}_t})} \right) x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}\sqrt{\alpha_t}} \epsilon \\
+    &= \frac{1}{\sqrt{\alpha_t}} x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}\sqrt{\alpha_t}} \epsilon \\
+    &= \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} \epsilon \right)
   \end{align}
 }
 \\\\
@@ -398,15 +401,15 @@ First of all, $L_{1: T-1}$ can be written as such:
   \\
   However, Ho et al. \cite{ho2020denoising} rewrite this formula so that it depends only on the noise $\epsilon$:
   \begin{align}
-    \frac{1}{2 \sigma^2_t} \| \mu_{\theta} - \tilde{\mu}_t \|_2^2 &= \frac{1}{2 \sigma^2_t} \left\| \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} \bar{\epsilon} \right) - \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} \epsilon_\theta \right)\right\|_2^2 \\
-    &= \frac{1}{2 \sigma^2_t} \left\| \frac{1}{\sqrt{\alpha_t}} \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} (\bar{\epsilon} - \epsilon_\theta) \right\|_2^2 \\
-    &= \frac{1}{2 \sigma^2_t} \frac{1}{\alpha_t} \frac{(1 - \alpha_t)^2}{1 - \bar{\alpha}_t} \| \bar{\epsilon} - \epsilon_\theta \|_2^2 \\
-    &= \frac{\beta_t^2}{2 \sigma^2_t \alpha_t (1 - \bar{\alpha}_t)} \| \bar{\epsilon} - \epsilon_\theta \|_2^2
+    \frac{1}{2 \sigma^2_t} \| \mu_{\theta} - \tilde{\mu}_t \|_2^2 &= \frac{1}{2 \sigma^2_t} \left\| \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} \epsilon \right) - \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} \epsilon_\theta \right)\right\|_2^2 \\
+    &= \frac{1}{2 \sigma^2_t} \left\| \frac{1}{\sqrt{\alpha_t}} \frac{1 - \alpha_t}{\sqrt{(1 - \bar{\alpha}_t)}} (\epsilon - \epsilon_\theta) \right\|_2^2 \\
+    &= \frac{1}{2 \sigma^2_t} \frac{1}{\alpha_t} \frac{(1 - \alpha_t)^2}{1 - \bar{\alpha}_t} \| \epsilon - \epsilon_\theta \|_2^2 \\
+    &= \frac{\beta_t^2}{2 \sigma^2_t \alpha_t (1 - \bar{\alpha}_t)} \| \epsilon - \epsilon_\theta \|_2^2
   \end{align}
 }
 Furthermore, they found that simply ignoring the factor in front gave better results, giving us:
 \begin{equation}
-  L_{1:T-1} = \| \bar{\epsilon} - \epsilon_\theta \|_2^2
+  L_{1:T-1} = \| \epsilon - \epsilon_\theta \|_2^2
 \end{equation}
 \\\\
 As for the second term $L_0$, the authors defined $p_\theta(x_0 | x_1)$ as:
@@ -429,13 +432,12 @@ As for the second term $L_0$, the authors defined $p_\theta(x_0 | x_1)$ as:
 This is a decoder for the last step in order to get pixel values between $\{0, 1, ..., 255 \}$ from the values in $[-1, 1]$ used for the neural network \cite{ho2020denoising,nichol2021improved} \\
 However the authors also ignored the entire term, giving us:
 \begin{equation}
-  L_{\text{simple}}(\theta) = \mathbb{E}_q \left[ \| \bar{\epsilon} - \epsilon_\theta \|_2^2 \right]
+  L_{\text{simple}}(\theta) = \mathbb{E}_q \left[ \| \epsilon - \epsilon_\theta \|_2^2 \right]
 \end{equation}
 \subsubsection{Model architecture}
-Ho et al. \cite{ho2020denoising} as well as the following papers use a U-Net style architecture for the neural network to estimate the noise.
+Ho et al. \cite{ho2020denoising} as well as the following papers use a U-Net style architecture for the neural network to estimate the noise. 
 \\\\
-The U-Net architecture is a convolutional neural network (CNN) that was originally designed for image segmentation in biomedical imaging \cite{ronneberger2015unet}. \\
-It consists of an encoder (or contracting path) and a decoder (or expansive path) that are connected by a bottleneck. \\
+The U-Net architecture is a convolutional neural network (CNN) that was originally designed for image segmentation in biomedical imaging \cite{ronneberger2015unet}. It consists of an encoder (or contracting path) and a decoder (or expansive path) that are connected by a bottleneck. \\
 The encoder takes in the noisy image as input and repeatedly applies unpadded convolutions followed by max pooling layers in order to reduce the spatial dimensions of the image. \cite{ronneberger2015unet} \\
 The bottleneck contains 3 unpadded convolutions each followed by a rectified linear unit (ReLU) activation function. \cite{ronneberger2015unet} \\
 The decoder then applies up-convolutions followed by unpadded convolutions to increase the spatial dimensions of the image, with at each step a concatenation of the feature maps from the encoder. \cite{ronneberger2015unet}
@@ -445,8 +447,8 @@ The decoder then applies up-convolutions followed by unpadded convolutions to in
 \end{figure}
 \\\\
 However, Ho et al. \cite{ho2020denoising} made some changes to the original U-Net architecture. \\
-First, they state that they used 4 feature map resolutions for their $32 \times 32$ resolution model, and 6 for the $256 \times 256$ resolution model. \\
-For each of these feature map, they used two convolutional residual blocks similar of those of a Wide ResNet \cite{zagoruyko2017wide} consisting of a convolutional layer, a ReLU activation function, a convolutional layer, a group normalisation layer, and another ReLU activation function. \\ The "residual" part of the block comes from the fact that the result at the end of the block on the encoder side is concatenated with the result at the end of the block on the decoder side in order to consider features that could have been lost during the downsampling. \cite{lai2022rethinking} \\
+First, they state that they used 4 feature map resolutions for their $32 \times 32$ resolution model, and 6 for the $256 \times 256$ resolution model. For each of these feature maps, they used two convolutional residual blocks similar of those of a Wide ResNet \cite{zagoruyko2017wide} consisting of a convolutional layer, a ReLU activation function, a convolutional layer, a group normalisation layer, and another ReLU activation function. \\ 
+The "residual" part of the block comes from the fact that the result at the end of the block on the encoder side is concatenated with the result at the end of the block on the decoder side in order to consider features that could have been lost during the downsampling. \cite{lai2022rethinking} \\
 They used group normalisation \cite{wu2018group} rather than weight normalisation \cite{salimans2016weight}, which is a normalisation technique that divides the channels into groups and computes the mean and standard deviation for each group \cite{ho2020denoising}. \\
 Finally, they state that they used self-attention layers from the Transformer architecture \cite{vaswani2023attention} at the $16 \times 16$ resolution between the two convolutional residual blocks. \cite{ho2020denoising}
 \\\\
@@ -457,6 +459,39 @@ The sinusoidal positional embedding is given by \cite{vaswani2023attention}:
   PE_{(pos, 2i+1)} &= \cos \left( \frac{pos}{10000^{2i/d_{model}}} \right) \\
   \text{where } \qquad & pos \text{ is the position and } i \text{ is the dimension} \notag
 \end{align}
+\\\\
+Ho et al. \cite{ho2020denoising} presented two algorithms: one for training the model and one for sampling from the model:
+\\
+\begin{minipage}{0.49\textwidth}
+  \begin{algorithm}[H]
+    \centering
+    \caption{Training}\label{alg:training}
+    \begin{algorithmic}[1]
+      \Repeat
+      \State $x_0 \sim q(x_0)$
+      \State $t \sim$ Uniform$(\{1,\ldots, T\})$
+      \State $\epsilon \sim \mathcal{N}(0, I)$
+      \State Take gradient descent step on:
+      \State \quad $\nabla_\theta \| \epsilon - \epsilon_\theta \left( \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon, t \right) \|^2$
+      \Until converged
+    \end{algorithmic}
+  \end{algorithm}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\textwidth}
+  \begin{algorithm}[H]
+    \centering
+    \caption{Sampling}\label{alg:sampling}
+    \begin{algorithmic}[1]
+      \State $x_T \sim \mathcal{N}(0, I)$
+      \For{$t = T,\ldots, 1$}
+        \State $z \sim \mathcal{N}(0, I)$ if $t > 0$, else $z = 0$
+        \State $x_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha_t}}} \epsilon_\theta (x_t, t) \right) + \sigma_t z $
+      \EndFor
+      \State \textbf{return} $x_0$
+    \end{algorithmic}
+  \end{algorithm}
+\end{minipage}
 
 
 

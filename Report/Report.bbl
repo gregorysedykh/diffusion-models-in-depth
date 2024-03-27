@@ -204,6 +204,57 @@
       \verb 1312.6114
       \endverb
     \endentry
+    \entry{lai2022rethinking}{misc}{}
+      \name{author}{6}{}{%
+        {{hash=1d72bff16530e4ab4a582ff11568c451}{%
+           family={Lai},
+           familyi={L\bibinitperiod},
+           given={Zhitong},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=fef16c7c4a9fa26114e81892425b06e7}{%
+           family={Sun},
+           familyi={S\bibinitperiod},
+           given={Haichao},
+           giveni={H\bibinitperiod}}}%
+        {{hash=3dc1bc897fb552aa92446eb4b86c0ad7}{%
+           family={Tian},
+           familyi={T\bibinitperiod},
+           given={Rui},
+           giveni={R\bibinitperiod}}}%
+        {{hash=837c84f86006354f8df3bcd4d66f4a02}{%
+           family={Ding},
+           familyi={D\bibinitperiod},
+           given={Nannan},
+           giveni={N\bibinitperiod}}}%
+        {{hash=e558e1df005d85c932c157d6b48b82b4}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Zhiguo},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=3a27876128eba6ec7843ed7614d968c3}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Yanjie},
+           giveni={Y\bibinitperiod}}}%
+      }
+      \strng{namehash}{2e881fb90cce18933e9081805abfc900}
+      \strng{fullhash}{e9ce32758b5ed1a21f26d9ef5a487080}
+      \strng{bibnamehash}{2e881fb90cce18933e9081805abfc900}
+      \strng{authorbibnamehash}{2e881fb90cce18933e9081805abfc900}
+      \strng{authornamehash}{2e881fb90cce18933e9081805abfc900}
+      \strng{authorfullhash}{e9ce32758b5ed1a21f26d9ef5a487080}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CV}
+      \field{eprinttype}{arXiv}
+      \field{title}{Rethinking Skip Connections in Encoder-decoder Networks for Monocular Depth Estimation}
+      \field{year}{2022}
+      \verb{eprint}
+      \verb 2208.13441
+      \endverb
+    \endentry
     \entry{nichol2021improved}{misc}{}
       \name{author}{2}{}{%
         {{hash=fc19c0dc057e2a02419916b39da6895b}{%
@@ -233,6 +284,73 @@
       \field{year}{2021}
       \verb{eprint}
       \verb 2102.09672
+      \endverb
+    \endentry
+    \entry{ronneberger2015unet}{misc}{}
+      \name{author}{3}{}{%
+        {{hash=8e46da9de9e53ea5d37089897d69cdd9}{%
+           family={Ronneberger},
+           familyi={R\bibinitperiod},
+           given={Olaf},
+           giveni={O\bibinitperiod}}}%
+        {{hash=168e84ce3582cbc6bac5e2ebc3ef8442}{%
+           family={Fischer},
+           familyi={F\bibinitperiod},
+           given={Philipp},
+           giveni={P\bibinitperiod}}}%
+        {{hash=b452a32296958371572717940f900884}{%
+           family={Brox},
+           familyi={B\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{f23ccc5160c62c7866172335b2c76e11}
+      \strng{fullhash}{f23ccc5160c62c7866172335b2c76e11}
+      \strng{bibnamehash}{f23ccc5160c62c7866172335b2c76e11}
+      \strng{authorbibnamehash}{f23ccc5160c62c7866172335b2c76e11}
+      \strng{authornamehash}{f23ccc5160c62c7866172335b2c76e11}
+      \strng{authorfullhash}{f23ccc5160c62c7866172335b2c76e11}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CV}
+      \field{eprinttype}{arXiv}
+      \field{title}{U-Net: Convolutional Networks for Biomedical Image Segmentation}
+      \field{year}{2015}
+      \verb{eprint}
+      \verb 1505.04597
+      \endverb
+    \endentry
+    \entry{salimans2016weight}{misc}{}
+      \name{author}{2}{}{%
+        {{hash=e6f76e1a4d058df028530916774ad3a7}{%
+           family={Salimans},
+           familyi={S\bibinitperiod},
+           given={Tim},
+           giveni={T\bibinitperiod}}}%
+        {{hash=b6fbd171848aad4edf3925543f1f1522}{%
+           family={Kingma},
+           familyi={K\bibinitperiod},
+           given={Diederik\bibnamedelima P.},
+           giveni={D\bibinitperiod\bibinitdelim P\bibinitperiod}}}%
+      }
+      \strng{namehash}{11edec4b986c03c894704fe7a8426405}
+      \strng{fullhash}{11edec4b986c03c894704fe7a8426405}
+      \strng{bibnamehash}{11edec4b986c03c894704fe7a8426405}
+      \strng{authorbibnamehash}{11edec4b986c03c894704fe7a8426405}
+      \strng{authornamehash}{11edec4b986c03c894704fe7a8426405}
+      \strng{authorfullhash}{11edec4b986c03c894704fe7a8426405}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.LG}
+      \field{eprinttype}{arXiv}
+      \field{title}{Weight Normalization: A Simple Reparameterization to Accelerate Training of Deep Neural Networks}
+      \field{year}{2016}
+      \verb{eprint}
+      \verb 1602.07868
       \endverb
     \endentry
     \entry{sohldickstein2015deep}{misc}{}
@@ -274,6 +392,129 @@
       \field{year}{2015}
       \verb{eprint}
       \verb 1503.03585
+      \endverb
+    \endentry
+    \entry{vaswani2023attention}{misc}{}
+      \name{author}{8}{}{%
+        {{hash=7f28e84700536646dd6620a0db07ad09}{%
+           family={Vaswani},
+           familyi={V\bibinitperiod},
+           given={Ashish},
+           giveni={A\bibinitperiod}}}%
+        {{hash=62efade83d70f0323fe248755e6c90c5}{%
+           family={Shazeer},
+           familyi={S\bibinitperiod},
+           given={Noam},
+           giveni={N\bibinitperiod}}}%
+        {{hash=06649ebab1ea5cac0250746a19764975}{%
+           family={Parmar},
+           familyi={P\bibinitperiod},
+           given={Niki},
+           giveni={N\bibinitperiod}}}%
+        {{hash=831027ee0ebf22375e2a86afc1881909}{%
+           family={Uszkoreit},
+           familyi={U\bibinitperiod},
+           given={Jakob},
+           giveni={J\bibinitperiod}}}%
+        {{hash=2fd2982e30ebcec93ec1cf76e0d797fd}{%
+           family={Jones},
+           familyi={J\bibinitperiod},
+           given={Llion},
+           giveni={L\bibinitperiod}}}%
+        {{hash=27b07e4eacbf4ef7a1438e3badb7dd8d}{%
+           family={Gomez},
+           familyi={G\bibinitperiod},
+           given={Aidan\bibnamedelima N.},
+           giveni={A\bibinitperiod\bibinitdelim N\bibinitperiod}}}%
+        {{hash=f2bc899b1160163417da7bf510f15d33}{%
+           family={Kaiser},
+           familyi={K\bibinitperiod},
+           given={Lukasz},
+           giveni={L\bibinitperiod}}}%
+        {{hash=95595a0fefb86187cbc36e551017d332}{%
+           family={Polosukhin},
+           familyi={P\bibinitperiod},
+           given={Illia},
+           giveni={I\bibinitperiod}}}%
+      }
+      \strng{namehash}{ee273ab30cfb889666f8c4d806eb9ce7}
+      \strng{fullhash}{f82970bbd2bdd7a002d2af62b743d5cc}
+      \strng{bibnamehash}{ee273ab30cfb889666f8c4d806eb9ce7}
+      \strng{authorbibnamehash}{ee273ab30cfb889666f8c4d806eb9ce7}
+      \strng{authornamehash}{ee273ab30cfb889666f8c4d806eb9ce7}
+      \strng{authorfullhash}{f82970bbd2bdd7a002d2af62b743d5cc}
+      \field{sortinit}{V}
+      \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CL}
+      \field{eprinttype}{arXiv}
+      \field{title}{Attention Is All You Need}
+      \field{year}{2023}
+      \verb{eprint}
+      \verb 1706.03762
+      \endverb
+    \endentry
+    \entry{wu2018group}{misc}{}
+      \name{author}{2}{}{%
+        {{hash=b626dcc418c3a5c74cfaa4c5e643a71f}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Yuxin},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=6b4b60e909e78633945f3f9c9dc83e01}{%
+           family={He},
+           familyi={H\bibinitperiod},
+           given={Kaiming},
+           giveni={K\bibinitperiod}}}%
+      }
+      \strng{namehash}{cdf9f82b747ba630cd44730e2b9982af}
+      \strng{fullhash}{cdf9f82b747ba630cd44730e2b9982af}
+      \strng{bibnamehash}{cdf9f82b747ba630cd44730e2b9982af}
+      \strng{authorbibnamehash}{cdf9f82b747ba630cd44730e2b9982af}
+      \strng{authornamehash}{cdf9f82b747ba630cd44730e2b9982af}
+      \strng{authorfullhash}{cdf9f82b747ba630cd44730e2b9982af}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CV}
+      \field{eprinttype}{arXiv}
+      \field{title}{Group Normalization}
+      \field{year}{2018}
+      \verb{eprint}
+      \verb 1803.08494
+      \endverb
+    \endentry
+    \entry{zagoruyko2017wide}{misc}{}
+      \name{author}{2}{}{%
+        {{hash=23bcbde34947ed4fd04cc55ff956c83e}{%
+           family={Zagoruyko},
+           familyi={Z\bibinitperiod},
+           given={Sergey},
+           giveni={S\bibinitperiod}}}%
+        {{hash=1b19df6325edc9e76749ac30a9d962c7}{%
+           family={Komodakis},
+           familyi={K\bibinitperiod},
+           given={Nikos},
+           giveni={N\bibinitperiod}}}%
+      }
+      \strng{namehash}{d6318237b805b7959eba1465dd40cf0a}
+      \strng{fullhash}{d6318237b805b7959eba1465dd40cf0a}
+      \strng{bibnamehash}{d6318237b805b7959eba1465dd40cf0a}
+      \strng{authorbibnamehash}{d6318237b805b7959eba1465dd40cf0a}
+      \strng{authornamehash}{d6318237b805b7959eba1465dd40cf0a}
+      \strng{authorfullhash}{d6318237b805b7959eba1465dd40cf0a}
+      \field{sortinit}{Z}
+      \field{sortinithash}{96892c0b0a36bb8557c40c49813d48b3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CV}
+      \field{eprinttype}{arXiv}
+      \field{title}{Wide Residual Networks}
+      \field{year}{2017}
+      \verb{eprint}
+      \verb 1605.07146
       \endverb
     \endentry
   \enddatalist

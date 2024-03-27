@@ -10,6 +10,7 @@
 \usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{pgfplots}
+\usepackage{float}
 \usepackage[backend=biber]{biblatex}
 
 \addbibresource{sources.bib}
@@ -111,25 +112,37 @@ The reverse process' objective is to "reverse" the forward process, starting fro
 
 \subsection{Forward Process}
 
-The forward process is a Markov process that starts from the original image $x_0$ and adds Gaussian noise during $T$ steps, where each step $t \in \left[1, T\right]$ has a size $\beta_t \in \{ \beta_1, ..., \beta_T \}$, which results in a more noisy image $x_t$. \cite{ho2020denoising}
+The forward process is a Markov process that starts from the original image $x_0$ and adds Gaussian noise during $T$ steps, where each step $t \in \left[1, T\right]$ has a size $\beta_t \in \{ \beta_1, ..., \beta_T \}$, which results in a more noisy image $x_t$. \cite{ho2020denoising}. \\
+It is defined by $q$ which is a probability distribution that takes as input an image $x_{t}$ and outputs its probability.
+\begin{align}
+  q: \mathbb{R}^D \rightarrow [0, 1]
+\end{align}
+where $D$ is the data dimensionality (e.g. for a $64 \times 64$ RGB image, $D = 64 \times 64 \times 3$). \\
+Each component $x_t^i \sim \mathbb{R}$ (pixel $i$ of the image $x_t$) and they are mutually independent since the covariance matrix ($\beta_t I$) is diagonal.
 \\\\
 Formally, we obtain:
 \begin{align}
-  q\left(x_{1},..., x_{T} | x_0\right) = \prod_{t = 1}^T{q\left(x_t | x_{t - 1}\right)} \label{eq:1}
+  q\left(x_{1},..., x_{T} | x_0\right) = \prod_{t = 1}^T{q\left(x_t | x_{t - 1}\right)}
 \end{align}
 where:
 \begin{align}
-  q\left(x_t | x_{t-1}\right) = \mathcal{N}\left(x_t; \sqrt{1 - \beta_t}x_{t-1}, \beta_t I\right) \label{eq:2}
+  q\left(x_t | x_{t-1}\right) = \mathcal{N}\left(x_t; \sqrt{1 - \beta_t}x_{t-1}, \beta_t I\right)
 \end{align}
 \\\\
 Equation \ref{eq:2} gives us a single step forward: given the previous image $x_{t-1}$, we add noise from a Gaussian distribution with mean $\sqrt{1 - \beta_t}x_{t-1}$ and variance $\beta_t I$ to obtain the next image $x_t$. \\
 Equation \ref{eq:1} gives us the full forward process from the original image $x_0$ to the final image $x_T$.
 \\\\
+The reparametrisation trick says that for a univariate Gaussian distribution where $z \sim p\left(z | x\right) = \mathcal{N}\left(\mu, \sigma^2\right)$, a valid reparametrisation would be $z = \mu + \sigma \epsilon$ where $\epsilon \sim \mathcal{N}\left(0, 1\right)$ is just noise. \cite{kingma2022autoencoding} \\
+In this case, we can see that the image becomes more random because of the added Gaussian noise from $\epsilon_t$ at each step, since we are sampling:
+\begin{align}
+  x_t &= q(x_t | x_{t-1}) \\
+  &= \sqrt{1 - \beta_t} x_{t-1} + \sqrt{\beta_t I} \epsilon_t \qquad \epsilon_t \sim \mathcal{N}\left(0, I\right)
+\end{align}
+\\\\
 It is important to note that as $T \rightarrow \infty$ and with a correct choice of $\beta_t$,  $x_T$ will become a sample of an isotropic Gaussian distribution ($\mathcal{N}\left(0, I\right)$). \cite{nichol2021improved} \cite{sohldickstein2015deep}. \\
 This is important for the reverse process, as it will allow us to take a sample $x_T \sim \mathcal{N}\left(0, I\right)$ and reverse the forward process to obtain the original image $x_0$ (however this cannot be done so simply, as seen in section 3) \cite{nichol2021improved}.
 \\\\
-The reparametrisation trick says that for a univariate Gaussian distribution where $z \sim p\left(z | x\right) = \mathcal{N}\left(\mu, \sigma^2\right)$, a valid reparametrisation would be $z = \mu + \sigma \epsilon$ where $\epsilon \sim \mathcal{N}\left(0, 1\right)$ is just noise. \cite{kingma2022autoencoding} \\
-Ho et al. \cite{ho2020denoising} use this trick to be able to sample $x_t$ at any arbitrary step $t$ of the forward process.
+Ho et al. \cite{ho2020denoising} use the reparametrisation trick to be able to sample $x_t$ at any arbitrary step $t$ of the forward process.
 \\\\
 Let $\alpha_t = 1 - \beta_t$, then:
 \begin{gather*}
@@ -148,18 +161,17 @@ Therefore, we get:
   x_t = \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \sqrt{\alpha_t\left(1 - \alpha_{t-1}\right)} \epsilon_{t - 2} + \sqrt{1 - \alpha_t} \epsilon_{t - 1}
 \end{gather*}
 \\\\
-Using the reparametrisation trick again, we can write:
-$$\sqrt{\alpha_t\left(1 - \alpha_{t-1}\right)} \epsilon_{t - 2}$$ 
-as 
-$$w \sim \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right)\right)$$
-and
-$$\sqrt{1 - \alpha_t} \epsilon_{t - 1}$$
-as
-$$z \sim \mathcal{N}\left(0, 1 - \alpha_t\right)$$
-\\\\
-Since the convolution of two Gaussian distributions is also a Gaussian distribution, we can write:
-$$w + z \sim \mathcal{N}\left(0, \left(\alpha_t\left(1 - \alpha_{t-1}\right) + 1 - \alpha_t\right)I\right)$$
-\\\\
+We can write:
+\begin{align}
+  x_t &= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right)\right) + \sqrt{1 - \alpha_t} \epsilon_{t - 1} \\
+&= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right)\right) + \mathcal{N}\left(0, 1 - \alpha_t\right)
+\end{align}
+\\
+The convolution of the two Gaussian distributions gives us a new Gaussian distribution with mean $\mu_1 + \mu_2$ and variance $\sigma_1^2 + \sigma_2^2$ (see Appendix A):
+\begin{align}
+  x_t = \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \left(\alpha_t\left(1 - \alpha_{t-1}\right) + 1 - \alpha_t\right)I\right)
+\end{align}
+\\
 Which finally gives us:
 \begin{gather*}
   x_t = \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \sqrt{1 - \alpha_t \alpha_{t-1}} \bar{\epsilon}_{t - 2}
@@ -168,12 +180,12 @@ Which finally gives us:
 We can recursively apply this until $x_0$. \\
 Let $\bar{\alpha}_t = \prod_{i=0}^{t}{\alpha_i}$:
 \begin{gather}
-  x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon} \label{eq:3}
+  x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \bar{\epsilon}
 \end{gather}
 \\\\
 This will give us a way to find a noisy image at step $t$ of the forward process, given the original image $x_0$ (we ignore the noise $\bar{\epsilon} \sim \mathcal{N}\left(0, I\right)$):
 \begin{gather}
-  q\left(x_t | x_0\right) = \mathcal{N}\left(\sqrt{\bar{\alpha}_t} x_0, \left(1 - \bar{\alpha}_t\right)I\right) \label{eq:4}
+  q\left(x_t | x_0\right) = \mathcal{N}\left(\sqrt{\bar{\alpha}_t} x_0, \left(1 - \bar{\alpha}_t\right)I\right)
 \end{gather}
 \\
 We now also know that $1 - \bar{\alpha}_t$ is the variance of the noise added at step $t$ of the forward process. \cite{nichol2021improved}
@@ -186,15 +198,18 @@ Finally, Ho et al. \cite{ho2020denoising} chose $T = 1000$ in order to be able t
 We will again see in section 3 that so many steps can make the sampling slow and that there are better choices. \cite{nichol2021improved}
 \subsection{Reverse Process}
 
-As mentioned previously, with a correct choice of $\beta_t$, $x_T$ will become a sample of an isotropic Gaussian distribution as $T \rightarrow \infty$. \cite{nichol2021improved, sohldickstein2015deep} \\
+As mentioned previously, with a correct choice of $\beta_t$, $x_T$ will become a sample of an isotropic Gaussian distribution over $\mathbb{R}^D$ as $T \rightarrow \infty$. \cite{nichol2021improved, sohldickstein2015deep} \\
 This should mean that we can take a sample $x_T \sim \mathcal{N}\left(0, I\right)$ and reverse the forward process to obtain the original image $x_0$. 
 However, this means that we need to use the entire dataset in order to figure out $q\left(x_{t-1} | x_t\right)$, which in practice cannot be done. \cite{nichol2021improved} \\
 Therefore, an estimation is found using a neural network. \cite{nichol2021improved}
 \\\\
 The reverse process is defined as follows \cite{ho2020denoising}:
 \begin{gather}
-  p_{\theta}\left(x_0, ..., x_T\right) = p\left(x_T\right) \: \prod_{t=1}^T p_{\theta}\left(x_{t-1} | x_t\right) \label{eq:5} \\
-  p_{\theta}\left(x_{t-1} | x_t\right) = \mathcal{N}\left(x_{t-1}; \mu_{\theta}\left(x_t, t\right), \Sigma_{\theta}\left(x_t, t\right)\right) \label{eq:6}
+  p_{\theta}\left(x_0, ..., x_T\right) = p\left(x_T\right) \: \prod_{t=1}^T p_{\theta}\left(x_{t-1} | x_t\right)
+\end{gather}
+where
+\begin{gather}
+  p_{\theta}\left(x_{t-1} | x_t\right) = \mathcal{N}\left(x_{t-1}; \mu_{\theta}\left(x_t, t\right), \Sigma_{\theta}\left(x_t, t\right)\right)
 \end{gather}
 \\\\
 Equation \ref{eq:5} gives us the full reverse process, starting from the final image $x_T$ to the original image $x_0$. \\
@@ -208,16 +223,16 @@ In order to find the negative log likelihood $\mathbb{E}\left[- \log p_{\theta} 
 Thus, Ho et al. \cite{ho2020denoising} use a variational lower bound ($VLB$ or more commonly known as $ELBO$) to estimate the negative log likelihood \cite{ho2020denoising,sohldickstein2015deep}.
 The variational lower bound given by Dederik et al. \cite{kingma2022autoencoding} leads us to:
 \begin{gather}
-  VLB = \log p_{\theta}\left(x_0\right) - D_{KL}\left(q\left(x_{1:T}|x_0\right) \| p_{\theta}\left(x_{1:T}|x_0\right)\right) \label{eq:7}
+  VLB = \log p_{\theta}\left(x_0\right) - D_{KL}\left(q\left(x_{1:T}|x_0\right) \| p_{\theta}\left(x_{1:T}|x_0\right)\right)
 \end{gather}
 Since we need to minimise the loss with the negative log likelihood, we can write:
 \begin{gather}
-  - VLB = - \log p_{\theta}\left(x_0\right) + D_{KL}\left(q\left(x_{1:T}|x_0\right) \| p_{\theta}\left(x_{1:T}|x_0\right)\right) \label{eq:8}
+  - VLB = - \log p_{\theta}\left(x_0\right) + D_{KL}\left(q\left(x_{1:T}|x_0\right) \| p_{\theta}\left(x_{1:T}|x_0\right)\right)
 \end{gather}
 We know that the Kullback-Leibler divergence $D_{KL}$ is non-negative, which means that we can write:
 \begin{align}
-  - \log p_{\theta}\left(x_0\right) &\leq - \log p_{\theta}\left(x_0\right) + D_{KL}\left(q\left(x_{1:T}|x_0\right) \| p_{\theta}\left(x_{1:T}|x_0\right)\right) \label{eq:9} \\[10pt]
-  &= - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{1:T}|x_0\right)}\right] \label{eq:10} \\[10pt]
+  - \log p_{\theta}\left(x_0\right) &\leq - \log p_{\theta}\left(x_0\right) + D_{KL}\left(q\left(x_{1:T}|x_0\right) \| p_{\theta}\left(x_{1:T}|x_0\right)\right) \\[10pt]
+  &= - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{1:T}|x_0\right)}\right] \\[10pt]
   &= - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{\frac{p_{\theta}\left(x_0, x_{1:T}\right)}{p_{\theta}\left(x_0\right)}}\right] \\[10pt]
   &= - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{\frac{p_{\theta}\left(x_{0:T}\right)}{p_{\theta}\left(x_0\right)}}\right] \\[10pt]
   &= - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{0:T}\right)} + \log {p_{\theta}\left(x_0\right)}\right] \\[10pt]
@@ -416,7 +431,35 @@ However the authors also ignored the entire term, giving us:
 \begin{equation}
   L_{\text{simple}}(\theta) = \mathbb{E}_q \left[ \| \bar{\epsilon} - \epsilon_\theta \|_2^2 \right]
 \end{equation}
-\subsubsection{U-Net}
+\subsubsection{Model architecture}
+Ho et al. \cite{ho2020denoising} as well as the following papers use a U-Net style architecture for the neural network to estimate the noise.
+\\\\
+The U-Net architecture is a convolutional neural network (CNN) that was originally designed for image segmentation in biomedical imaging \cite{ronneberger2015unet}. \\
+It consists of an encoder (or contracting path) and a decoder (or expansive path) that are connected by a bottleneck. \\
+The encoder takes in the noisy image as input and repeatedly applies unpadded convolutions followed by max pooling layers in order to reduce the spatial dimensions of the image. \cite{ronneberger2015unet} \\
+The bottleneck contains 3 unpadded convolutions each followed by a rectified linear unit (ReLU) activation function. \cite{ronneberger2015unet} \\
+The decoder then applies up-convolutions followed by unpadded convolutions to increase the spatial dimensions of the image, with at each step a concatenation of the feature maps from the encoder. \cite{ronneberger2015unet}
+\begin{figure}[h]
+  \includegraphics[width=\textwidth]{images/unet.png}
+  \caption{Original U-Net architecture \cite{ronneberger2015unet}}
+\end{figure}
+\\\\
+However, Ho et al. \cite{ho2020denoising} made some changes to the original U-Net architecture. \\
+First, they state that they used 4 feature map resolutions for their $32 \times 32$ resolution model, and 6 for the $256 \times 256$ resolution model. \\
+For each of these feature map, they used two convolutional residual blocks similar of those of a Wide ResNet \cite{zagoruyko2017wide} consisting of a convolutional layer, a ReLU activation function, a convolutional layer, a group normalisation layer, and another ReLU activation function. \\ The "residual" part of the block comes from the fact that the result at the end of the block on the encoder side is concatenated with the result at the end of the block on the decoder side in order to consider features that could have been lost during the downsampling. \cite{lai2022rethinking} \\
+They used group normalisation \cite{wu2018group} rather than weight normalisation \cite{salimans2016weight}, which is a normalisation technique that divides the channels into groups and computes the mean and standard deviation for each group \cite{ho2020denoising}. \\
+Finally, they state that they used self-attention layers from the Transformer architecture \cite{vaswani2023attention} at the $16 \times 16$ resolution between the two convolutional residual blocks. \cite{ho2020denoising}
+\\\\
+Since the model needs to be able to predict the noise at any timestep $t$, the authors added a time embedding to the input of the network using the sinusoidal positional embedding from the Transformer architecture \cite{vaswani2023attention}, which allows the parameters to be shared across all timesteps. \\
+The sinusoidal positional embedding is given by \cite{vaswani2023attention}:
+\begin{align}
+  PE_{(pos, 2i)} &= \sin \left( \frac{pos}{10000^{2i/d_{model}}} \right) \\
+  PE_{(pos, 2i+1)} &= \cos \left( \frac{pos}{10000^{2i/d_{model}}} \right) \\
+  \text{where } \qquad & pos \text{ is the position and } i \text{ is the dimension} \notag
+\end{align}
+
+
+
 
 
 \subsection{Comparison with other diffusion models}
@@ -430,6 +473,43 @@ However the authors also ignored the entire term, giving us:
 \newpage
 \section{Conclusion}
 
+\newpage
+\appendix
+\section{Convolution of two Gaussian distributions}
+Equation \ref{eq:} had given us:
+\begin{align*}
+  x_t &= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right)\right) + \mathcal{N}\left(0, 1 - \alpha_t\right)
+\end{align*}
+We can find the sum of two independant random variables $X \sim \mathcal{N}\left(\mu_X, \sigma_X^2\right)$ and $Y \sim \mathcal{N}\left(\mu_Y, \sigma_Y^2\right)$ by finding the convolution of two Gaussian distributions.
+\\\\
+Let $Z = X + Y$ with $X$ and $Y$ independent and $\sigma_Z = \sqrt{\sigma_X^2 + \sigma_Y^2}$, the convolution of two Gaussian distributions is given by:
+{
+  \allowdisplaybreaks
+\begin{align*}
+  f_Z(z) &= \int_{-\infty}^{\infty} f_X(x) f_Y(z - x) \: dx \\
+  &= \int_{-\infty}^{\infty} \frac{1}{\sqrt{2 \pi \sigma_X^2}} \exp \left[{-\frac{(x - \mu_X)^2}{2 \sigma_X^2}} \right] \frac{1}{\sqrt{2 \pi \sigma_Y^2}} \exp \left[{-\frac{(z - x - \mu_Y)^2}{2 \sigma_Y^2}} \right] \: dx \\[10pt]
+  &= \frac{1}{2 \pi \sigma_X \sigma_Y} \int_{-\infty}^{\infty} \exp \left[{-\frac{(x - \mu_X)^2}{2 \sigma_X^2}} \right] \exp \left[{-\frac{(z - x - \mu_Y)^2}{2 \sigma_Y^2}} \right] \: dx \\[10pt]
+  &= \frac{1}{2 \pi \sigma_X \sigma_Y} \int_{-\infty}^{\infty} \exp\left[{-\frac{(x - \mu_X)^2}{2 \sigma_X^2} - \frac{(z - x - \mu_Y)^2}{2 \sigma_Y^2}} \right] \: dx \\[10pt]
+  &= \frac{1}{2 \pi \sigma_X \sigma_Y} \int_{-\infty}^{\infty} \exp\left[{-\frac{x^2 - 2 \mu_X x + \mu_X^2}{2 \sigma_X^2} - \frac{z^2 + x^2 - 2 x z - 2 z \mu_Y + 2 \mu_Y x + \mu_Y^2}{2 \sigma_Y^2}} \right] \: dx \\[10pt]
+  &= \frac{1}{2 \pi \sigma_X \sigma_Y} \int_{-\infty}^{\infty} \exp\left[{-\frac{\sigma_Y^2(x^2 - 2 \mu_X x + \mu_X^2)}{2 \sigma_X^2 \sigma_Y^2} - \frac{\sigma_X^2(z^2 + x^2 - 2 x z - 2 z \mu_Y + 2 \mu_Y x + \mu_Y^2)}{2 \sigma_X^2 \sigma_Y^2 }} \right] \: dx \\[10pt]
+  &= \frac{1}{2 \pi \sigma_X \sigma_Y} \int_{-\infty}^{\infty} \exp\left[{-\frac{\sigma_Y^2 x^2 - 2 \mu_X \sigma_Y^2 x + \mu_X^2 \sigma_Y^2 + \sigma_X^2 z^2 + \sigma_X^2 x^2 - 2xz\sigma_X^2 + 2 z \mu_Y \sigma_X^2 - 2\mu_Y x \sigma_X^2 + \sigma_X^2 \mu_Y^2}{2 \sigma_X^2 \sigma_Y^2}} \right] \: dx \\[10pt]
+  &= \frac{1}{2 \pi \sigma_X \sigma_Y} \int_{-\infty}^{\infty} \exp\left[{-\frac{\left(\sigma_X^2 + \sigma_Y^2\right) x^2 - 2 x \left( \mu_X \sigma_Y^2 + z \sigma_X^2 - \mu_Y \sigma_X^2 \right) + \sigma_X^2 \left( z - \mu_Y \right)^2 + \mu_X^2 \sigma_Y^2}{2 \sigma_X^2 \sigma_Y^2}} \right] \: dx \\[10pt]
+  &= \frac{1}{\sqrt{2 \pi} \frac{\sigma_X \sigma_Y}{\sigma_Z}} \frac{1}{\sqrt{2 \pi} \sigma_Z} \int_{-\infty}^{\infty} \exp\left[{-\frac{x^2 - 2x \frac{\sigma_X^2 (z - \mu_Y) + \sigma_Y^2 \mu_X}{\sigma_Z^2} + \frac{\sigma_X^2 \left( z - \mu_Y \right)^2 + \mu_X^2 \sigma_Y^2}{\sigma_Z^2}}{2 \left(\frac{\sigma_X \sigma_Y}{\sigma_Z}\right)^2}} \right] \: dx \\[10pt]
+  &= \frac{1}{\sqrt{2 \pi} \frac{\sigma_X \sigma_Y}{\sigma_Z}} \frac{1}{\sqrt{2 \pi} \sigma_Z} \int_{-\infty}^{\infty} \exp\left[{-\frac{\left( x - \frac{\sigma_X^2 (z - \mu_Y) + \sigma_Y^2 \mu_X}{\sigma_Z^2}\right)^2 - \left( \frac{\sigma_X^2 (z - \mu_Y) + \sigma_Y^2 \mu_X}{\sigma_Z^2} \right)^2 + \frac{\sigma_X^2 (z - \mu_Y)^2 + \sigma_Y^2 \mu_X^2}{\sigma_Z^2}}{2 \left(\frac{\sigma_X \sigma_Y}{\sigma_Z}\right)^2}} \right] \: dx  \\[10pt]
+  &= \int_{-\infty}^{\infty} \frac{1}{\sqrt{2 \pi} \frac{\sigma_X \sigma_Y}{\sigma_Z}} \exp\left[{-\frac{\left( x - \frac{\sigma_X^2 (z - \mu_Y) + \sigma_Y^2 \mu_X}{\sigma_Z^2}\right)^2}{2 \left(\frac{\sigma_X \sigma_Y}{\sigma_Z}\right)^2}} \right] \\[10pt]
+  & \hspace{3cm} \frac{1}{\sqrt{2 \pi} \sigma_Z} \exp \left[ - \frac{\sigma_Z^2 \left( \sigma_X^2 (z - \mu_Y)^2 + \sigma_Y^2 \mu_X^2 \right) - \left( \sigma_X^2 (z - \mu_Y) + \sigma_Y^2 \mu_X \right)^2}{2 \sigma_Z^2 (\sigma_X \sigma_Y)^2} \right] \: dx  \\[10pt]
+  &= \int_{-\infty}^{\infty} \frac{1}{\sqrt{2 \pi} \frac{\sigma_X \sigma_Y}{\sigma_Z}} \exp\left[{-\frac{\left( x - \frac{\sigma_X^2 (z - \mu_Y) + \sigma_Y^2 \mu_X}{\sigma_Z^2}\right)^2}{2 \left(\frac{\sigma_X \sigma_Y}{\sigma_Z}\right)^2}} \right] \frac{1}{\sqrt{2 \pi} \sigma_Z} \exp \left[ - \frac{(z - (\mu_X + \mu_Y))^2}{2 \sigma_Z^2} \right] \: dx  \\[10pt]
+  &= \frac{1}{\sqrt{2 \pi} \sigma_Z} \exp \left[ - \frac{(z - (\mu_X + \mu_Y))^2}{2 \sigma_Z^2} \right] \int_{-\infty}^{\infty} \frac{1}{\sqrt{2 \pi} \frac{\sigma_X \sigma_Y}{\sigma_Z}} \exp\left[{-\frac{\left( x - \frac{\sigma_X^2 (z - \mu_Y) + \sigma_Y^2 \mu_X}{\sigma_Z^2}\right)^2}{2 \left(\frac{\sigma_X \sigma_Y}{\sigma_Z}\right)^2}} \right] \: dx  \\[10pt]
+  &= \frac{1}{\sqrt{2 \pi} \sigma_Z} \exp \left[ - \frac{(z - (\mu_X + \mu_Y))^2}{2 \sigma_Z^2} \right] \\[10pt]
+  &= \mathcal{N}\left(z; \mu_X + \mu_Y, \sigma_X^2 + \sigma_Y^2 \right)
+\end{align*}
+}
+\\
+Given this, we can refer back to our case and therefore we find:
+\begin{align*}
+  x_t &= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right)\right) + \mathcal{N}\left(0, 1 - \alpha_t\right) \\
+  &= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right) + 1 - \alpha_t\right) 
+\end{align*}
 %% ----------------------------------------------------------------- %%
 
 \newpage

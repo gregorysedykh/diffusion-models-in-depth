@@ -218,7 +218,7 @@ where
 Equation \ref{eq:5} gives us the full reverse process, starting from the final image $x_T$ to the original image $x_0$. \\
 Equation \ref{eq:6} gives us the reverse process at step $t$, where we estimate the noise that was added to the image at step $t$ of the forward process in order to find the image $x_{t-1}$. \\
 Two parameters must be estimated to find the reverse process at step $t$: the mean $\mu_{\theta}\left(x_t, t\right)$ and the variance $\Sigma_{\theta}\left(x_t, t\right)$. \\
-At first, Ho et al. \cite{ho2020denoising} used neural networks to estimate both the mean and the variance, but explain that estimating the variance was not necessary as there was little difference between the estimated variance $\sigma_t^2 = \tilde{\beta}_t = \frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t}$ and the actual values $\sigma_t^2 = \beta_t$ \cite{ho2020denoising}. Thus they set $\Sigma_{\theta}\left(x_t, t\right) = \sigma_t^2 I$. \\
+At first, Ho et al. \cite{ho2020denoising} used neural networks to estimate both the mean and the variance, but explain that estimating the variance was not necessary as there was little difference between the estimated variance $\sigma_t^2 = \tilde{\beta}_t = \frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t}$ and the actual values $\sigma_t^2 = \beta_t$ \cite{ho2020denoising}. Thus they set $\Sigma_{\theta}\left(x_t, t\right) = \sigma_t^2 I = \beta_t I$. \\
 As for the mean, it is estimated using a neural network trained to optimise a variational lower bound ($VLB$) of the negative log likelihood $\mathbb{E}\left[- \log p_{\theta} \left(x_0\right)\right]$ \cite{ho2020denoising}
 
 \subsubsection{Variational Lower Bound}
@@ -496,7 +496,49 @@ Ho et al. \cite{ho2020denoising} presented two algorithms: one for training the 
 \newpage
 \section{Improvements upon DDPMs}
 
+As mentioned previously, the DDPM paper \cite{ho2020denoising} had certain choices that limited its performance.\\
+Several papers following it have improved upon the original DDPM in various ways.
+
 \subsection{Improved likelihood}
+Ho et al. \cite{ho2020denoising} admit that their model, despite its high sample quality, did not have a competitive log-likelihood in comparison to other likelihood-based models such as VAEs and autoregressive models \cite{nichol2021improved}
+\\\\
+The \textit{"Improved Denoising Diffusion Probabilistic Models"} paper published by Nichol et al. \cite{nichol2021improved} in 2021 implemented certain changes in order to improve the log-likelihood of the model not only on simpler datasets such as CIFAR-10 \cite{cifar10} that the original DDPM was trained on, but also on more complex datasets such as ImageNet. \cite{kingma2022autoencoding,oord2016conditional, nichol2021improved}.
+\\\\
+In order to improve the log-likelihood, Nichol et al. \cite{nichol2021improved} started by investigating the fixed variance $\Sigma_\theta (x_t, t) = \sigma_t^2 I = \beta_t I$ of the original DDPM and whether or not it could be worth learning it. \\
+Recall that Ho et al. \cite{ho2020denoising} saw no difference in sample quality when using a learned variance $\tilde{\beta}_t$ and therefore opted for using the fixed variance $\beta_t$. \\
+Nichol et al. \cite{nichol2021improved} came to the same conclusion, finding that as the number of steps $T$ increased (the authors also mentioned that they used $T = 4000$ for their models rather than $T = 1000$ from the original paper), the difference between $\beta_t$ and $\tilde{\beta}_t$ remained very small. However, they were still interested in the possibility of learning the variance in order to improve the log-likelihood. \cite{nichol2021improved}. \\
+For this, they used an interpolation approach, where they parametrised the variance as an interpolation between the fixed variance $\beta_t$ and a learned variance $\tilde{\beta}_t$ in the $\log$ domain, with $v$ an output vector from the model containing one component per dimension:
+\begin{align}
+  \Sigma_\theta (x_t, t) &= \exp \left( v \log \beta_t + (1 - v) \log \tilde{\beta}_t \right)
+\end{align}
+As the simplified training objective $L_{\text{simple}}$ used in the original DDPM paper \cite{ho2020denoising} did not include the variance, Nichol et al. \cite{nichol2021improved} introduced a new training objective $L_{\text{hybrid}}$, defined as:
+\begin{align}
+  L_{\text{hybrid}} &= L_{\text{simple}} + \lambda L_{\text{VLB}}
+\end{align}
+with $\lambda = 0.001$ in order to keep $L_{\text{simple}}$ as the main training objective. \cite{nichol2021improved}
+\\\\
+At first, they found that the hybrid objective $L_{\text{hybrid}}$ achieved a better log-likelihoods and was easier to optimise than just $L_{\text{VLB}}$, contrary to what they had expected. \cite{nichol2021improved} \\
+However, they obtained the best log-likelihoods by optimising $L_{\text{VLB}}$ directly but with importance samping, which is a technique where samples of a difficult distribution are taken from a distribution that is easier to compute. \cite{nichol2021improved} \\
+They defined it as:
+\begin{align}
+  L_{\text{VLB}} &= \mathbb{E}_{t \sim p_t} \left[ \frac{L_t}{p_t} \right]
+  &\text{where } p_t \propto \sqrt{\mathbb{E}\left[ L_t^2 \right]} \text{ and } \sum p_t = 1
+\end{align}
+\\\\
+Another change that Nichol et al. \cite{nichol2021improved} made was to use a cosine noising schedule rather than the linear noising schedule used in the original DDPM paper \cite{ho2020denoising}. \\
+They explain this change by the fact that towards the end of the forward process, the image is already very noisy and yet more noise is added while not really improving the model, particularly for $32 \times 32$ and $64 \times 64$ images. \cite{nichol2021improved} \\
+In effect, the input images get destroyed by noise very quickly with the linear noising schedule converging to zero rapidly. \cite{nichol2021improved}
+\\\\
+They defined the cosine schedule as:
+\begin{align}
+  f(t) &= \cos \left( \frac{\frac{t}{T} + s}{1 + s} \cdot \frac{\pi}{2} \right)^2 \\
+  \bar{\alpha}_t &= \frac{f(t)}{f(0)} \\
+  \beta_t &= 1 - \frac{\bar{\alpha}_t}{\bar{\alpha}_{t-1}} \\
+\end{align}
+where $t$ is the timestep, $T$ is the total number of timesteps, and $s$ is a small offset used to prevent $\beta_t$ from being too small when $t = 0$ in order to allow the noise $\epsilon$ to be predicted more accurately at the beginning of the process. \cite{nichol2021improved}.
+
+ 
+
 
 \subsection{Denoising Diffusion Implicit Models (DDIMs)}
 

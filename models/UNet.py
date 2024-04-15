@@ -191,9 +191,7 @@ class UNet(nn.Module):
                 out = layer(out, time_emb)
                 out = torch.cat([out, skips.pop()], dim=1)
             else:
-                out = layer(out, time_emb)
-
-
+                out = layer(out, time_emb) 
 
         out = self.final_norm(out)
         out = self.final_activation(out)

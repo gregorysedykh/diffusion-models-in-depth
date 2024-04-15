@@ -204,6 +204,44 @@
       \verb 1312.6114
       \endverb
     \endentry
+    \entry{cifar10}{article}{}
+      \name{author}{3}{}{%
+        {{hash=c5e3a676e2ac1164b3afcd539c131fc9}{%
+           family={Krizhevsky},
+           familyi={K\bibinitperiod},
+           given={Alex},
+           giveni={A\bibinitperiod}}}%
+        {{hash=0719e279192084705efab5d7e0505f52}{%
+           family={Nair},
+           familyi={N\bibinitperiod},
+           given={Vinod},
+           giveni={V\bibinitperiod}}}%
+        {{hash=9a8750ccdb2a4cf14d2655face1ce016}{%
+           family={Hinton},
+           familyi={H\bibinitperiod},
+           given={Geoffrey},
+           giveni={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{6e09b9ce88b5f989fe4ba482da47726c}
+      \strng{fullhash}{6e09b9ce88b5f989fe4ba482da47726c}
+      \strng{bibnamehash}{6e09b9ce88b5f989fe4ba482da47726c}
+      \strng{authorbibnamehash}{6e09b9ce88b5f989fe4ba482da47726c}
+      \strng{authornamehash}{6e09b9ce88b5f989fe4ba482da47726c}
+      \strng{authorfullhash}{6e09b9ce88b5f989fe4ba482da47726c}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The CIFAR-10 dataset consists of 60000 32x32 colour images in 10 classes, with 6000 images per class. There are 50000 training images and 10000 test images. The dataset is divided into five training batches and one test batch, each with 10000 images. The test batch contains exactly 1000 randomly-selected images from each class. The training batches contain the remaining images in random order, but some training batches may contain more images from one class than another. Between them, the training batches contain exactly 5000 images from each class.}
+      \field{title}{CIFAR-10 (Canadian Institute for Advanced Research)}
+      \verb{urlraw}
+      \verb http://www.cs.toronto.edu/~kriz/cifar.html
+      \endverb
+      \verb{url}
+      \verb http://www.cs.toronto.edu/~kriz/cifar.html
+      \endverb
+      \keyw{Dataset}
+    \endentry
     \entry{lai2022rethinking}{misc}{}
       \name{author}{6}{}{%
         {{hash=1d72bff16530e4ab4a582ff11568c451}{%
@@ -284,6 +322,59 @@
       \field{year}{2021}
       \verb{eprint}
       \verb 2102.09672
+      \endverb
+    \endentry
+    \entry{oord2016conditional}{misc}{}
+      \name{author}{6}{}{%
+        {{hash=705a5ed355c190be3a39e0a5134d2ae5}{%
+           family={Oord},
+           familyi={O\bibinitperiod},
+           given={Aaron},
+           giveni={A\bibinitperiod},
+           prefix={van\bibnamedelima den},
+           prefixi={v\bibinitperiod\bibinitdelim d\bibinitperiod}}}%
+        {{hash=d2d0778c1cdd451c75b874b58eec7564}{%
+           family={Kalchbrenner},
+           familyi={K\bibinitperiod},
+           given={Nal},
+           giveni={N\bibinitperiod}}}%
+        {{hash=494b568c5dc85ba8f3f409635f9c5f25}{%
+           family={Vinyals},
+           familyi={V\bibinitperiod},
+           given={Oriol},
+           giveni={O\bibinitperiod}}}%
+        {{hash=31f15faeab280fcda1466b9710381955}{%
+           family={Espeholt},
+           familyi={E\bibinitperiod},
+           given={Lasse},
+           giveni={L\bibinitperiod}}}%
+        {{hash=dfca94b0427da7f9088af596e23b46c0}{%
+           family={Graves},
+           familyi={G\bibinitperiod},
+           given={Alex},
+           giveni={A\bibinitperiod}}}%
+        {{hash=481308b301166b521c74fde6566e97e6}{%
+           family={Kavukcuoglu},
+           familyi={K\bibinitperiod},
+           given={Koray},
+           giveni={K\bibinitperiod}}}%
+      }
+      \strng{namehash}{d5a17822de636ff8de45307e236e0824}
+      \strng{fullhash}{e382ad180acf1ac8100461c9c24aabd9}
+      \strng{bibnamehash}{d5a17822de636ff8de45307e236e0824}
+      \strng{authorbibnamehash}{d5a17822de636ff8de45307e236e0824}
+      \strng{authornamehash}{d5a17822de636ff8de45307e236e0824}
+      \strng{authorfullhash}{e382ad180acf1ac8100461c9c24aabd9}
+      \field{sortinit}{O}
+      \field{sortinithash}{2cd7140a07aea5341f9e2771efe90aae}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CV}
+      \field{eprinttype}{arXiv}
+      \field{title}{Conditional Image Generation with PixelCNN Decoders}
+      \field{year}{2016}
+      \verb{eprint}
+      \verb 1606.05328
       \endverb
     \endentry
     \entry{ronneberger2015unet}{misc}{}

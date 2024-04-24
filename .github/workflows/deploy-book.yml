@@ -13,10 +13,6 @@ on:
     paths:
     - dmid/**
 
-defaults:
- run:
-  working-directory: ./dmid
-
 # This job installs dependencies, builds the book, and pushes it to `gh-pages`
 jobs:
   deploy-book:

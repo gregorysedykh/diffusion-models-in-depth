@@ -234,6 +234,7 @@
       \field{labeltitlesource}{title}
       \field{abstract}{The CIFAR-10 dataset consists of 60000 32x32 colour images in 10 classes, with 6000 images per class. There are 50000 training images and 10000 test images. The dataset is divided into five training batches and one test batch, each with 10000 images. The test batch contains exactly 1000 randomly-selected images from each class. The training batches contain the remaining images in random order, but some training batches may contain more images from one class than another. Between them, the training batches contain exactly 5000 images from each class.}
       \field{title}{CIFAR-10 (Canadian Institute for Advanced Research)}
+      \field{year}{2024}
       \verb{urlraw}
       \verb http://www.cs.toronto.edu/~kriz/cifar.html
       \endverb
@@ -292,6 +293,44 @@
       \verb{eprint}
       \verb 2208.13441
       \endverb
+    \endentry
+    \entry{liu2015faceattributes}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=15a5322a1b261fe95ac6e04758acf39c}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Ziwei},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=e85079235b2a8c88ee9360e55b37523a}{%
+           family={Luo},
+           familyi={L\bibinitperiod},
+           given={Ping},
+           giveni={P\bibinitperiod}}}%
+        {{hash=e88500bd6ca50746707a22554761b61a}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Xiaogang},
+           giveni={X\bibinitperiod}}}%
+        {{hash=7e09524e32e7b51c169850f848787677}{%
+           family={Tang},
+           familyi={T\bibinitperiod},
+           given={Xiaoou},
+           giveni={X\bibinitperiod}}}%
+      }
+      \strng{namehash}{f66c20b822b68ca98bb24041283da652}
+      \strng{fullhash}{8e39318bdba17f8e188f5c3f4b8e03b6}
+      \strng{bibnamehash}{f66c20b822b68ca98bb24041283da652}
+      \strng{authorbibnamehash}{f66c20b822b68ca98bb24041283da652}
+      \strng{authornamehash}{f66c20b822b68ca98bb24041283da652}
+      \strng{authorfullhash}{8e39318bdba17f8e188f5c3f4b8e03b6}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of International Conference on Computer Vision (ICCV)}
+      \field{month}{12}
+      \field{title}{Deep Learning Face Attributes in the Wild}
+      \field{year}{2015}
     \endentry
     \entry{nichol2021improved}{misc}{}
       \name{author}{2}{}{%
@@ -483,6 +522,42 @@
       \field{year}{2015}
       \verb{eprint}
       \verb 1503.03585
+      \endverb
+    \endentry
+    \entry{song2022denoising}{misc}{}
+      \name{author}{3}{}{%
+        {{hash=78372b7167d001d4c80db2b19d6a76f3}{%
+           family={Song},
+           familyi={S\bibinitperiod},
+           given={Jiaming},
+           giveni={J\bibinitperiod}}}%
+        {{hash=58f87d1ad306023b7f8301b2b85c1584}{%
+           family={Meng},
+           familyi={M\bibinitperiod},
+           given={Chenlin},
+           giveni={C\bibinitperiod}}}%
+        {{hash=160929a7e6ceecdf3f7c9a13abd5ea35}{%
+           family={Ermon},
+           familyi={E\bibinitperiod},
+           given={Stefano},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{ebc7e264c58ec8ac9b0159b127245547}
+      \strng{fullhash}{ebc7e264c58ec8ac9b0159b127245547}
+      \strng{bibnamehash}{ebc7e264c58ec8ac9b0159b127245547}
+      \strng{authorbibnamehash}{ebc7e264c58ec8ac9b0159b127245547}
+      \strng{authornamehash}{ebc7e264c58ec8ac9b0159b127245547}
+      \strng{authorfullhash}{ebc7e264c58ec8ac9b0159b127245547}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.LG}
+      \field{eprinttype}{arXiv}
+      \field{title}{Denoising Diffusion Implicit Models}
+      \field{year}{2022}
+      \verb{eprint}
+      \verb 2010.02502
       \endverb
     \endentry
     \entry{vaswani2023attention}{misc}{}

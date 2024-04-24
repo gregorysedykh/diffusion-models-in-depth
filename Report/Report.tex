@@ -109,20 +109,21 @@ This report aims to provide an overview of the theory behind diffusion models, a
 \section{Denoising Diffusion Probabilistic Models}
 
 A \textbf{diffusion model} is a generative model that consists of two Markov chains, one forward and one reverse. \\
-Given an input (e.g. an image), the forward process will destroy the image by gradually adding Gaussian noise at each step of the process. \cite{ho2020denoising} \\
-The reverse process' objective is to "reverse" the forward process, starting from the noisy image and step-by-step, estimating the noise that was added to the image at each step and removing it until the first step is reached, where we should obtain the original image. \cite{ho2020denoising} \\
+Given an input (e.g. an image), the forward process will destroy the information in the image by gradually adding Gaussian noise at each step of the process. \cite{ho2020denoising} \\
+The reverse process' objective is to "reverse" the forward process and learn how to do so, starting from the noisy image and step-by-step, estimating the noise that was added to the image at each step and removing it until the first step is reached, where we should obtain the original image. \cite{ho2020denoising} \\
 
 \subsection{Forward Process}
 
-The forward process is a Markov process that starts from the original image $x_0$ and adds Gaussian noise during $T$ steps, where each step $t \in \left[1, T\right]$ has a size $\beta_t \in \{ \beta_1, ..., \beta_T \}$, which results in a more noisy image $x_t$. \cite{ho2020denoising}. \\
-It is defined by $q$ which is a probability distribution that takes as input an image $x_{t}$ and outputs its probability.
+The forward process is a Markov process that starts from the original image $x_0$ and adds Gaussian noise during $T$ steps which results in a more noisy image $x_t$. \cite{ho2020denoising}. \\
+Each step $t \in \left[1, T\right]$ has a size $\beta_t \in \{ \beta_1, ..., \beta_T \}$. \\ 
+This process is defined by $q$ which is a probability distribution that takes as input an image $x_{t}$ and outputs its likelihood.
 \begin{align}
   q: \mathbb{R}^D \rightarrow [0, 1]
 \end{align}
 where $D$ is the data dimensionality (e.g. for a $64 \times 64$ RGB image, $D = 64 \times 64 \times 3$). \\
-Each component $x_t^i \sim \mathbb{R}$ (pixel $i$ of the image $x_t$) and they are mutually independent since the covariance matrix ($\beta_t I$) is diagonal.
+Pixels in the image $x_t$ are assumed to be mutually independent since the covariance matrix ($\beta_t I$) is diagonal.
 \\\\
-Formally, we obtain:
+Formally, we obtain the following Markov process:
 \begin{align}
   q\left(x_{1},..., x_{T} | x_0\right) = \prod_{t = 1}^T{q\left(x_t | x_{t - 1}\right)}
 \end{align}
@@ -131,14 +132,14 @@ where:
   q\left(x_t | x_{t-1}\right) = \mathcal{N}\left(x_t; \sqrt{1 - \beta_t}x_{t-1}, \beta_t I\right)
 \end{align}
 \\\\
-Equation \ref{eq:2} gives us a single step forward: given the previous image $x_{t-1}$, we add noise from a Gaussian distribution with mean $\sqrt{1 - \beta_t}x_{t-1}$ and variance $\beta_t I$ to obtain the next image $x_t$. \\
+Equation \ref{eq:2} gives us a single step forward: given the previous image $x_{t-1}$, $x_t$ is obtained by sampling a $D$-dimensional Gaussian distribution with mean $\sqrt{1 - \beta_t}x_{t-1}$ and variance $\beta_t I$. \\
 Equation \ref{eq:1} gives us the full forward process from the original image $x_0$ to the final image $x_T$.
 \\\\
 The reparametrisation trick says that for a univariate Gaussian distribution where $z \sim p\left(z | x\right) = \mathcal{N}\left(\mu, \sigma^2\right)$, a valid reparametrisation would be $z = \mu + \sigma \epsilon$ where $\epsilon \sim \mathcal{N}\left(0, 1\right)$ is just noise. \cite{kingma2022autoencoding} \\
 In this case, we can see that the image becomes more random because of the added Gaussian noise from $\epsilon_t$ at each step, since we are sampling:
 \begin{align}
   x_t &= q(x_t | x_{t-1}) \\
-  &= \sqrt{1 - \beta_t} x_{t-1} + \sqrt{\beta_t I} \epsilon_t \qquad \epsilon_t \sim \mathcal{N}\left(0, I\right)
+  &= \sqrt{1 - \beta_t} x_{t-1} + \sqrt{\beta_t}I \epsilon_t \qquad \epsilon_t \sim \mathcal{N}_D \left(0, I\right)
 \end{align}
 \\\\
 It is important to note that as $T \rightarrow \infty$ and with a correct choice of $\beta_t$,  $x_T$ will become a sample of an isotropic Gaussian distribution ($\mathcal{N}\left(0, I\right)$). \cite{nichol2021improved} \cite{sohldickstein2015deep}. \\
@@ -149,7 +150,7 @@ Ho et al. \cite{ho2020denoising} use the reparametrisation trick to be able to s
 Let $\alpha_t = 1 - \beta_t$, then:
 \begin{gather*}
   x_t \sim \mathcal{N}\left(\sqrt{1 - \beta_t} x_{t-1}, \beta_t I\right) \\
-  x_t = \sqrt{1 - \beta_t} x_{t-1} + \sqrt{\beta_t I} \epsilon_{t-1} \qquad \epsilon_{t - 1} \sim \mathcal{N}\left(0, I\right) \\
+  x_t = \sqrt{1 - \beta_t} x_{t-1} + \sqrt{\beta_t }I \epsilon_{t-1} \qquad \epsilon_{t - 1} \sim \mathcal{N}_D \left(0, I\right) \\
   x_t = \sqrt{\alpha_t} x_{t-1} + \sqrt{1 - \alpha_t} \epsilon_{t - 1}
 \end{gather*}
 \\\\
@@ -165,11 +166,11 @@ Therefore, we get:
 \\\\
 We can write:
 \begin{align}
-  x_t &= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right)\right) + \sqrt{1 - \alpha_t} \epsilon_{t - 1} \\
-&= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right)\right) + \mathcal{N}\left(0, 1 - \alpha_t\right)
+  x_t &= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right)I \right) + \sqrt{1 - \alpha_t} \epsilon_{t - 1} \\
+&= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right)I\right) + \mathcal{N}\left(0, (1 - \alpha_t) \right)
 \end{align}
 \\
-The convolution of the two Gaussian distributions gives us a new Gaussian distribution with mean $\mu_1 + \mu_2$ and variance $\sigma_1^2 + \sigma_2^2$ (see Appendix A):
+The convolution of the two Gaussian distributions $\mathcal{N}(\mu_1, \sigma_1^2)$ and $\mathcal{N}(\mu_2, \sigma_2^2)$ gives us a new Gaussian distribution with mean $\mu_1 + \mu_2$ and variance $\sigma_1^2 + \sigma_2^2$ (see Appendix A):
 \begin{align}
   x_t = \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \left(\alpha_t\left(1 - \alpha_{t-1}\right) + 1 - \alpha_t\right)I\right)
 \end{align}
@@ -178,20 +179,20 @@ Which finally gives us:
 \begin{gather*}
   x_t = \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \sqrt{1 - \alpha_t \alpha_{t-1}} \bar{\epsilon}_{t - 2}
 \end{gather*}
-Where $\epsilon_{t - 1}, \epsilon_{t - 2}, \ldots \sim \mathcal{N}\left(0, I\right)$ and $\bar{\epsilon}_{t - 2}$ is the convolution of the noise $\epsilon_{t - 1}$ and $\epsilon_{t - 2}$.
+Where $\epsilon_{t - 1}, \epsilon_{t - 2}, \ldots \sim \mathcal{N}\left(0, I\right)$ and $\bar{\epsilon}_{t - 2}$ is the convolution of the noise distributions $\epsilon_{t - 1}$ and $\epsilon_{t - 2}$.
 \\\\
-We can recursively apply this until $x_0$. \\
+We can recursively apply this backwards until $x_0$. \\
 Let $\bar{\alpha}_t = \prod_{i=0}^{t}{\alpha_i}$:
 \begin{gather}
   x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon
 \end{gather}
 \\\\
-This will give us a way to find a noisy image at step $t$ of the forward process, given the original image $x_0$ (we ignore the noise $\bar{\epsilon} \sim \mathcal{N}\left(0, I\right)$):
+This will give us a way to find a noisy image at step $t$ of the forward process, given the original image $x_0$ (we ignore the noise $\epsilon \sim \mathcal{N}_D\left(0, I\right)$):
 \begin{gather}
   q\left(x_t | x_0\right) = \mathcal{N}\left(\sqrt{\bar{\alpha}_t} x_0, \left(1 - \bar{\alpha}_t\right)I\right)
 \end{gather}
 \\
-We now also know that $1 - \bar{\alpha}_t$ is the variance of the noise added at step $t$ of the forward process. \cite{nichol2021improved}
+We now also know that $1 - \bar{\alpha}_t$ is the equivalent variance of the noise added to $x_0$ to obtain $x_t$ during the forward process. \cite{nichol2021improved}
 \\\\
 Choosing the variances $\beta_t$ is an important step when developing the forward process. \\
 Ho et al. \cite{ho2020denoising} chose to use a linear schedule starting from $\beta_1 = 10^{-4}$ and increasing linearly until $\beta_T = 0.02$ in order for them to be small compared to the pixel values that were in $\left[-1, 1\right]$. \cite{ho2020denoising} \\
@@ -202,9 +203,9 @@ We will again see in section 3 that so many steps can make the sampling slow and
 \subsection{Reverse Process}
 
 As mentioned previously, with a correct choice of $\beta_t$, $x_T$ will become a sample of an isotropic Gaussian distribution over $\mathbb{R}^D$ as $T \rightarrow \infty$. \cite{nichol2021improved, sohldickstein2015deep} \\
-This should mean that we can take a sample $x_T \sim \mathcal{N}\left(0, I\right)$ and reverse the forward process to obtain the original image $x_0$. 
+This should mean that we can take a sample $x_T \sim \mathcal{N}_D \left(0, I\right)$ and reverse the forward process to obtain the original image $x_0$. 
 However, this means that we need to use the entire dataset in order to figure out $q\left(x_{t-1} | x_t\right)$, which in practice cannot be done. \cite{nichol2021improved} \\
-Therefore, an estimation is found using a neural network. \cite{nichol2021improved}
+Therefore, an estimation $p_\theta (x_{t-1} | x_t)$ of $q(x_{t-1}|x_t)$ is found using a neural network, with $\theta$ the parameters of the neural network. \cite{nichol2021improved}
 \\\\
 The reverse process is defined as follows \cite{ho2020denoising}:
 \begin{gather}
@@ -217,18 +218,26 @@ where
 \\\\
 Equation \ref{eq:5} gives us the full reverse process, starting from the final image $x_T$ to the original image $x_0$. \\
 Equation \ref{eq:6} gives us the reverse process at step $t$, where we estimate the noise that was added to the image at step $t$ of the forward process in order to find the image $x_{t-1}$. \\
-Two parameters must be estimated to find the reverse process at step $t$: the mean $\mu_{\theta}\left(x_t, t\right)$ and the variance $\Sigma_{\theta}\left(x_t, t\right)$. \\
+Two parameters must be estimated to find the reverse process at step $t$ (from $x_t$ to $x_{t-1}$): the mean $\mu_{\theta}\left(x_t, t\right)$ and the variance $\Sigma_{\theta}\left(x_t, t\right)$. \\
 At first, Ho et al. \cite{ho2020denoising} used neural networks to estimate both the mean and the variance, but explain that estimating the variance was not necessary as there was little difference between the estimated variance $\sigma_t^2 = \tilde{\beta}_t = \frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t}$ and the actual values $\sigma_t^2 = \beta_t$ \cite{ho2020denoising}. Thus they set $\Sigma_{\theta}\left(x_t, t\right) = \sigma_t^2 I = \beta_t I$. \\
-As for the mean, it is estimated using a neural network trained to optimise a variational lower bound ($VLB$) of the negative log likelihood $\mathbb{E}\left[- \log p_{\theta} \left(x_0\right)\right]$ \cite{ho2020denoising}
+As for the mean, it is estimated using a neural network trained to optimise a variational lower bound ($VLB$) of the negative log likelihood $\mathbb{E}\left[- \log p_{\theta} \left(x_0\right)\right]$. \cite{ho2020denoising}
 
 \subsubsection{Variational Lower Bound}
 In order to find the negative log likelihood $\mathbb{E}\left[- \log p_{\theta} \left(x_0\right)\right]$, we would need to know $p_{\theta} (x_0)$ which means going through $T$ steps, which is computationally expensive. \\
 Thus, Ho et al. \cite{ho2020denoising} use a variational lower bound ($VLB$ or more commonly known as $ELBO$) to estimate the negative log likelihood \cite{ho2020denoising,sohldickstein2015deep}.
-The variational lower bound given by Dederik et al. \cite{kingma2022autoencoding} leads us to:
+\\\\
+The variational lower bound given by Dederik et al. is defined as: \cite{kingma2022autoencoding} 
+\begin{align}
+  VLB &= \mathbb{E}_{q_\phi (x | z)} \left[ - \log q_\phi (z | x) + \log p_\theta(x, z) \right] \\[10pt]
+  &= - D_{KL} (q_\phi (z | x) \| \, p_\theta (z)) + \mathbb{E}_{q_\phi (z | x)} \left[ \log p_\theta (x | z) \right]
+\end{align}
+where $X, Z$ are jointly distributed random variables with distribution $p_\theta (x, z)$, $x \sim p_\theta$ and $q_\phi$ is any distribution.
+\\\\
+This gives us:
 \begin{gather}
   VLB = \log p_{\theta}\left(x_0\right) - D_{KL}\left(q\left(x_{1:T}|x_0\right) \| p_{\theta}\left(x_{1:T}|x_0\right)\right)
 \end{gather}
-Since we need to minimise the loss with the negative log likelihood, we can write:
+Since we need to minimise the loss with the negative log likelihood, we write:
 \begin{gather}
   - VLB = - \log p_{\theta}\left(x_0\right) + D_{KL}\left(q\left(x_{1:T}|x_0\right) \| p_{\theta}\left(x_{1:T}|x_0\right)\right)
 \end{gather}
@@ -241,6 +250,10 @@ We know that the Kullback-Leibler divergence $D_{KL}$ is non-negative, which mea
   &= - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{0:T}\right)} + \log {p_{\theta}\left(x_0\right)}\right] \\[10pt]
   &= \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{0:T}\right)}\right]
 \end{align}
+so that we obtain that:
+\begin{align}
+  - \log p_{\theta}\left(x_0\right) \leq \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{0:T}\right)}\right]
+\end{align}
 \\\\
 We can subsequently define $L_{VLB}$ as the loss to be minimised:
 \begin{gather}
@@ -249,7 +262,7 @@ We can subsequently define $L_{VLB}$ as the loss to be minimised:
 Ho et al. \cite{ho2020denoising} reformulate the loss in order to reduce variance:
 \begin{align}
   L_{VLB} &= \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{0:T}\right)}\right] \\
-  &= \mathbb{E}_q \left[\log \frac{\prod_{t \geq 1} q\left(x_t | x_{t-1}\right)}{p\left(x_T\right) \prod_{t \geq 1} p_{\theta}\left(x_{t-1} | x_t\right)}\right] \\
+  &= \mathbb{E}_q \left[\log \frac{\prod_{t \geq 1} q\left(x_t | x_{t-1}\right)}{p_{\theta} \left(x_T\right) \prod_{t \geq 1} p_{\theta}\left(x_{t-1} | x_t\right)}\right] \\
   &= \mathbb{E}_q \left[-\log\left(p_{\theta}\left(x_T\right)\right) + \log \frac{\prod_{t \geq 1} q\left(x_t | x_{t-1}\right)}{\prod_{t \geq 1} p_{\theta}\left(x_{t-1} | x_t\right)}\right] \\
   &= \mathbb{E}_q \left[-\log\left(p_{\theta}\left(x_T\right)\right) + \log \prod_{t \geq 1} q\left(x_t | x_{t-1}\right) - \log \prod_{t \geq 1} p_{\theta}\left(x_{t-1} | x_t\right)\right] \\
   &= \mathbb{E}_q \left[-\log\left(p_{\theta}\left(x_T\right)\right) + \sum_{t \geq 1} \log q\left(x_t | x_{t-1}\right) - \sum_{t \geq 1} \log p_{\theta}\left(x_{t-1} | x_t\right)\right] \\
@@ -281,11 +294,12 @@ Ho et al. \cite{ho2020denoising} define it as:
 Using Bayes' theorem, we find:
 
 \begin{align}
-  q\left(x_{t-1} | x_t, x_0\right) &= \mathcal{N}\left(x_{t-1}; \tilde{\mu}_t \left(x_t, x_0\right), \tilde{\beta_t} I\right) \\
-  &= q\left(x_t | x_{t-1}, x_0\right) \frac{q\left(x_{t-1}| x_0\right)}{q\left(x_t | x_0\right)} \\[10pt]
-  &= \mathcal{N}\left(x_t; \sqrt{1 - \beta_t}x_{t-1}, \beta_t I\right) \frac{\mathcal{N}\left(\sqrt{\bar{\alpha}_{t-1}} x_0, \left(1 - \bar{\alpha}_{t-1}\right)I\right)}{\mathcal{N}\left(\sqrt{\bar{\alpha}_t} x_0, \left(1 - \bar{\alpha}_t\right)I\right)} \\[15pt]
-  &= \frac{1}{\sqrt{2 \pi \left(1 - \bar{\alpha}_t\right) \left(1 - \bar{\alpha}_{t-1}\right) \left(\sqrt{1 - \beta_t}\right)}} \notag \\
-  &\qquad \qquad e^{- \frac{1}{2} \left(\frac{\left(x_t - \sqrt{1 - \beta_t}x_{t-1}\right)^2}{\beta_t} + \frac{\left(x_{t-1} - \sqrt{\bar{\alpha}_{t-1}}x_0\right)^2}{1 - \bar{\alpha}_{t-1}} - \frac{\left(x_t - \sqrt{\alpha}_t x_0\right)^2}{1 - \bar{\alpha}_{t}}\right)}
+  q\left(x_{t-1} | x_t, x_0\right) &= q\left(x_t | x_{t-1}, x_0\right) \frac{q\left(x_{t-1}| x_0\right)}{q\left(x_t | x_0\right)}
+\end{align}
+  Assuming that $q\left(x_t | x_{t-1}, x_0\right) = \mathcal{N}\left(x_{t-1}; \tilde{\mu}_t \left(x_t, x_0\right), \tilde{\beta_t} I\right)$, then:
+\begin{align}
+  q\left(x_{t-1} | x_t, x_0\right) = \mathcal{N} & \left(x_t; \sqrt{1 - \beta_t}x_{t-1}, \beta_t I\right) \frac{\mathcal{N}\left(\sqrt{\bar{\alpha}_{t-1}} x_0, \left(1 - \bar{\alpha}_{t-1}\right)I\right)}{\mathcal{N}\left(\sqrt{\bar{\alpha}_t} x_0, \left(1 - \bar{\alpha}_t\right)I\right)} \\[15pt]
+  = \frac{1}{\sqrt{2 \pi \left(1 - \bar{\alpha}_t\right) \left(1 - \bar{\alpha}_{t-1}\right) \left(\sqrt{1 - \beta_t}\right)}} & \, e^{- \frac{1}{2} \left(\frac{\left(x_t - \sqrt{1 - \beta_t}x_{t-1}\right)^2}{\beta_t} + \frac{\left(x_{t-1} - \sqrt{\bar{\alpha}_{t-1}}x_0\right)^2}{1 - \bar{\alpha}_{t-1}} - \frac{\left(x_t - \sqrt{\alpha}_t x_0\right)^2}{1 - \bar{\alpha}_{t}}\right)}
 \end{align}
 \\\\
 \textit{Note}: we rewrote $q\left(x_t | x_{t-1}, x_0\right)$ as $q\left(x_t | x_{t-1}\right)$ since $x_0$ adds no new information not already present \indent \indent in $x_{t-1}$.
@@ -350,7 +364,7 @@ We can now replace this value into the original expression:
   & \hspace{3cm} \left. \left. \left. + \left(\frac{\left( x_t \sqrt{\alpha_t} \left( 1 - \bar{\alpha}_{t-1} \right) + x_0 \sqrt{\bar{\alpha}_{t-1}} \left( 1 - \bar{\alpha}_t \right) \right)}{\left(1 - \bar{\alpha}_{t}\right)} \right)^2 \right) \right) \right) \\[15pt]
   &= \exp \left(- \frac{1}{2} \left(\frac{1}{\frac{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}{1 - \bar{\alpha}_{t-1}}}\right) \right. \\
   & \hspace{3cm} \left. \left( x_{t-1} - \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + \sqrt{\bar{\alpha}_{t-1}}(1 - \alpha_t) x_0}{1 - \bar{\alpha}_t} \right)^2  \right) \notag \\[15pt]
-  &= \mathcal{N} \left(x_{t-1}; \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + \sqrt{\bar{\alpha}_{t-1}}(1 - \alpha_t) x_0}{1 - \bar{\alpha}_t} , \frac{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}{1 - \bar{\alpha}_{t-1}} I \right) \\[15pt]
+  &= \mathcal{N} \left(x_{t-1}; \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1}) x_t + \sqrt{\bar{\alpha}_{t-1}}(1 - \alpha_t) x_0}{1 - \bar{\alpha}_t} , \frac{\left(1 - \alpha_t\right)\left(1 - \bar{\alpha}_{t-1}\right)}{1 - \bar{\alpha}_{t}} I \right) \\[15pt]
   &= \mathcal{N} \left(x_{t-1}; \tilde{\mu}(x_t, x_0), \tilde{\beta}_t I \right)
 \end{align}
 {
@@ -372,10 +386,11 @@ The authors also rearrange $\tilde{\mu}(x_t, x_0)$ in order to remove the depend
   \end{align}
 }
 \\\\
-Another important point is that $L_T$ can be omitted since $q$ has no learnable parameters and with the fact that it will almost become a Gaussian distribution, the $D_{KL}\left(q\left(x_T | x_0\right) \| p\left(x_T\right)\right)$ (the Kullback-Leibler Divergence between a nearly Gaussian distribution and a Gaussian distribution $p\left(x_T\right) = \mathcal{N}\left(x_t; 0, I\right)$) will be close to 0. \cite{ho2020denoising} \\
+Another important point is that $L_T$ can be omitted since $q$ has no learnable parameters and with the fact that it will almost become a Gaussian distribution, the Kullback-Leibler Divergence \\
+$D_{KL}\left(q\left(x_T | x_0\right) \| \, p\left(x_T\right)\right)$ between a nearly Gaussian distribution and a Gaussian distribution $p\left(x_T\right) = \mathcal{N}\left(x_t; 0, I\right)$ will be close to 0. \cite{ho2020denoising} \\
 We thus find ourselves with:
 \begin{gather}
-  L_{VLB} = \mathbb{E}_q \left[ \sum_{t \geq 2} D_{KL}\left(q\left(x_{t-1} | x_t, x_0\right) \| p_{\theta}\left(x_{t-1} | x_t\right)\right) - \log\left(p_{\theta}\left(x_0 | x_1\right)\right) \right]
+  L_{VLB} = \mathbb{E}_q \left[ \sum_{t \geq 2} D_{KL}\left(q\left(x_{t-1} | x_t, x_0\right) \| \, p_{\theta}\left(x_{t-1} | x_t\right)\right) - \log\left(p_{\theta}\left(x_0 | x_1\right)\right) \right]
 \end{gather}
 
 \subsubsection{Simplified training objective}
@@ -411,8 +426,8 @@ Furthermore, they found that simply ignoring the factor in front gave better res
 \begin{equation}
   L_{1:T-1} = \| \epsilon - \epsilon_\theta \|_2^2
 \end{equation}
-\\\\
-As for the second term $L_0$, the authors defined $p_\theta(x_0 | x_1)$ as:
+\\
+As for the second term $L_0$, the authors define $p_\theta(x_0 | x_1)$ as:
 \begin{align}
   p_\theta(x_0 | x_1) &= \prod_{i=1}^{D} \int_{\delta_{-} (x_0^i)}^{\delta_{+} (x_0^i)} \mathcal{N}(x; \mu_\theta^i (x_1, 1), \sigma^2_1) \: dx
 \end{align}
@@ -434,8 +449,9 @@ However the authors also ignored the entire term, giving us:
 \begin{equation}
   L_{\text{simple}}(\theta) = \mathbb{E}_q \left[ \| \epsilon - \epsilon_\theta \|_2^2 \right]
 \end{equation}
+\\\\
 \subsubsection{Model architecture}
-Ho et al. \cite{ho2020denoising} as well as the following papers use a U-Net style architecture for the neural network to estimate the noise. 
+Ho et al. \cite{ho2020denoising} as well as the following papers \cite{song2022denoising, nichol2021improved, dhariwal2021diffusion} use a U-Net style architecture for the neural network to estimate the noise. 
 \\\\
 The U-Net architecture is a convolutional neural network (CNN) that was originally designed for image segmentation in biomedical imaging \cite{ronneberger2015unet}. It consists of an encoder (or contracting path) and a decoder (or expansive path) that are connected by a bottleneck. \\
 The encoder takes in the noisy image as input and repeatedly applies unpadded convolutions followed by max pooling layers in order to reduce the spatial dimensions of the image. \cite{ronneberger2015unet} \\
@@ -460,7 +476,7 @@ The sinusoidal positional embedding is given by \cite{vaswani2023attention}:
   \text{where } \qquad & pos \text{ is the position and } i \text{ is the dimension} \notag
 \end{align}
 \\\\
-Ho et al. \cite{ho2020denoising} presented two algorithms: one for training the model and one for sampling from the model:
+Ho et al. \cite{ho2020denoising} present two algorithms: one for training the model and one for sampling from the model:
 \\
 \begin{minipage}{0.49\textwidth}
   \begin{algorithm}[H]
@@ -497,12 +513,12 @@ Ho et al. \cite{ho2020denoising} presented two algorithms: one for training the 
 \section{Improvements upon DDPMs}
 
 As mentioned previously, the DDPM paper \cite{ho2020denoising} had certain choices that limited its performance.\\
-Several papers following it have improved upon the original DDPM in various ways.
+Several papers \cite{nichol2021improved, song2022denoising} following it have improved upon the original DDPM in various ways.
 
 \subsection{Improved likelihood}
 Ho et al. \cite{ho2020denoising} admit that their model, despite its high sample quality, did not have a competitive log-likelihood in comparison to other likelihood-based models such as VAEs and autoregressive models \cite{nichol2021improved}
 \\\\
-The \textit{"Improved Denoising Diffusion Probabilistic Models"} paper published by Nichol et al. \cite{nichol2021improved} in 2021 implemented certain changes in order to improve the log-likelihood of the model not only on simpler datasets such as CIFAR-10 \cite{cifar10} that the original DDPM was trained on, but also on more complex datasets such as ImageNet. \cite{kingma2022autoencoding,oord2016conditional, nichol2021improved}.
+The \textit{"Improved Denoising Diffusion Probabilistic Models"} paper published by Nichol et al. \cite{nichol2021improved} in 2021 implemented certain changes in order to improve the log-likelihood of the model not only on simpler datasets such as CIFAR-10 \cite{cifar10} that the original DDPM was trained on, but also on more complex datasets such as ImageNet. \cite{kingma2022autoencoding, oord2016conditional, nichol2021improved}.
 \\\\
 In order to improve the log-likelihood, Nichol et al. \cite{nichol2021improved} started by investigating the fixed variance $\Sigma_\theta (x_t, t) = \sigma_t^2 I = \beta_t I$ of the original DDPM and whether or not it could be worth learning it. \\
 Recall that Ho et al. \cite{ho2020denoising} saw no difference in sample quality when using a learned variance $\tilde{\beta}_t$ and therefore opted for using the fixed variance $\beta_t$. \\
@@ -518,29 +534,132 @@ As the simplified training objective $L_{\text{simple}}$ used in the original DD
 with $\lambda = 0.001$ in order to keep $L_{\text{simple}}$ as the main training objective. \cite{nichol2021improved}
 \\\\
 At first, they found that the hybrid objective $L_{\text{hybrid}}$ achieved a better log-likelihoods and was easier to optimise than just $L_{\text{VLB}}$, contrary to what they had expected. \cite{nichol2021improved} \\
-However, they obtained the best log-likelihoods by optimising $L_{\text{VLB}}$ directly but with importance samping, which is a technique where samples of a difficult distribution are taken from a distribution that is easier to compute. \cite{nichol2021improved} \\
+However, they obtained the best log-likelihoods by optimising $L_{\text{VLB}}$ directly but with importance samping, which is a technique where samples of a difficult distribution are taken from a distribution that is easier to compute and then the original distribution is approximated by weighted samples. \cite{nichol2021improved}
+\\\\
 They defined it as:
 \begin{align}
   L_{\text{VLB}} &= \mathbb{E}_{t \sim p_t} \left[ \frac{L_t}{p_t} \right]
   &\text{where } p_t \propto \sqrt{\mathbb{E}\left[ L_t^2 \right]} \text{ and } \sum p_t = 1
 \end{align}
-\\\\
+\\
 Another change that Nichol et al. \cite{nichol2021improved} made was to use a cosine noising schedule rather than the linear noising schedule used in the original DDPM paper \cite{ho2020denoising}. \\
 They explain this change by the fact that towards the end of the forward process, the image is already very noisy and yet more noise is added while not really improving the model, particularly for $32 \times 32$ and $64 \times 64$ images. \cite{nichol2021improved} \\
 In effect, the input images get destroyed by noise very quickly with the linear noising schedule converging to zero rapidly. \cite{nichol2021improved}
 \\\\
-They defined the cosine schedule as:
+They define the cosine schedule as:
 \begin{align}
   f(t) &= \cos \left( \frac{\frac{t}{T} + s}{1 + s} \cdot \frac{\pi}{2} \right)^2 \\
   \bar{\alpha}_t &= \frac{f(t)}{f(0)} \\
-  \beta_t &= 1 - \frac{\bar{\alpha}_t}{\bar{\alpha}_{t-1}} \\
+  \beta_t &= 1 - \frac{\bar{\alpha}_t}{\bar{\alpha}_{t-1}}
 \end{align}
-where $t$ is the timestep, $T$ is the total number of timesteps, and $s$ is a small offset used to prevent $\beta_t$ from being too small when $t = 0$ in order to allow the noise $\epsilon$ to be predicted more accurately at the beginning of the process. \cite{nichol2021improved}.
+$T$ is the total number of timesteps, $t$ is the timestep and $s$ is a small offset used to prevent $\beta_t$ from being too small when $t = 0$ in order to allow the noise $\epsilon$ to be predicted more accurately at the beginning of the process. \cite{nichol2021improved}.
+\\\\
+With these changes, Nichol et al. \cite{nichol2021improved} were able to achieve a negative log-likelihood (NLL) of $2.94$ bits/dim on CIFAR-10 \cite{cifar10} and $3.53$ bits/dim on ImageNet \cite{oord2016conditional}, compared to the original DDPM paper \cite{ho2020denoising} which had a NLL of $3.70$ on CIFAR-10 and $3.77$ on ImageNet. \cite{nichol2021improved}.
+\\\\
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width= 0.5\textwidth]{images/comparison.png}
+    \caption{Comparison of NLLs of different models \cite{nichol2021improved}}
+  \end{center}
+\end{figure}
+\\\\
+Moreover, Nichol et al. \cite{nichol2021improved} were able to improve sampling speed due to the aforementioned changes, even though they trained their model with $T = 4000$ timesteps. \\
+They were able to train their model with $4000$ timesteps, but use only $100$ timesteps for sampling which brought them near-optimal FID (Fréchet Inception Distance) scores when using the $L_{\text{hybrid}}$ training objective. \cite{nichol2021improved} \\
+They had tried to reduce the number of sampling steps with the original fixed variance versions from the DDPM paper \cite{ho2020denoising} but found that the sample quality degraded a lot more. \cite{nichol2021improved}
 
- 
-
+\newpage
 
 \subsection{Denoising Diffusion Implicit Models (DDIMs)}
+As mentioned previously, the DDPM paper \cite{ho2020denoising} has a forward process and a reverse process which are both Markov processes. \\
+While the forward process can be easily calculated for a specific timestep $t$ with equation \ref{eq:}, the reverse process still requires 1000 timesteps in the case of Ho et al.'s \cite{ho2020denoising} model, and Nichol et al.'s model requires 100 and 4000 timesteps for sampling and training respectively. \cite{nichol2021improved} \\
+This is time-consuming and computationally expensive compared to GANs which only require one forward pass through the network rather than thousands to produce a sample. \cite{song2022denoising}
+\\\\
+To address this issue, Song et al. \cite{song2022denoising} introduced the Denoising Diffusion Implicit Models (DDIMs) in 2020. \\
+The main objective of DDIMs was to accelerate sampling by making the forward process non-Markovian, which would allow the reverse process to require less iterations. \cite{song2022denoising}
+\\\\
+Song et al. \cite{song2022denoising} define a family $\mathcal{Q}$ of forward processes, each indexed by $\sigma \in \mathbb{R}^T_+$:
+\begin{align}
+  q_{\sigma}(x_{1:T}| \, x_0) &= q_{\sigma}(x_T | \, x_0) \prod_{t=2}^{T} q_{\sigma}(x_{t-1}| \, x_t, x_0)
+\end{align}
+where
+\begin{align}
+  q_{\sigma}(x_T | \, x_0) &= \mathcal{N}(\sqrt{\alpha_T} x_0, (1 - \alpha_T) I)
+\end{align}
+and for all $t > 1$:
+\begin{align}
+  q_{\sigma}(x_{t-1} | \, x_t, x_0) &= \mathcal{N}\left( \sqrt{\alpha_{t-1}} x_0 + \sqrt{1 - \alpha_{t-1} - \sigma_t^2} \cdot \frac{x_t - \sqrt{\alpha_t} x_0}{\sqrt{1 - \alpha_t}}, \: \sigma_t^2 I \right)
+\end{align}
+It is interesting to note that when $\sigma_t^2 = (1 - \alpha_t)(1 - \bar{\alpha}_{t-1})/(1 - \bar{\alpha}_t)$, we obtain equation \ref{eq:}, which was the definition of the forward process in the original DDPM paper \cite{ho2020denoising, song2022denoising}. \\
+Song et al. \cite{song2022denoising} also note when $\sigma_t^2 = 0$, then $x_{t-1}$ is fixed and known in advance. \\
+Therefore, we can see that as Song et al. \cite{song2022denoising} state, the value of $\sigma$ controls the stochasticity (or more simply, the randomness) of the forward process.
+\\\\
+The authors use Bayes' rule similarly to the original DDPM paper \cite{ho2020denoising} in equation \ref{eq:}, but instead to find the forward process $q_\sigma(x_t | \, x_{t-1}, x_0)$:
+\begin{align}
+  q_{\sigma}(x_t | \, x_{t-1}, x_0) &= \frac{q_\sigma (x_{t-1} | \, x_t, x_0) \: q_\sigma (x_t | \, x_0)}{q_\sigma (x_{t-1} | \, x_0)}
+\end{align}
+Since $q_\sigma (x_t | \, x_{t-1}, x_0)$ means that $x_t$ not only depends on $x_{t-1}$ but also on $x_0$, we see that the forward process is no longer Markovian, which was what the authors were aiming to achieve. \cite{song2022denoising}
+\\\\
+However, since the reverse process in the original DDPM paper \cite{ho2020denoising} was an estimation of the forward process which was Markovian, a new reverse process was defined. \\
+Their idea of the reverse process is to sample an image $x_T$ like in the original DDPM paper \cite{ho2020denoising}, predict $x_0$ from $x_T$ and then use this prediction of $x_0$ to sample $x_{T-1}$. \cite{song2022denoising} \\
+This is repeated until we reach $x_1$ and then $x_0$ is predicted from $x_1$. \cite{song2022denoising} \\
+Similar to equation \ref{eq:} from the DDPM paper, Song et al. \cite{song2022denoising} define the prediction of $x_0$ from $x_t$ as:
+\begin{align}
+  f_\theta^{(t)} (x_t) &= \frac{x_t - \sqrt{1 - \bar{\alpha}_t} \: \epsilon(x_t, t)}{\sqrt{\bar{\alpha}_t}}
+\end{align}
+Given this, the reverse process is defined as \cite{song2022denoising}:
+\begin{align}
+  p_\theta (x_T) &= \mathcal{N}_D(0, I) \\
+  p_\theta^{(t)} (x_{t-1} | \, x_t) &= \begin{cases}
+    \mathcal{N}(f_\theta^{(1)}(x_{1}), \sigma_1^2 I) & \text{if } t = 1 \\
+    q_\sigma(x_{t-1} | \, x_t, f_\theta^{(t)}(x_t)) & \text{if } t > 1
+  \end{cases}
+\end{align}
+Therefore, $x_{t-1}$ is sampled from $x_t$ \cite{song2022denoising}: 
+\begin{align}
+  x_{t-1} &= \sqrt{\alpha_{t-1}} \left( \frac{x_t - \sqrt{1 - \bar{\alpha}_t} \: \epsilon(x_t, t)}{\sqrt{\bar{\alpha}_t}} \right) + \sqrt{1 - \alpha_{t-1} - \sigma_t^2} \cdot \epsilon_\theta (x_t, t) + \sigma_t \epsilon_t
+\end{align}
+In order to train the model, Song et al. \cite{song2022denoising} define the following \textit{variational inference objective}:
+\begin{align}
+  J_\sigma & (\epsilon_\theta) = \mathbb{E}_{q_\sigma (x_{0:T})} \left[ \log q_\sigma (x_{1:T} | \, x_0) - \log p_\theta (x_{0:T}) \right] \\
+  &= \mathbb{E}_{q_\sigma (x_{0:T})} \left[ \log q_\sigma (x_T | \, x_0) + \sum_{t=2}^{T} \log q_\sigma (x_{t-1} | \, x_t, x_0) - \sum_{t=1}^{T} \log p_\theta^{(t)} (x_{t-1} | \, x_t) - \log p_\theta (x_T) \right]
+\end{align}
+This would mean that for different choices of $\sigma$, we would have a different objective to optimise. \cite{song2022denoising} \\
+However, the authors \cite{song2022denoising} prove that $J_\sigma$ is in fact equivalent to $L_\gamma$ for certain choices of $\gamma$, where $L_\gamma$ is defined as:
+\begin{align}
+  L_\gamma (\epsilon_\theta) &= \sum_{t=1}^{T} \gamma_t \mathbb{E}_{x_0 \sim q(x_0), \epsilon_t \sim \mathcal{N}(0, I)}  \left[ \| \epsilon_\theta^{(t)} (\sqrt{\alpha_t} x_0 + \sqrt{1 - \alpha_t} \epsilon_t) - \epsilon_t \|_2^2 \right]
+\end{align}
+where $\gamma$ is a vector of length $T$ with positive values that depend on $\alpha$. \\
+We easily see that when $\gamma = 1$, we get $L_1$ which is the training objective from the original DDPM paper. \cite{ho2020denoising, song2022denoising} \\
+Song et al. prove that
+\begin{align}
+  \forall \sigma > 0, \, \exists \, \gamma \in \mathbb{R}_+^T \text{ and } \exists \, C \in \mathbb{R} \text{ s.t. } J_\sigma = L_\gamma + C
+\end{align}
+This means that the optimal solution for $J_\sigma$ is the same as the optimal solution for $L_1$, which means that the training objective for DDIMs can be kept the same as the one for DDPMs if the parameters being trained $\theta$ are not the same for all timesteps. \cite{song2022denoising}
+\\\\
+In order to speed up the sampling process, Song et al. \cite{song2022denoising} skip some timesteps in the reverse process. \\
+To do this, the forward process is redefined on a subset of timesteps of size $S$, $\left\{ x_{\tau_1}, ..., x_{\tau_S} \right\}$ and such that $q(x_{\tau_i} | \, x_0) = \mathcal{N}(\sqrt{\alpha_{\tau_i}} x_0, (1 - \alpha_{\tau_i})I)$ \\
+Since this is a subset of the timesteps, the training can be done all timesteps and the sampling can be done on the subset. \cite{song2022denoising}
+\\\\
+With the same amount of training timesteps $T = 1000$ and the same training objective as the DDPM paper \cite{ho2020denoising}, Song et al. \cite{song2022denoising} were able to achieve solid FID scores on CIFAR-10 \cite{cifar10} and CelebA \cite{liu2015faceattributes} datasets, with far fewer sampling timesteps, ranging from $10$ to $100$ timesteps. \cite{song2022denoising} \\
+A new hyperparameter $\eta \in \mathbb{R}_+$ is introduced to control the interpolation between the DDPM $\sigma$ and the deterministic $\sigma$ of the DDIM. \cite{song2022denoising}:
+\begin{align}
+  \sigma_{\tau_i} (\eta) &= \eta \sqrt{\frac{1 - \alpha_{\tau_{i-1}}}{1 - \alpha_{\tau_i}}} \sqrt{1 - \frac{\alpha_{\tau_i}}{\alpha_{\tau_{i-1}}}}
+\end{align}
+The results obtained by Song et al. \cite{song2022denoising} show that the DDIM outperformed the DDPM for 10, 20, 50, 100 and 1000 timesteps and was only slightly worse at $1000$ timesteps and $\sigma_{\tau_i} = \hat{\sigma}_{\tau_i} = \sqrt{1 - \alpha_{\tau_i} / \alpha_{\tau_{i-1}}}$
+\\\\
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/ddim_table.png}
+    \caption{Comparison of FID scores (lower is better) of DDPMs and DDIMs trained on $S$ timesteps, $S < T$ and $\eta = 0$ is DDIM, $\eta = 1$ and $\hat{\sigma}$ are DDPMs \cite{song2022denoising}}
+  \end{center}
+\end{figure}
+\\\\
+
+
+\subsection{Guidance}
+
+\subsubsection{Classifier guidance}
+\subsubsection{Classifier-free guidance}
 
 \newpage
 \section{Comparison with other diffusion models}
@@ -549,7 +668,6 @@ where $t$ is the timestep, $T$ is the total number of timesteps, and $s$ is a sm
 
 \subsection{Latent diffusion models}
 
-\subsection{Classifier guidance}
 
 \newpage
 \section{Implementation}
@@ -562,11 +680,11 @@ where $t$ is the timestep, $T$ is the total number of timesteps, and $s$ is a sm
 \section{Convolution of two Gaussian distributions}
 Equation \ref{eq:} had given us:
 \begin{align*}
-  x_t &= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right)\right) + \mathcal{N}\left(0, 1 - \alpha_t\right)
+  x_t &= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right)I \right) + \mathcal{N}\left(0, (1 - \alpha_t) I \right)
 \end{align*}
-We can find the sum of two independant random variables $X \sim \mathcal{N}\left(\mu_X, \sigma_X^2\right)$ and $Y \sim \mathcal{N}\left(\mu_Y, \sigma_Y^2\right)$ by finding the convolution of two Gaussian distributions.
+We can find the distribution of the sum of two independant 1D random variables $X \sim \mathcal{N}\left(\mu_X, \sigma_X^2\right)$ and $Y \sim \mathcal{N}\left(\mu_Y, \sigma_Y^2\right)$ as the convolution of two Gaussian distributions.
 \\\\
-Let $Z = X + Y$ with $X$ and $Y$ independent and $\sigma_Z = \sqrt{\sigma_X^2 + \sigma_Y^2}$, the convolution of two Gaussian distributions is given by:
+Let $Z = X + Y$ with $X$ and $Y$ independent.
 {
   \allowdisplaybreaks
 \begin{align*}
@@ -578,6 +696,7 @@ Let $Z = X + Y$ with $X$ and $Y$ independent and $\sigma_Z = \sqrt{\sigma_X^2 + 
   &= \frac{1}{2 \pi \sigma_X \sigma_Y} \int_{-\infty}^{\infty} \exp\left[{-\frac{\sigma_Y^2(x^2 - 2 \mu_X x + \mu_X^2)}{2 \sigma_X^2 \sigma_Y^2} - \frac{\sigma_X^2(z^2 + x^2 - 2 x z - 2 z \mu_Y + 2 \mu_Y x + \mu_Y^2)}{2 \sigma_X^2 \sigma_Y^2 }} \right] \: dx \\[10pt]
   &= \frac{1}{2 \pi \sigma_X \sigma_Y} \int_{-\infty}^{\infty} \exp\left[{-\frac{\sigma_Y^2 x^2 - 2 \mu_X \sigma_Y^2 x + \mu_X^2 \sigma_Y^2 + \sigma_X^2 z^2 + \sigma_X^2 x^2 - 2xz\sigma_X^2 + 2 z \mu_Y \sigma_X^2 - 2\mu_Y x \sigma_X^2 + \sigma_X^2 \mu_Y^2}{2 \sigma_X^2 \sigma_Y^2}} \right] \: dx \\[10pt]
   &= \frac{1}{2 \pi \sigma_X \sigma_Y} \int_{-\infty}^{\infty} \exp\left[{-\frac{\left(\sigma_X^2 + \sigma_Y^2\right) x^2 - 2 x \left( \mu_X \sigma_Y^2 + z \sigma_X^2 - \mu_Y \sigma_X^2 \right) + \sigma_X^2 \left( z - \mu_Y \right)^2 + \mu_X^2 \sigma_Y^2}{2 \sigma_X^2 \sigma_Y^2}} \right] \: dx \\[10pt]
+  &\text{Let $\sigma_Z = \sqrt{\sigma_X^2 + \sigma_Y^2}$}. \\
   &= \frac{1}{\sqrt{2 \pi} \frac{\sigma_X \sigma_Y}{\sigma_Z}} \frac{1}{\sqrt{2 \pi} \sigma_Z} \int_{-\infty}^{\infty} \exp\left[{-\frac{x^2 - 2x \frac{\sigma_X^2 (z - \mu_Y) + \sigma_Y^2 \mu_X}{\sigma_Z^2} + \frac{\sigma_X^2 \left( z - \mu_Y \right)^2 + \mu_X^2 \sigma_Y^2}{\sigma_Z^2}}{2 \left(\frac{\sigma_X \sigma_Y}{\sigma_Z}\right)^2}} \right] \: dx \\[10pt]
   &= \frac{1}{\sqrt{2 \pi} \frac{\sigma_X \sigma_Y}{\sigma_Z}} \frac{1}{\sqrt{2 \pi} \sigma_Z} \int_{-\infty}^{\infty} \exp\left[{-\frac{\left( x - \frac{\sigma_X^2 (z - \mu_Y) + \sigma_Y^2 \mu_X}{\sigma_Z^2}\right)^2 - \left( \frac{\sigma_X^2 (z - \mu_Y) + \sigma_Y^2 \mu_X}{\sigma_Z^2} \right)^2 + \frac{\sigma_X^2 (z - \mu_Y)^2 + \sigma_Y^2 \mu_X^2}{\sigma_Z^2}}{2 \left(\frac{\sigma_X \sigma_Y}{\sigma_Z}\right)^2}} \right] \: dx  \\[10pt]
   &= \int_{-\infty}^{\infty} \frac{1}{\sqrt{2 \pi} \frac{\sigma_X \sigma_Y}{\sigma_Z}} \exp\left[{-\frac{\left( x - \frac{\sigma_X^2 (z - \mu_Y) + \sigma_Y^2 \mu_X}{\sigma_Z^2}\right)^2}{2 \left(\frac{\sigma_X \sigma_Y}{\sigma_Z}\right)^2}} \right] \\[10pt]
@@ -591,8 +710,8 @@ Let $Z = X + Y$ with $X$ and $Y$ independent and $\sigma_Z = \sqrt{\sigma_X^2 + 
 \\
 Given this, we can refer back to our case and therefore we find:
 \begin{align*}
-  x_t &= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right)\right) + \mathcal{N}\left(0, 1 - \alpha_t\right) \\
-  &= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right) + 1 - \alpha_t\right) 
+  x_t &= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t\left(1 - \alpha_{t-1}\right)I \right) + \mathcal{N}\left(0, (1 - \alpha_t) I \right) \\
+  &= \sqrt{\alpha_t \alpha_{t-1}} x_{t-2} + \mathcal{N}\left(0, \alpha_t \left((1 - \alpha_{t-1}) + 1 - \alpha_t \right)I \right) 
 \end{align*}
 %% ----------------------------------------------------------------- %%
 

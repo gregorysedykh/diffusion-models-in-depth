@@ -132,16 +132,12 @@ class UNet(nn.Module):
         self.encoder = nn.ModuleList()
 
         self.encoder.append(ResidualBlock(32, 32, self.time_dim))
-        # self.encoder.append(SelfAttention(32))
         self.encoder.append(DownsampleBlock(32, 64))
         self.encoder.append(ResidualBlock(64, 64, self.time_dim))
-        # self.encoder.append(SelfAttention(64))
         self.encoder.append(DownsampleBlock(64, 128))
         self.encoder.append(ResidualBlock(128, 128, self.time_dim))
-        # self.encoder.append(SelfAttention(128))
         self.encoder.append(DownsampleBlock(128, 256))
         self.encoder.append(ResidualBlock(256, 256, self.time_dim))
-        # self.encoder.append(SelfAttention(256))
 
 
         self.bottleneck = nn.ModuleList()
@@ -151,16 +147,12 @@ class UNet(nn.Module):
 
         self.decoder = nn.ModuleList()
         self.decoder.append(ResidualBlock(256, 256, self.time_dim))
-        # self.decoder.append(SelfAttention(256))
         self.decoder.append(UpsampleBlock(256, 128))
         self.decoder.append(ResidualBlock(256, 128, self.time_dim))
-        # self.decoder.append(SelfAttention(128))
         self.decoder.append(UpsampleBlock(128, 64))
         self.decoder.append(ResidualBlock(128, 64, self.time_dim))
-        # self.decoder.append(SelfAttention(64))
         self.decoder.append(UpsampleBlock(64, 32))
         self.decoder.append(ResidualBlock(64, 32, self.time_dim))
-        # self.decoder.append(SelfAttention(32))
 
         self.final_norm = nn.GroupNorm(8, 32)
         self.final_activation = nn.SiLU()

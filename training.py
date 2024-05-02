@@ -26,7 +26,6 @@ transform = transforms.Compose([
     transforms.Normalize((0.5,), (0.5,)),
 ])
 
-# dataset = datasets.CIFAR10(root="data", download=True, transform=transform)
 dataset = datasets.MNIST(root="data", download=True, transform=transform)
 
 data_loader = DataLoader(dataset, batch_size=64, shuffle=True)

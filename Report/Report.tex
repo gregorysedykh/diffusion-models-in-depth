@@ -8,12 +8,14 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{xcolor}
-\usepackage{hyperref}
 \usepackage{pgfplots}
 \usepackage{float}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage[backend=biber]{biblatex}
+\usepackage{hyperref}
+
+\hypersetup{citecolor=blue}
 
 \addbibresource{sources.bib}
 
@@ -509,6 +511,56 @@ Ho et al. \cite{ho2020denoising} present two algorithms: one for training the mo
   \end{algorithm}
 \end{minipage}
 
+\subsection{Score-based formulation}
+The DDPM paper \cite{ho2020denoising} allows us to predict either the next denoised image, the mean of the next denoised image or the noise itself. \\
+However they mention another formulation of the DDPM model that is equivalent: a score-based generative modeling version (also known as NCSN: Noise conditional score network).
+\subsubsection{Score matching}
+This formulation uses score matching \cite{hyvarinen2005}, either denoising score matching \cite{vincent2010denoising} or sliced score matching \cite{song2019sliced}. \\
+Essentially, score matching avoids optimizing the likelihood which can sometimes be difficult to find because of normalisation constants, and instead optimises a score function which is the gradient of the log-likelihood. \\
+Suppose we have a probability density function $p_\theta (x)$ that models an i.i.d. dataset $\{x_i\}_{i=1}^N$ of the p.d.f. $p(x)$. 
+\\\\
+Let $f_\theta (x)$ be a real valued function which is an unnormalized density function and $Z_\theta = \int e^{-f_\theta (x)} dx$ be the normalisation constant such that $\int p_\theta (x) \; dx = 1$. \\
+Then $p_\theta(x)$ is defined as:
+\begin{align}
+  p_\theta (x) &= \frac{e^{-f_\theta (x)}}{Z_\theta}
+\end{align}
+However for a lot of models, $Z_\theta$ cannot be computed. \cite{luo2022understanding} \\
+\\\\
+The score function $s_\theta: \mathbb{R}^D \rightarrow \mathbb{R}^D$ is defined as \cite{song2020generative}: 
+\begin{align}
+  s_\theta (x) &= \nabla_x \log p(x)
+\end{align}
+If we try to train a model to optimise this score function, we get:
+\begin{align}
+  s_\theta (x) &= \nabla_x \log p_\theta(x) \\
+  &= \nabla_x \log \frac{e^{-f_\theta (x)}}{Z_\theta} \\
+  &= \nabla_x \left( -f_\theta (x) - \log Z_\theta \right) \\
+  &= - \nabla_x f_\theta (x) - \nabla_x \log Z_\theta \\
+  &= - \nabla_x f_\theta (x)
+\end{align}
+Since $Z_\theta$ is a constant with respect to $x$, $\nabla_x \log Z_\theta = 0$ which means we don't need to compute the intractable normalisation constant $Z_\theta$. \\
+This means we could train the score network $s_\theta$ to match the true score function $s(x) = \nabla_x \log p(x)$. \\
+The model should then optimise the following Fisher divergence \cite{hyvarinen2005, luo2022understanding}:
+\begin{align}
+  \frac{1}{2} \mathbb{E}_{x \sim p(x)} \left[ \| s_\theta (x) - s(x) \|_2^2 \right]
+\end{align}
+However, since we don't know the true score function $s(x)$ which is the score function of the true data distribution $p(x)$, another formulation was shown by Hyvärinen \cite{hyvarinen2005} to be equivalent: 
+\begin{align}
+  \mathbb{E}_{x \sim p(x)} \left[ \text{ tr}(\nabla_x s_\theta (x)) + \frac{1}{2} \| s_\theta (x) \|_2^2 \right]
+\end{align}
+This is the score matching objective we want to minimise. \cite{hyvarinen2005}. \\
+It can also be computed using the datapoints with the following formula \cite{hyvarinen2005}:
+\begin{align}
+  \approx \frac{1}{N} \sum_{i=1}^N \text{ tr}(\nabla_x s_\theta (x_i)) + \frac{1}{2} \| s_\theta (x_i) \|_2^2
+\end{align}
+A problem that arises with this formulation is that the Jacobian matrix $\nabla_x s_\theta (x)$ is not suitable for deep neural networks as it requires backpropagation to compute all its diagonal elements to find the trace \cite{song2020generative, song2019sliced}. To solve this problem, Song et al. \cite{song2020generative} propose either denoising score matching or sliced score matching.
+
+
+\subsubsection{Sampling}
+
+\subsubsection{Equivalence between DDPM and NCSN}
+
+
 \newpage
 \section{Improvements upon DDPMs}
 
@@ -518,7 +570,7 @@ Several papers \cite{nichol2021improved, song2022denoising} following it have im
 \subsection{Improved likelihood}
 Ho et al. \cite{ho2020denoising} admit that their model, despite its high sample quality, did not have a competitive log-likelihood in comparison to other likelihood-based models such as VAEs and autoregressive models \cite{nichol2021improved}
 \\\\
-The \textit{"Improved Denoising Diffusion Probabilistic Models"} paper published by Nichol et al. \cite{nichol2021improved} in 2021 implemented certain changes in order to improve the log-likelihood of the model not only on simpler datasets such as CIFAR-10 \cite{cifar10} that the original DDPM was trained on, but also on more complex datasets such as ImageNet. \cite{kingma2022autoencoding, oord2016conditional, nichol2021improved}.
+The \textit{Improved Denoising Diffusion Probabilistic Models} paper published by Nichol et al. \cite{nichol2021improved} in 2021 implemented certain changes in order to improve the log-likelihood of the model not only on simpler datasets such as CIFAR-10 \cite{cifar10} that the original DDPM was trained on, but also on more complex datasets such as ImageNet. \cite{kingma2022autoencoding, oord2016conditional, nichol2021improved}.
 \\\\
 In order to improve the log-likelihood, Nichol et al. \cite{nichol2021improved} started by investigating the fixed variance $\Sigma_\theta (x_t, t) = \sigma_t^2 I = \beta_t I$ of the original DDPM and whether or not it could be worth learning it. \\
 Recall that Ho et al. \cite{ho2020denoising} saw no difference in sample quality when using a learned variance $\tilde{\beta}_t$ and therefore opted for using the fixed variance $\beta_t$. \\
@@ -599,7 +651,7 @@ The authors use Bayes' rule similarly to the original DDPM paper \cite{ho2020den
 \end{align}
 Since $q_\sigma (x_t | \, x_{t-1}, x_0)$ means that $x_t$ not only depends on $x_{t-1}$ but also on $x_0$, we see that the forward process is no longer Markovian, which was what the authors were aiming to achieve. \cite{song2022denoising}
 \\\\
-However, since the reverse process in the original DDPM paper \cite{ho2020denoising} was an estimation of the forward process which was Markovian, a new reverse process was defined. \\
+However, since the reverse process in the original DDPM paper \cite{ho2020denoising} was anestimation of the forward process which was Markovian, a new reverse process was defined. \\
 Their idea of the reverse process is to sample an image $x_T$ like in the original DDPM paper \cite{ho2020denoising}, predict $x_0$ from $x_T$ and then use this prediction of $x_0$ to sample $x_{T-1}$. \cite{song2022denoising} \\
 This is repeated until we reach $x_1$ and then $x_0$ is predicted from $x_1$. \cite{song2022denoising} \\
 Similar to equation \ref{eq:} from the DDPM paper, Song et al. \cite{song2022denoising} define the prediction of $x_0$ from $x_t$ as:
@@ -657,17 +709,25 @@ The results obtained by Song et al. \cite{song2022denoising} show that the DDIM 
 
 
 \subsection{Guidance}
-
+Recall that when sampling from a DDPM or a DDIM, we start with an image of Gaussian noise $x_T$ and we denoise the image until we get some image $x_0$ that resembles an image from the original dataset. We may however be interested in sampling something specific; for instance, from some text. \\
+In this case it is helpful to guide the denoising process towards whatever we specified.
 \subsubsection{Classifier guidance}
+Classifier guidance was introduced by Dhariwal and Nichol in their \textit{Diffusion Models Beat GANs on Image Synthesis} paper \cite{dhariwal2021diffusion} in order to improve the samples generated. \\
+To do this, they trained a classifier $p_\Phi (y \, | \, x_t, t)$ on noisy images \cite{dhariwal2021diffusion} since pre-trained classifiers were are generally trained on dataset images and not on noised ones. \\
+The reverse process is then guided towards a class $y$ using the gradient $\nabla_{x_t} \log p_\Phi (y \, | \, x_t, t)$. \cite{dhariwal2021diffusion}
+The authors prove \cite{dhariwal2021diffusion} that if we have a reverse process such as that from the DDPM $p_\theta (x_t, x_{t+1})$, to condition it on class $y$, we can sample from the following process instead:
+\begin{align}
+  p_{\theta, \Phi} (x_t \, | \, x_{t+1}, y) &= Z p_\theta (x_t \, | \, x_{t+1}) \, p_\Phi(y \, | \, x_t)
+\end{align}
+where $Z$ is a normalization constant.
+
+
+
 \subsubsection{Classifier-free guidance}
+Despite the impressive performance of the \textit{ablated diffusion model} that used classifier guidance, Ho and Salimans made an improvement by using classifier-free guidance. \cite{ho2022classifierfree}
 
 \newpage
 \section{Comparison with other diffusion models}
-
-\subsection{Score-based generative models}
-
-\subsection{Latent diffusion models}
-
 
 \newpage
 \section{Implementation}

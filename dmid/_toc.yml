@@ -9,7 +9,4 @@ chapters:
   sections:
     - file: forward
     - file: reverse
-# - file: Improvements upon DDPMs
-# - file: Comparaison with other diffusion models
-# - file: Implementation
-# - file: Conclusion
+

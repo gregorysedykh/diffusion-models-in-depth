@@ -554,7 +554,23 @@ It can also be computed using the datapoints with the following formula \cite{hy
   \approx \frac{1}{N} \sum_{i=1}^N \text{ tr}(\nabla_x s_\theta (x_i)) + \frac{1}{2} \| s_\theta (x_i) \|_2^2
 \end{align}
 A problem that arises with this formulation is that the Jacobian matrix $\nabla_x s_\theta (x)$ is not suitable for deep neural networks as it requires backpropagation to compute all its diagonal elements to find the trace \cite{song2020generative, song2019sliced}. To solve this problem, Song et al. \cite{song2020generative} propose either denoising score matching or sliced score matching.
-
+\\\\
+\textbf{Denoising score matching} \cite{vincent2010denoising} is a method that slightly noises a datapoint and then score matches the denoised datapoint. This is done by convolving the true data distribution $p$ with a noising kernel $q_\sigma$ but such that $p(x) \approx q_\sigma (x)$. Given a datapoint $x$, we get a noised datapoint $\tilde{x}$ by sampling from $q_\sigma(\tilde{x} | x)$. \\
+The score matching now estimates the score of the noised data distribution $q_\sigma(\tilde{x})$, which leads us to the following objective \cite{song2020generative, vincent2010denoising}:
+\begin{align}
+  \frac{1}{2} \mathbb{E}_{q_\sigma(\tilde{x} | x) p(x)} \left[ \| s_\theta (\tilde{x}) - \nabla_x \log q_\sigma(\tilde{x} | x) \|_2^2 \right]
+\end{align}
+\\\\
+\textbf{Sliced score matching} \cite{song2019sliced} projects the vectors of the vector field $s_\theta (x)$ onto random directions to obtain a scalar field. This will approximate the trace of the Jacobian matrix and it becomes much easier to compute. \cite{song2020generative} \\
+We get the following objective \cite{song2019sliced}:
+\begin{align}
+  \mathbb{E}_{p_v} \mathbb{E}_{x \sim p(x)} \left[ v^T \nabla_x s_\theta (x) \, v + \frac{1}{2} \| s_\theta (x) \|_2^2 \right]
+\end{align}
+The approximation of the Jacobian matrix $v^T \nabla_x s_\theta (x) \, v$ can be rewritten as \cite{song2019sliced}:
+\begin{align}
+  v^T \nabla_x s_\theta (x) \, v &= v^T \nabla_x (v^T s_\theta (x))
+\end{align}
+The gradient of the inner product $\nabla_x (v^T s_\theta (x))$ requires only one backpropagation pass and requires another inner product with $v^T$ to approximate the trace. \cite{song2019sliced} 
 
 \subsubsection{Sampling}
 

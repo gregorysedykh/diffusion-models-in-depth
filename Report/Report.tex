@@ -513,7 +513,7 @@ Ho et al. \cite{ho2020denoising} present two algorithms: one for training the mo
 
 \subsection{Score-based formulation}
 The DDPM paper \cite{ho2020denoising} allows us to predict either the next denoised image, the mean of the next denoised image or the noise itself. \\
-However they mention another formulation of the DDPM model that is equivalent: a score-based generative modeling version (also known as NCSN: Noise conditional score network).
+However they mention another formulation of the DDPM model that is equivalent: a score-based generative modeling version
 \subsubsection{Score matching}
 This formulation uses score matching \cite{hyvarinen2005}, either denoising score matching \cite{vincent2010denoising} or sliced score matching \cite{song2019sliced}. \\
 Essentially, score matching avoids optimizing the likelihood which can sometimes be difficult to find because of normalisation constants, and instead optimises a score function which is the gradient of the log-likelihood. \\
@@ -573,6 +573,83 @@ The approximation of the Jacobian matrix $v^T \nabla_x s_\theta (x) \, v$ can be
 The gradient of the inner product $\nabla_x (v^T s_\theta (x))$ requires only one backpropagation pass and requires another inner product with $v^T$ to approximate the trace. \cite{song2019sliced} 
 
 \subsubsection{Sampling}
+Using the score function mentioned above, we can sample from the model by using Langevin dynamics \cite{song2020generative, WelTeh2011a}, which will give us the definition of score-based generative modeling. \cite{song2020generative}
+\\\\
+Let $x_0 \sim \pi (x)$ where $\pi (x)$ is an arbitrary distribution (such as a Gaussian distribution), $\epsilon > 0$ a fixed step size and $z_t \sim \mathcal{N}_D (0, I)$. \\
+Using Stochastic Gradient Langevin Dynamics (SGLD) \cite{song2020generative, WelTeh2011a}, we can recursively sample using the following formula:
+\begin{align}
+  x_t &= x_{t-1} + \frac{\epsilon}{2} \nabla_x \log p(x_{t-1}) + \sqrt{\epsilon} z_t
+\end{align}
+When $T \rightarrow \infty$ and $\epsilon \rightarrow 0$, the distribution of $x_T$ will converge to the true data distribution $p(x)$ therefore the sample will become one from the true data distribution. \cite{song2020generative,WelTeh2011a} \\
+$z_t$ is used to add some Gaussian noise at each step because if there was no stochasticity at each step, the sampling would become deterministic and all the samples would essentially be the same.\\
+Since we don't know the true data distribution $p(x)$, we can use the score function $s_\theta (x)$ trained to match the true score function $s(x)$ to sample from the model. \\
+\begin{align}
+  x_t &= x_{t-1} + \frac{\epsilon}{2} s_\theta (x_{t-1}) + \sqrt{\epsilon} z_t
+\end{align}
+There is however a problem with this method: the score function is well approximated at high density regions where there are a lot of data points but not at low density regions. \cite{song2020generative} \\
+Song and Ermon \cite{song2020generative} show this in figure \ref{} by comparing the real score function $\nabla_x \log p(x)$ and the estimated score function $s_\theta (x)$ for a mixture of two Gaussian distributions.
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width= 0.75\textwidth]{images/highlowdensity.png}
+    \caption{Data scores represent the real score function $\nabla_x \log p(x)$ and estimated scores reperesent the estimated score function $s_\theta (x)$. We can see that the regions in the red rectangles are the darker high density regions where the score function is well approximated, while the lighter lower density regions outside the red rectangles were not well estimated. \cite{song2020generative}}
+  \end{center}
+\end{figure}
+\\\\
+This means that when sampling using Langevin dynamics, the samples will ultimately be incorrect. \cite{song2020generative} 
+To correct this, Song and Ermon \cite{song2020generative} use annealed Langevin dynamics. \\
+The idea is to add noise to the data points in order to improve the score function estimation in low density regions. \cite{songblog} However adding too much noise will make the score function estimation worse in high density regions. \cite{songblog}. \\
+Therefore, they control the amount of noise added using a scale of differents standard deviations $\sigma_i$ with $i = 1, 2, ..., L$ such that $\sigma_1 < \sigma_2 < ... < \sigma_L$. \cite{songblog,song2020generative} \\
+To sample, the same Langevin dynamics method is used going from $i = L, L-1, ..., 1$ with $\sigma_i$ decreasing at each step. This is the annealed Langevin dynamics method they used, and the results can be seen in figure \ref{}, where we clearly see that the annealed Langevin dynamics samples are much more similar to the original data samples than the simple Langevin dynamics samples. \cite{songblog,song2020generative} \\ 
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/samples.png}
+    \caption{Left: Samples from data distribution. Middle: Samples from model using Langevin dynamics. Right: Samples from model using annealed Langevin dynamics. \cite{song2020generative}} 
+  \end{center}
+\end{figure}
+\subsubsection{Noise Conditional Score Networks}
+Noise Conditional Score Networks (NCSN) are a score-based generative model that use a neural network to estimate the score function of the previously mentioned noised distribution and then use annealed Langevin dynamics to sample from the model. \cite{song2020generative}
+\\\\
+Given the increasing sequence of standard deviations $\sigma_i$ with $i = 1, 2, ..., L$, the perturbed data distribution is defined as \cite{song2020generative}:
+\begin{align}
+  q_{\sigma_i}(x) &= \int p(t) \, \mathcal{N}(x; t, \sigma_i^2) \; dt
+\end{align}
+Song and Ermon \cite{song2020generative} then define the Noise Conditional Score Network $s_\theta$ that estimates the scores of all the perturbed data distributions $q_{\sigma_i}(x)$ given a data point $x$:
+\begin{align}
+  s_\theta : \mathbb{R}^D &\times \mathbb{R} \rightarrow \mathbb{R}^D \\
+  s_\theta (x, \sigma) &\approx \nabla_x \log q_\sigma (x) \qquad \forall \sigma \in \{ \sigma_1, \sigma_2, ..., \sigma_L \}
+\end{align}
+To train the NCSN, the authors chose denoising score matching \cite{vincent2010denoising} as its goal is to estimate the score function of a noised data distribution while being quicker than sliced score matching \cite{song2019sliced}. \cite{song2020generative}
+\\\\
+Let $q_\sigma (\tilde{x} | x) = \mathcal{N}(\tilde{x} | x, \sigma^2, I)$ be the noise distribution that noised the data point $x$ to get the noised data point $\tilde{x}$. \\
+Its score function is given by \cite{song2020generative}:
+\begin{align}
+  \nabla_{\tilde{x}} \log q_\sigma (\tilde{x} | x) &= - \frac{\tilde{x} - x}{\sigma^2} 
+\end{align}
+Let $\lambda (\sigma_i)$ be a positive coefficient function, often chosen to be $\lambda (\sigma_i) = \sigma_i^2$ \cite{songblog, song2020generative} \\
+The denoising score matching objective is given by \cite{song2020generative}:
+\begin{align}
+  \mathcal{L}(\theta, \{ \sigma_i \}_{i=1}^L) &= \frac{1}{2L} \sum^L_{i=1} \lambda(\sigma_i) \, \mathbb{E}_p(x) \mathbb{E}_{\tilde{x} \sim \mathcal{N}(x, \sigma^2 I)} \left[ \| s_\theta (\tilde{x}, \sigma_i) + \frac{\tilde{x} - x}{\sigma_i^2} \|_2^2 \right]
+\end{align}
+\\\\
+To sample from the model, Song and Ermon \cite{song2020generative} define an algorithm that uses the previously mentioned annealed Langevin dynamics:
+\begin{algorithm}[H]
+  \centering
+  \caption{Sampling from NCSN}\label{alg:ncsn}
+  \begin{algorithmic}[1]
+    \Require $\{\sigma_i\}_{i=1}^L$, $\epsilon$, $T$ 
+    \State $\tilde{x}_0 \sim \pi(x)$
+    \For{$i = 1, 2, ..., L $}
+      \State $\alpha_i \leftarrow \epsilon \cdot \sigma_i^2 / \sigma_L^2$
+      \For{$t = 1, 2, ..., T$}
+        \State $z_t \sim \mathcal{N}(0, I)$
+        \State $\tilde{x}_t \leftarrow \tilde{x}_{t-1} + \frac{\alpha_i}{2} s_\theta (\tilde{x}_{t-1}, \sigma_i) + \sqrt{\alpha_i} z_t$
+      \EndFor
+      \State $\tilde{x}_0 \leftarrow \tilde{x}_T$
+    \EndFor
+    \State \textbf{return} $\tilde{x}_T$
+  \end{algorithmic}
+\end{algorithm}
+
 
 \subsubsection{Equivalence between DDPM and NCSN}
 

@@ -644,6 +644,33 @@
       \verb 2010.02502
       \endverb
     \endentry
+    \entry{songblog}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=7dacbb5a6e92ab16944d46ba03705563}{%
+           family={Song},
+           familyi={S\bibinitperiod},
+           given={Yang},
+           giveni={Y\bibinitperiod}}}%
+      }
+      \strng{namehash}{7dacbb5a6e92ab16944d46ba03705563}
+      \strng{fullhash}{7dacbb5a6e92ab16944d46ba03705563}
+      \strng{bibnamehash}{7dacbb5a6e92ab16944d46ba03705563}
+      \strng{authorbibnamehash}{7dacbb5a6e92ab16944d46ba03705563}
+      \strng{authornamehash}{7dacbb5a6e92ab16944d46ba03705563}
+      \strng{authorfullhash}{7dacbb5a6e92ab16944d46ba03705563}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Blog post: Generative Modeling by Estimating Gradients of the Data Distribution}
+      \field{year}{2021}
+      \verb{urlraw}
+      \verb https://yang-song.net/blog/2021/score/
+      \endverb
+      \verb{url}
+      \verb https://yang-song.net/blog/2021/score/
+      \endverb
+    \endentry
     \entry{song2020generative}{misc}{}
       \name{author}{2}{}{%
         {{hash=7dacbb5a6e92ab16944d46ba03705563}{%
@@ -802,6 +829,38 @@
       \endverb
       \verb{url}
       \verb https://www.iro.umontreal.ca/~vincentp/Publications/smdae_techreport.pdf
+      \endverb
+    \endentry
+    \entry{WelTeh2011a}{misc}{}
+      \name{author}{2}{}{%
+        {{hash=53d2880ad8047b61cdae2c6b2803e763}{%
+           family={Welling},
+           familyi={W\bibinitperiod},
+           given={Max},
+           giveni={M\bibinitperiod}}}%
+        {{hash=a71fae003da84f44e31d26e868859945}{%
+           family={Teh},
+           familyi={T\bibinitperiod},
+           given={Yee\bibnamedelima Whye},
+           giveni={Y\bibinitperiod\bibinitdelim W\bibinitperiod}}}%
+      }
+      \strng{namehash}{f9356edf09db032343ca2eddcc350d31}
+      \strng{fullhash}{f9356edf09db032343ca2eddcc350d31}
+      \strng{bibnamehash}{f9356edf09db032343ca2eddcc350d31}
+      \strng{authorbibnamehash}{f9356edf09db032343ca2eddcc350d31}
+      \strng{authornamehash}{f9356edf09db032343ca2eddcc350d31}
+      \strng{authorfullhash}{f9356edf09db032343ca2eddcc350d31}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Bayesian Learning via Stochastic Gradient Langevin Dynamics}
+      \field{year}{2011}
+      \verb{urlraw}
+      \verb https://www.stats.ox.ac.uk/~teh/research/compstats/WelTeh2011a.pdf
+      \endverb
+      \verb{url}
+      \verb https://www.stats.ox.ac.uk/~teh/research/compstats/WelTeh2011a.pdf
       \endverb
     \endentry
     \entry{wu2018group}{misc}{}

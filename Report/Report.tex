@@ -652,6 +652,25 @@ To sample from the model, Song and Ermon \cite{song2020generative} define an alg
 
 
 \subsubsection{Equivalence between DDPM and NCSN}
+Ho et al.'s DDPM paper \cite{ho2020denoising} showed that the DDPM model is equivalent to the NCSN model with denoising score matching and annealed Langevin dynamics. \\
+This can be seen by the fact that sampling algorithm \ref{} of the DDPM paper is in fact very similar to the sampling algorithm \ref{} of the NCSN paper, but rather than estimating a score, the DDPM model estimates the noise. \cite{ho2020denoising} \\
+Similarly, the score function $s_\theta (x, \sigma)$ can be rewritten in terms of the DDPM's forward process as \cite{weng2021diffusion}:
+{
+  \allowdisplaybreaks
+  \begin{align}
+    s_\theta (x, \sigma) \approx \nabla_x \log q_\sigma (x) &\Leftrightarrow s_\theta (x_t, t) \approx \nabla_{x_t} \log q(x_t) \\
+    &= \mathbb{E}_{q (x_0)} \left[ \nabla_{x_t} \log q(x_t \, | \, x_0) \right] \\
+    &= \mathbb{E}_{q (x_0)} \left[ \nabla_{x_t} \log \mathcal{N} (\sqrt{\bar{\alpha}_t} x_0, (1 - \bar{\alpha}_t) I) \right] \\
+    &= \mathbb{E}_{q (x_0)} \left[ \nabla_{x_t} \log e^{- \frac{1}{2} \left( \frac{x_t - \sqrt{\bar{\alpha}_t} x_0}{\sqrt{1 - \bar{\alpha}_t}} \right)^T \left( \frac{x_t - \sqrt{\bar{\alpha}_t} x_0}{\sqrt{1 - \bar{\alpha}_t}} \right)} \right] \\
+    &= \mathbb{E}_{q (x_0)} \left[ \Sigma^{-1} (x_t - \sqrt{\bar{\alpha}_t} x_0) \right] \\
+    &= \mathbb{E}_{q (x_0)} \left[ \Sigma^{-1} \left(x_t - \sqrt{\bar{\alpha}_t} \left( \frac{x_t - \sqrt{1 - \bar{\alpha}_t} \epsilon_\theta}{\sqrt{\bar{\alpha}_t}} \right) \right) \right] \\
+    &= \mathbb{E}_{q (x_0)} \left[ \Sigma^{-1} \left( \sqrt{1 - \bar{\alpha}_t} \epsilon_\theta \right) \right] \\
+    &= - \frac{1}{1 - \bar{\alpha}_t}  \sqrt{1 - \bar{\alpha}_t} \epsilon_\theta \\
+    &= - \frac{\epsilon_\theta}{\sqrt{1 - \bar{\alpha}_t}}
+  \end{align}
+  We can see that this quantity is used in sampling algorithm \ref{} of the DDPM paper \cite{ho2020denoising}. 
+}
+
 
 
 \newpage

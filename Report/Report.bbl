@@ -863,6 +863,35 @@
       \verb https://www.stats.ox.ac.uk/~teh/research/compstats/WelTeh2011a.pdf
       \endverb
     \endentry
+    \entry{weng2021diffusion}{article}{}
+      \name{author}{1}{}{%
+        {{hash=49d03d499031db786a0e61119024cf5a}{%
+           family={Weng},
+           familyi={W\bibinitperiod},
+           given={Lilian},
+           giveni={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{49d03d499031db786a0e61119024cf5a}
+      \strng{fullhash}{49d03d499031db786a0e61119024cf5a}
+      \strng{bibnamehash}{49d03d499031db786a0e61119024cf5a}
+      \strng{authorbibnamehash}{49d03d499031db786a0e61119024cf5a}
+      \strng{authornamehash}{49d03d499031db786a0e61119024cf5a}
+      \strng{authorfullhash}{49d03d499031db786a0e61119024cf5a}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{lilianweng.github.io}
+      \field{month}{7}
+      \field{title}{What are diffusion models?}
+      \field{year}{2021}
+      \verb{urlraw}
+      \verb https://lilianweng.github.io/posts/2021-07-11-diffusion-models/
+      \endverb
+      \verb{url}
+      \verb https://lilianweng.github.io/posts/2021-07-11-diffusion-models/
+      \endverb
+    \endentry
     \entry{wu2018group}{misc}{}
       \name{author}{2}{}{%
         {{hash=b626dcc418c3a5c74cfaa4c5e643a71f}{%

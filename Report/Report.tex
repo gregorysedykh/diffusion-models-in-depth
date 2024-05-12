@@ -1,7 +1,7 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
-\usepackage{geometry} % Add geometry package here
-\geometry{margin=1.2in} % Set the margin size here
+\usepackage{geometry}
+\geometry{margin=1.2in}
 \usepackage{listings}
 \usepackage{fancyhdr}
 \usepackage{amssymb}
@@ -832,12 +832,55 @@ The authors prove \cite{dhariwal2021diffusion} that if we have a reverse process
   p_{\theta, \Phi} (x_t \, | \, x_{t+1}, y) &= Z p_\theta (x_t \, | \, x_{t+1}) \, p_\Phi(y \, | \, x_t)
 \end{align}
 where $Z$ is a normalization constant.
-
-
+\\\\
+Using the score-based formulation, we can easily find the new objective to train the model with classifier guidance. \cite{luo2022understanding} \\
+Remember that the score-based generative model learned to estimate $\nabla_{x_t} \log q(x_t)$ \ref{}. \\
+If we want to condition the model on class $y$, we are interested in estimating $\nabla_{x_t} \log q(x_t \, | \, y)$. \cite{luo2022understanding} \\
+With Bayes' rule, we can rewrite this as \cite{luo2022understanding}:
+\begin{align}
+  q(x_t \, | \, y) &= \frac{q(y \, | \, x_t) \, q(x_t)}{q(y)}\\
+  \Leftrightarrow \log q(x_t \, | \, y) &= \log \left[ \frac{q(y \, | \, x_t) \, q(x_t)}{q(y)} \right] \\
+  \Leftrightarrow \nabla_{x_t} \log q(x_t \, | \, y) &= \nabla_{x_t} \log q(x_t) + \nabla_{x_t} \log q(y \, | \, x_t) - \nabla_{x_t} \log q(y) \\
+  &= \nabla_{x_t} \log q(x_t) + \nabla_{x_t} \log q(y \, | \, x_t)
+\end{align}
+We can see that $\nabla_{x_t} \log q(x_t)$ is the original unconditional score from the score-based generative model and $\nabla_{x_t} \log q(y \, | \, x_t)$ is the gradient of the log-likelihood of the class $y$ given the image $x_t$. \cite{dhariwal2021diffusion, luo2022understanding}. \\
+To control the strength of the guidance, the authors introduce a hyperparameter $\gamma$ that multiplies the classifier gradient \cite{dhariwal2021diffusion,luo2022understanding}:
+\begin{align}
+  \nabla_{x_t} \log q(x_t \, | \, y) &= \nabla_{x_t} \log q(x_t) + \gamma \nabla_{x_t} \log q(y \, | \, x_t)
+\end{align}
+Trivially, when $\gamma = 0$, the model doesn't use the classifier and we get the original score-based generative model.
+\\\\
+Dhariwal and Nichol \cite{dhariwal2021diffusion} gave two algorithms to train the model with classifier guidance: one for DDPMs and one that also works for DDIMs that uses the score-based generative model formulation:
+\begin{algorithm}[H]
+  \centering
+  \caption{Training a DDPM/DDIM with classifier guidance}\label{alg:ddpm_classifier}
+  \begin{algorithmic}[1]
+    \Require \textit{Model} $\epsilon_\theta (x_t, t)$, \textit{Classifier} $p_\Phi (y \, | \, x_t)$ with $y$ the class label
+    \State Sample $x_T \sim \mathcal{N}(0, I)$
+    \For{$t = T, T-1, ..., 1$}
+      \State $\hat{\epsilon} \leftarrow \epsilon_\theta (x_t, t) - \sqrt{1 - \bar{\alpha}_t} \; \nabla_{x_t} \, p_\Phi (y \, | \, x_t)$
+      \State $x_{t-1} \leftarrow \sqrt{\bar{\alpha}_{t-1}} \left( \frac{x_t - \hat{\epsilon} \sqrt{1 - \bar{\alpha}_t}}{\sqrt{\bar{\alpha}_t}} \right) + \hat{\epsilon} \sqrt{1 - \bar{\alpha}_{t-1}}$
+    \EndFor
+    \State \textbf{return} $x_0$
+  \end{algorithmic}
+\end{algorithm}
 
 \subsubsection{Classifier-free guidance}
-Despite the impressive performance of the \textit{ablated diffusion model} that used classifier guidance, Ho and Salimans made an improvement by using classifier-free guidance. \cite{ho2022classifierfree}
-
+Despite the impressive performance of the \textit{ablated diffusion model} that used classifier guidance, Ho and Salimans made an improvement by using classifier-free guidance. \cite{ho2022classifierfree} \\
+Classifier guidance requires a classifier to be trained on noisy images. This means that not only does it requires training a classifier in addition to the generative model, but it also requires the classifier to be trained on noisy images for which pre-trained classifiers do not generally exist \cite{ho2022classifierfree}. \\
+Therefore, Ho and Salimans \cite{ho2022classifierfree} introduced a classifier-free guidance method which does not require a trained classifier at all. 
+\\\\
+The authors use an unconditional diffusion model $q(x_t)$ and a conditional diffusion model $q(x_t \, | \, y)$ where $y$ is the class label. \cite{ho2022classifierfree, luo2022understanding}. \\
+Starting from equation \ref{}:
+\begin{align}
+  \nabla_{x_t} \log q(x_t \, | \, y) &= \nabla_{x_t} \log q(x_t) + \gamma \nabla_{x_t} \log q(y \, | \, x_t) \\
+  &= \nabla_{x_t} \log q(x_t) + \gamma \left( \nabla_{x_t} \log q (x_t \, | \, y) - \nabla_{x_t} \log q(x_t) \right) \\
+  &= \nabla_{x_t} \log q(x_t) + \gamma \nabla_{x_t} \log q (x_t \, | \, y) - \gamma \nabla_{x_t} \log q(x_t) \\
+  &= \gamma \nabla_{x_t} \log q (x_t \, | \, y) + \nabla_{x_t} \log q(x_t) - \gamma \nabla_{x_t} \log q(x_t) \\
+  &= \gamma \nabla_{x_t} \log q (x_t \, | \, y) + (1 - \gamma) \nabla_{x_t} \log q(x_t)
+\end{align}
+$\gamma \nabla_{x_t} \log q (x_t \, | \, y)$ is the score of the conditional model and $(1 - \gamma) \nabla_{x_t} \log q(x_t)$ is the score of the unconditional model \cite{luo2022understanding}. \\
+However it isn't necessary to train a conditional model and an unconditional model as we can just train the conditional model $q(x_t \, | \, y)$ and simply ignore the conditioning information $y$ (by setting it to null, for example) to get the unconditional model $q(x_t)$. \cite{ho2022classifierfree,luo2022understanding} \\
 \newpage
 \section{Comparison with other diffusion models}
 

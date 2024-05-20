@@ -19,6 +19,30 @@
 
 \refsection{0}
   \datalist[entry]{nty/global//global/global}
+    \entry{stablediffusion}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=57da0a89f365731f93fa82d5a77e8d93}{%
+           family={AI},
+           familyi={A\bibinitperiod},
+           given={Stability},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{57da0a89f365731f93fa82d5a77e8d93}
+      \strng{fullhash}{57da0a89f365731f93fa82d5a77e8d93}
+      \strng{bibnamehash}{57da0a89f365731f93fa82d5a77e8d93}
+      \strng{authorbibnamehash}{57da0a89f365731f93fa82d5a77e8d93}
+      \strng{authornamehash}{57da0a89f365731f93fa82d5a77e8d93}
+      \strng{authorfullhash}{57da0a89f365731f93fa82d5a77e8d93}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labelnamesource}{author}
+      \verb{urlraw}
+      \verb https://github.com/Stability-AI/stablediffusion
+      \endverb
+      \verb{url}
+      \verb https://github.com/Stability-AI/stablediffusion
+      \endverb
+    \endentry
     \entry{videoworldsimulators2024}{article}{}
       \name{author}{13}{}{%
         {{hash=fc86624ab341f287c6199bcbb2ac1686}{%
@@ -202,6 +226,57 @@
       \field{year}{2022}
       \verb{eprint}
       \verb 2207.12598
+      \endverb
+    \endentry
+    \entry{ho2021cascaded}{misc}{}
+      \name{author}{6}{}{%
+        {{hash=2ac2ca10b22e4d13af1767e87495412f}{%
+           family={Ho},
+           familyi={H\bibinitperiod},
+           given={Jonathan},
+           giveni={J\bibinitperiod}}}%
+        {{hash=5350ba4e3e741e11177e033c49a589f4}{%
+           family={Saharia},
+           familyi={S\bibinitperiod},
+           given={Chitwan},
+           giveni={C\bibinitperiod}}}%
+        {{hash=ab1fb800ced7899ad07a1f8377f5c41a}{%
+           family={Chan},
+           familyi={C\bibinitperiod},
+           given={William},
+           giveni={W\bibinitperiod}}}%
+        {{hash=5573293f17e1f12b10be0e811918a6b3}{%
+           family={Fleet},
+           familyi={F\bibinitperiod},
+           given={David\bibnamedelima J.},
+           giveni={D\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=e34c5aa67281924804d54d88e58ca38a}{%
+           family={Norouzi},
+           familyi={N\bibinitperiod},
+           given={Mohammad},
+           giveni={M\bibinitperiod}}}%
+        {{hash=e6f76e1a4d058df028530916774ad3a7}{%
+           family={Salimans},
+           familyi={S\bibinitperiod},
+           given={Tim},
+           giveni={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{d9c72e0919aac578c7e983d804becd3d}
+      \strng{fullhash}{ef7946b1c90c725ef8a448843a25bad3}
+      \strng{bibnamehash}{d9c72e0919aac578c7e983d804becd3d}
+      \strng{authorbibnamehash}{d9c72e0919aac578c7e983d804becd3d}
+      \strng{authornamehash}{d9c72e0919aac578c7e983d804becd3d}
+      \strng{authorfullhash}{ef7946b1c90c725ef8a448843a25bad3}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CV}
+      \field{eprinttype}{arXiv}
+      \field{title}{Cascaded Diffusion Models for High Fidelity Image Generation}
+      \field{year}{2021}
+      \verb{eprint}
+      \verb 2106.15282
       \endverb
     \endentry
     \entry{hyvarinen2005}{misc}{}
@@ -500,6 +575,83 @@
       \verb 1606.05328
       \endverb
     \endentry
+    \entry{peebles2023scalable}{misc}{}
+      \name{author}{2}{}{%
+        {{hash=51d495a7d0ed92eccf02ec3933b18cca}{%
+           family={Peebles},
+           familyi={P\bibinitperiod},
+           given={William},
+           giveni={W\bibinitperiod}}}%
+        {{hash=843b6293b24d49cdfdcda48e1ccd7eb3}{%
+           family={Xie},
+           familyi={X\bibinitperiod},
+           given={Saining},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{cc2d2d1f183667e1057d2062c1f28715}
+      \strng{fullhash}{cc2d2d1f183667e1057d2062c1f28715}
+      \strng{bibnamehash}{cc2d2d1f183667e1057d2062c1f28715}
+      \strng{authorbibnamehash}{cc2d2d1f183667e1057d2062c1f28715}
+      \strng{authornamehash}{cc2d2d1f183667e1057d2062c1f28715}
+      \strng{authorfullhash}{cc2d2d1f183667e1057d2062c1f28715}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CV}
+      \field{eprinttype}{arXiv}
+      \field{title}{Scalable Diffusion Models with Transformers}
+      \field{year}{2023}
+      \verb{eprint}
+      \verb 2212.09748
+      \endverb
+    \endentry
+    \entry{rombach2022highresolution}{misc}{}
+      \name{author}{5}{}{%
+        {{hash=0921e3810ca1ba112b5f374d82f0735f}{%
+           family={Rombach},
+           familyi={R\bibinitperiod},
+           given={Robin},
+           giveni={R\bibinitperiod}}}%
+        {{hash=43a95cf5d0fe271fe6d6d0e5803cbfc9}{%
+           family={Blattmann},
+           familyi={B\bibinitperiod},
+           given={Andreas},
+           giveni={A\bibinitperiod}}}%
+        {{hash=809ae73566d8d76e9931ffde3969f1dc}{%
+           family={Lorenz},
+           familyi={L\bibinitperiod},
+           given={Dominik},
+           giveni={D\bibinitperiod}}}%
+        {{hash=e61c1cb5e29d764299a12d1ab334cdc2}{%
+           family={Esser},
+           familyi={E\bibinitperiod},
+           given={Patrick},
+           giveni={P\bibinitperiod}}}%
+        {{hash=030fdbe4b0bf5c4210fa2e50c87b9ff1}{%
+           family={Ommer},
+           familyi={O\bibinitperiod},
+           given={Björn},
+           giveni={B\bibinitperiod}}}%
+      }
+      \strng{namehash}{b5bfcd95459df0d66c58a299cbec3e9a}
+      \strng{fullhash}{c1e635e3f33ee547be2644eb3d687673}
+      \strng{bibnamehash}{b5bfcd95459df0d66c58a299cbec3e9a}
+      \strng{authorbibnamehash}{b5bfcd95459df0d66c58a299cbec3e9a}
+      \strng{authornamehash}{b5bfcd95459df0d66c58a299cbec3e9a}
+      \strng{authorfullhash}{c1e635e3f33ee547be2644eb3d687673}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CV}
+      \field{eprinttype}{arXiv}
+      \field{title}{High-Resolution Image Synthesis with Latent Diffusion Models}
+      \field{year}{2022}
+      \verb{eprint}
+      \verb 2112.10752
+      \endverb
+    \endentry
     \entry{ronneberger2015unet}{misc}{}
       \name{author}{3}{}{%
         {{hash=8e46da9de9e53ea5d37089897d69cdd9}{%
@@ -534,6 +686,97 @@
       \field{year}{2015}
       \verb{eprint}
       \verb 1505.04597
+      \endverb
+    \endentry
+    \entry{saharia2022photorealistic}{misc}{}
+      \name{author}{14}{}{%
+        {{hash=5350ba4e3e741e11177e033c49a589f4}{%
+           family={Saharia},
+           familyi={S\bibinitperiod},
+           given={Chitwan},
+           giveni={C\bibinitperiod}}}%
+        {{hash=ab1fb800ced7899ad07a1f8377f5c41a}{%
+           family={Chan},
+           familyi={C\bibinitperiod},
+           given={William},
+           giveni={W\bibinitperiod}}}%
+        {{hash=e78159416ed55b8e24182fe25ace3e12}{%
+           family={Saxena},
+           familyi={S\bibinitperiod},
+           given={Saurabh},
+           giveni={S\bibinitperiod}}}%
+        {{hash=0bde480b669967bb3a864e27dbd502cf}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Lala},
+           giveni={L\bibinitperiod}}}%
+        {{hash=de84205a3a888d56a397b2e41e306955}{%
+           family={Whang},
+           familyi={W\bibinitperiod},
+           given={Jay},
+           giveni={J\bibinitperiod}}}%
+        {{hash=ae22b640e83fa2ce5eb7934297e0fa76}{%
+           family={Denton},
+           familyi={D\bibinitperiod},
+           given={Emily},
+           giveni={E\bibinitperiod}}}%
+        {{hash=617a471b74f2b40f5802e2be1150e2da}{%
+           family={Ghasemipour},
+           familyi={G\bibinitperiod},
+           given={Seyed\bibnamedelimb Kamyar\bibnamedelima Seyed},
+           giveni={S\bibinitperiod\bibinitdelim K\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=c922a3723b5d1187cb7ab16fc2611eff}{%
+           family={Ayan},
+           familyi={A\bibinitperiod},
+           given={Burcu\bibnamedelima Karagol},
+           giveni={B\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+        {{hash=7ba9eb9911f14f6315178036e845e637}{%
+           family={Mahdavi},
+           familyi={M\bibinitperiod},
+           given={S.\bibnamedelimi Sara},
+           giveni={S\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=a346efb7a4e21263dac36ca67cf43fc3}{%
+           family={Lopes},
+           familyi={L\bibinitperiod},
+           given={Rapha\bibnamedelima Gontijo},
+           giveni={R\bibinitperiod\bibinitdelim G\bibinitperiod}}}%
+        {{hash=e6f76e1a4d058df028530916774ad3a7}{%
+           family={Salimans},
+           familyi={S\bibinitperiod},
+           given={Tim},
+           giveni={T\bibinitperiod}}}%
+        {{hash=2ac2ca10b22e4d13af1767e87495412f}{%
+           family={Ho},
+           familyi={H\bibinitperiod},
+           given={Jonathan},
+           giveni={J\bibinitperiod}}}%
+        {{hash=5573293f17e1f12b10be0e811918a6b3}{%
+           family={Fleet},
+           familyi={F\bibinitperiod},
+           given={David\bibnamedelima J},
+           giveni={D\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=e34c5aa67281924804d54d88e58ca38a}{%
+           family={Norouzi},
+           familyi={N\bibinitperiod},
+           given={Mohammad},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{01c07b2f7e8809bcc5ee0da070039c95}
+      \strng{fullhash}{8b04eec1ac8842357503ea16a8ebfb7e}
+      \strng{bibnamehash}{01c07b2f7e8809bcc5ee0da070039c95}
+      \strng{authorbibnamehash}{01c07b2f7e8809bcc5ee0da070039c95}
+      \strng{authornamehash}{01c07b2f7e8809bcc5ee0da070039c95}
+      \strng{authorfullhash}{8b04eec1ac8842357503ea16a8ebfb7e}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CV}
+      \field{eprinttype}{arXiv}
+      \field{title}{Photorealistic Text-to-Image Diffusion Models with Deep Language Understanding}
+      \field{year}{2022}
+      \verb{eprint}
+      \verb 2205.11487
       \endverb
     \endentry
     \entry{salimans2016weight}{misc}{}

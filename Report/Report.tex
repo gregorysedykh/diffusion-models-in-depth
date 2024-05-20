@@ -23,6 +23,10 @@
 
 \graphicspath{ {./images/} }
 
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+
+
 \hypersetup{
     colorlinks=true,
     linkcolor=blue,
@@ -94,7 +98,7 @@
 \newpage
 \section{Introduction}
 
-Diffusion models have gained widespread popularity since 2020, as models such as DALL-E, Stable Diffusion and Midjourney have proven to be capable of generating high-quality images given a text prompt. Furthermore, OpenAI's recent announcement of Sora has shown that diffusion models have now also become highly capable of generating minute long high-definition videos from a text prompt. \cite{videoworldsimulators2024}
+Diffusion models have gained widespread popularity since 2020, as models such as DALL-E, Stable Diffusion \cite{stablediffusion,rombach2022highresolution} and Midjourney have proven to be capable of generating high-quality images given a text prompt. Furthermore, OpenAI's recent announcement of Sora has shown that diffusion models have now also become highly capable of generating minute long high-definition videos from a text prompt. \cite{videoworldsimulators2024}
 \\\\
 These models date back to 2015, where the idea of a diffusion model appeared, based on diffusion processes used in thermodynamics. \cite{sohldickstein2015deep} \\
 Denoising Diffusion Probabilistic Models (DDPMs) were a development of the original diffusion probabilistic model introduced in 2015. \cite{ho2020denoising} \\
@@ -511,10 +515,10 @@ Ho et al. \cite{ho2020denoising} present two algorithms: one for training the mo
   \end{algorithm}
 \end{minipage}
 
-\subsection{Score-based formulation}
+\section{Score-based formulation}
 The DDPM paper \cite{ho2020denoising} allows us to predict either the next denoised image, the mean of the next denoised image or the noise itself. \\
 However they mention another formulation of the DDPM model that is equivalent: a score-based generative modeling version
-\subsubsection{Score matching}
+\subsection{Score matching}
 This formulation uses score matching \cite{hyvarinen2005}, either denoising score matching \cite{vincent2010denoising} or sliced score matching \cite{song2019sliced}. \\
 Essentially, score matching avoids optimizing the likelihood which can sometimes be difficult to find because of normalisation constants, and instead optimises a score function which is the gradient of the log-likelihood. \\
 Suppose we have a probability density function $p_\theta (x)$ that models an i.i.d. dataset $\{x_i\}_{i=1}^N$ of the p.d.f. $p(x)$. 
@@ -572,7 +576,7 @@ The approximation of the Jacobian matrix $v^T \nabla_x s_\theta (x) \, v$ can be
 \end{align}
 The gradient of the inner product $\nabla_x (v^T s_\theta (x))$ requires only one backpropagation pass and requires another inner product with $v^T$ to approximate the trace. \cite{song2019sliced} 
 
-\subsubsection{Sampling}
+\subsection{Sampling}
 Using the score function mentioned above, we can sample from the model by using Langevin dynamics \cite{song2020generative, WelTeh2011a}, which will give us the definition of score-based generative modeling. \cite{song2020generative}
 \\\\
 Let $x_0 \sim \pi (x)$ where $\pi (x)$ is an arbitrary distribution (such as a Gaussian distribution), $\epsilon > 0$ a fixed step size and $z_t \sim \mathcal{N}_D (0, I)$. \\
@@ -599,14 +603,14 @@ This means that when sampling using Langevin dynamics, the samples will ultimate
 To correct this, Song and Ermon \cite{song2020generative} use annealed Langevin dynamics. \\
 The idea is to add noise to the data points in order to improve the score function estimation in low density regions. \cite{songblog} However adding too much noise will make the score function estimation worse in high density regions. \cite{songblog}. \\
 Therefore, they control the amount of noise added using a scale of differents standard deviations $\sigma_i$ with $i = 1, 2, ..., L$ such that $\sigma_1 < \sigma_2 < ... < \sigma_L$. \cite{songblog,song2020generative} \\
-To sample, the same Langevin dynamics method is used going from $i = L, L-1, ..., 1$ with $\sigma_i$ decreasing at each step. This is the annealed Langevin dynamics method they used, and the results can be seen in figure \ref{}, where we clearly see that the annealed Langevin dynamics samples are much more similar to the original data samples than the simple Langevin dynamics samples. \cite{songblog,song2020generative} \\ 
+To sample, the same Langevin dynamics method is used going from $i = L, L-1, ..., 1$ with $\sigma_i$ decreasing at each step. This is the annealed Langevin dynamics method they used, and the results can be seen in figure \ref{}, where we clearly see that the annealed Langevin dynamics samples are much more similar to the original data samples than the simple Langevin dynamics samples. \cite{songblog, song2020generative} \\ 
 \begin{figure}[h]
   \begin{center}
-    \includegraphics[width=\textwidth]{images/samples.png}
+    \includegraphics[width=\textwidth]{images/langevin_samples.png}
     \caption{Left: Samples from data distribution. Middle: Samples from model using Langevin dynamics. Right: Samples from model using annealed Langevin dynamics. \cite{song2020generative}} 
   \end{center}
 \end{figure}
-\subsubsection{Noise Conditional Score Networks}
+\subsection{Noise Conditional Score Networks}
 Noise Conditional Score Networks (NCSN) are a score-based generative model that use a neural network to estimate the score function of the previously mentioned noised distribution and then use annealed Langevin dynamics to sample from the model. \cite{song2020generative}
 \\\\
 Given the increasing sequence of standard deviations $\sigma_i$ with $i = 1, 2, ..., L$, the perturbed data distribution is defined as \cite{song2020generative}:
@@ -651,7 +655,7 @@ To sample from the model, Song and Ermon \cite{song2020generative} define an alg
 \end{algorithm}
 
 
-\subsubsection{Equivalence between DDPM and NCSN}
+\subsection{Equivalence between DDPM and NCSN}
 Ho et al.'s DDPM paper \cite{ho2020denoising} showed that the DDPM model is equivalent to the NCSN model with denoising score matching and annealed Langevin dynamics. \\
 This can be seen by the fact that sampling algorithm \ref{} of the DDPM paper is in fact very similar to the sampling algorithm \ref{} of the NCSN paper, but rather than estimating a score, the DDPM model estimates the noise. \cite{ho2020denoising} \\
 Similarly, the score function $s_\theta (x, \sigma)$ can be rewritten in terms of the DDPM's forward process as \cite{weng2021diffusion}:
@@ -882,11 +886,104 @@ Starting from equation \ref{}:
 $\gamma \nabla_{x_t} \log q (x_t \, | \, y)$ is the score of the conditional model and $(1 - \gamma) \nabla_{x_t} \log q(x_t)$ is the score of the unconditional model \cite{luo2022understanding}. \\
 However it isn't necessary to train a conditional model and an unconditional model as we can just train the conditional model $q(x_t \, | \, y)$ and simply ignore the conditioning information $y$ (by setting it to null, for example) to get the unconditional model $q(x_t)$. \cite{ho2022classifierfree,luo2022understanding} \\
 \newpage
-\section{Comparison with other diffusion models}
+\section{Further development}
+
+\subsection{Cascaded Diffusion Models}
+Training a diffusion model on high-resolution images is computationally expensive and therefore time-consuming. \\
+To address this, Ho et al. \cite{ho2021cascaded} introduced the cascaded diffusion model (CDM) which is essentially a pipeline of diffusion models where the first one generates a low-resolution image and the subsequent ones are trained to upsample the image to a higher resolution. \\
+This method is much faster than training a single diffusion model on the high-resolution image as most of the important features for sampling are already present in the low-resolution image which are fast to train, whereas training at bigger resolutions doesn't add much more detail compared to the computation costs. \cite{ho2021cascaded}
+\\
+As mentioned, the first model is trained to generate an image as we have seen before. The subsequent models are trained using what Ho et al. call conditioning augmentation, a type of data augmentation, where the model is given a lower-resolution image and is trained on modified versions of the image to generate a higher-resolution and overall higher-quality image. \cite{ho2021cascaded} \\
+For low resolution images, the authors use added Gaussian noise and use Gaussian blurring for higher resolution images. \cite{ho2021cascaded}
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{images/cascadedUnet.png}
+    \caption{U-Net used for each of the model of a CDM pipeline: the upsampling models are given an image to upsample $x_t$ and an upsampled low-resolution image $z$. For each of the blocks $1, ..., K$, the image is upsampled/downsampled by 2, the channels are given by the channel multipliers $M_{1, ..., K}$ \cite{ho2021cascaded}}
+  \end{center}
+\end{figure}
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{images/cascading.png}
+    \caption{Example of a cascading diffusion pipeline for generating a 256 $\times$ 256 resolution image conditioned on a class \cite{ho2021cascaded}}
+  \end{center}
+\end{figure}
+\\
+As a result, the authors achieve an FID of $4.88$ on ImageNet $256 \times 256$ with a CDM, where the first model generates a $32 \times 32$ image, the second model upsamples it to $64 \times 64$ and the third model upsamples it to $256 \times 256$ \cite{ho2021cascaded}. \\
+As an example,\textit{Imagen} \cite{saharia2022photorealistic} from Google is a popular cascaded diffusion model to efficiently generate high-resolution images. \\
+\subsection{Latent Diffusion Models}
+Latent Diffusion Models (LDMs) were introduced by Rombach et al. in their paper \textit{High-Resolution Image Synthesis with Latent Diffusion Models} \cite{rombach2022highresolution}. \\
+Rather than do the forward and reverse processes in the pixel space, the authors propose to do them in the latent space in order to speed up the computation by reducing the dimensionality of the data. \cite{rombach2022highresolution} \\
+In order to do this, a Variational Autoencoder (VAE) is used to first encode the image $x$ into a latent representation $z$. The forward process is then applied to the latent representation $z$ until we obtain $z_T$. \cite{rombach2022highresolution}
+As for the reverse process, the model (a U-Net in their paper) will denoise the latent representation $z_T$ until we obtain $\tilde{z}$ which is then passed through the decoder of the VAE to obtain the denoised image $\tilde{x}$ \cite{rombach2022highresolution}. \\
+\\
+This means that given an image $x$, the encoder $\mathcal{E}$ will encode $x$ into a latent representation $z$:
+\begin{align}
+  z &= \mathcal{E}(x)
+\end{align}
+Once the forward process and reverse process are done in the latent space, the decoder $\mathcal{D}$ will decode the denoised latent representation $\tilde{z}$ into the denoised image $\tilde{x}$:
+\begin{align}
+  \tilde{x} &= \mathcal{D}(\tilde{z})
+\end{align}
+From the training objective \ref{}, we get a new training objective for LDMs \cite{rombach2022highresolution}:
+\begin{align}
+  L_{\text{LDM}} &= \mathbb{E}_{\mathcal{E}(x), \epsilon \sim \mathcal{N}(0, I), t} \left[ \| \epsilon - \epsilon_\theta (z_t, t) \|_2^2 \right]
+\end{align}
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=0.75\textwidth]{images/latentdiffusion.png}
+    \caption{Latent Diffusion processes \cite{rombach2022highresolution}}
+  \end{center}
+\end{figure}
+\\
+In terms of results, Rombach et al. \cite{rombach2022highresolution} managed to achieve an FID of 3.60 on ImageNet $256 \times 256$ with 271 days of training on a Nvidia V100 GPU, which is better than the 3.85 FID achieved by Dhariwal and Nichol \cite{dhariwal2021diffusion} with their ADM-G and ADM-U (guidance and upsampling) which required 349 days of training on a V100 \cite{rombach2022highresolution}.
+\\\\
+An example of a current LDM is \textit{Stable Diffusion} \cite{stablediffusion, rombach2022highresolution}, which has become very popular nowadays and is easily available for use to the general public.
+
+\subsection{Diffusion Transformer}
+Recently, a new alternative to the U-Net architecture has been proposed by Peebles and Xie in their paper \textit{Scalable Diffusion Models with Transformers} \cite{peebles2023scalable}. \\
+As the name suggests, the Diffusion Transformer (DiT) architecture is based on the Transformer architecture \cite{vaswani2023attention} used for Natural Language Processing (NLP).
+\\\\
+The architecture builds upon Latent Diffusion Models (LDMs) \cite{rombach2022highresolution}, since it takes as input the latent representation $z$. \\
+The first step is called \textit{patchify}: given that we have a spatial input, this input is to be converted into tokens.
+Positional encodings are subsequently added to the tokens to give the model information about the spatial structure of the image. \cite{peebles2023scalable} \\
+This information is then passed through DiT blocks (see figure \ref{fig:DiT}) before going through layer normalisation. \\
+Finally, the output is passed through a linear layer and then reshaped back in order to return the noise and the covariance matrix $\Sigma$. \cite{peebles2023scalable}
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/DiT.png}
+    \caption{Diffusion Transformer architecture \cite{peebles2023scalable}}
+    \label{fig:DiT}
+  \end{center}
+\end{figure}
+\\\\
+Compared to the previous experiments on class-conditioned ImageNet $256 \times 256$, the DiT model has the best FID of them all with $2.27$ \cite{peebles2023scalable}, showing that the DiT brings significant improvement to sample quality. \\
 
 \newpage
 \section{Implementation}
-
+A simple implementation of a DDPM for the MNIST dataset in PyTorch is given in the Jupyter notebook \texttt{DMID.ipynb}. The code aims to be as close as possible to the original DDPM paper \cite{ho2020denoising}. It can be run on a CPU or a CUDA-enabled GPU.
+\\\\
+The code provides an explanation and implementation of a U-Net architecture similar to the original one. \\
+Ho et al. used a self-attention block not only between the two ResNet-like blocks in the bottleneck, but also at the encoder and decoder stages at $16 \times 16$ resolution images. They trained the model as such for CIFAR-10, CelebA-HQ and LSUN datasets. \cite{ho2020denoising} \\
+\texttt{DMID.ipynb} contains a model without self-attention blocks as this visually gave worse results on the MNIST dataset, possibly because of overfitting.
+\\\\
+The forward process uses the linear noising schedule $\beta$ and the reverse process uses the same $1000$ timesteps from the original DDPM paper \cite{ho2020denoising}, however the code is easily modifiable to use a different noising schedule (e.g. cosine noising schedule) and a different number of timesteps. Similarly, a learning rate of $10^{-4}$ was used as it was found to work well for the MNIST dataset but this can also be changed to the original $2 \times 10^{-4}$ learning rate.
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/forward.png}
+    \caption{Noised images at different timesteps of the forward process}
+  \end{center}
+\end{figure}
+\\
+The model contains 7'339'297 parameters, much less than Ho et al.'s CIFAR-10 model which has 35.7 mln parameters and the CelebA-HQ model with its 114 mln parameters. \cite{ho2020denoising} \\
+On an Apple M2 Pro chip using MPS, training takes around 70s per epoch for $1000$ timesteps and $32 \times 32$ MNIST images and sampling 1 image takes around 13.4s. \\
+This means that the model is not so complex but still takes a long time to train and sample from without significant resources like a TPU v3-8 used by Ho et al. \cite{ho2020denoising}. 
+\newpage
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{images/sample.png}
+    \caption{Samples generated by the model}
+  \end{center}
+\end{figure}
 \newpage
 \section{Conclusion}
 

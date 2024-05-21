@@ -131,15 +131,15 @@ Pixels in the image $x_t$ are assumed to be mutually independent since the covar
 \\\\
 Formally, we obtain the following Markov process:
 \begin{align}
-  q\left(x_{1},..., x_{T} | x_0\right) = \prod_{t = 1}^T{q\left(x_t | x_{t - 1}\right)}
+  q\left(x_{1},..., x_{T} | x_0\right) = \prod_{t = 1}^T{q\left(x_t | x_{t - 1}\right)} \label{eq:forwardprocess}
 \end{align}
 where:
 \begin{align}
-  q\left(x_t | x_{t-1}\right) = \mathcal{N}\left(x_t; \sqrt{1 - \beta_t}x_{t-1}, \beta_t I\right)
+  q\left(x_t | x_{t-1}\right) = \mathcal{N}\left(x_t; \sqrt{1 - \beta_t}x_{t-1}, \beta_t I\right) \label{eq:forwardstep}
 \end{align}
 \\\\
-Equation \ref{eq:2} gives us a single step forward: given the previous image $x_{t-1}$, $x_t$ is obtained by sampling a $D$-dimensional Gaussian distribution with mean $\sqrt{1 - \beta_t}x_{t-1}$ and variance $\beta_t I$. \\
-Equation \ref{eq:1} gives us the full forward process from the original image $x_0$ to the final image $x_T$.
+Equation \ref{eq:forwardstep} gives us a single step forward: given the previous image $x_{t-1}$, $x_t$ is obtained by sampling a $D$-dimensional Gaussian distribution with mean $\sqrt{1 - \beta_t}x_{t-1}$ and variance $\beta_t I$. \\
+Equation \ref{eq:forwardprocess} gives us the full forward process from the original image $x_0$ to the final image $x_T$.
 \\\\
 The reparametrisation trick says that for a univariate Gaussian distribution where $z \sim p\left(z | x\right) = \mathcal{N}\left(\mu, \sigma^2\right)$, a valid reparametrisation would be $z = \mu + \sigma \epsilon$ where $\epsilon \sim \mathcal{N}\left(0, 1\right)$ is just noise. \cite{kingma2022autoencoding} \\
 In this case, we can see that the image becomes more random because of the added Gaussian noise from $\epsilon_t$ at each step, since we are sampling:
@@ -149,7 +149,7 @@ In this case, we can see that the image becomes more random because of the added
 \end{align}
 \\\\
 It is important to note that as $T \rightarrow \infty$ and with a correct choice of $\beta_t$,  $x_T$ will become a sample of an isotropic Gaussian distribution ($\mathcal{N}\left(0, I\right)$). \cite{nichol2021improved} \cite{sohldickstein2015deep}. \\
-This is important for the reverse process, as it will allow us to take a sample $x_T \sim \mathcal{N}\left(0, I\right)$ and reverse the forward process to obtain the original image $x_0$ (however this cannot be done so simply, as seen in section 3) \cite{nichol2021improved}.
+This is important for the reverse process, as it will allow us to take a sample $x_T \sim \mathcal{N}\left(0, I\right)$ and reverse the forward process to obtain the original image $x_0$ (however this cannot be done so simply, as seen in section \ref{improvements}) \cite{nichol2021improved}.
 \\\\
 Ho et al. \cite{ho2020denoising} use the reparametrisation trick to be able to sample $x_t$ at any arbitrary step $t$ of the forward process.
 \\\\
@@ -195,17 +195,17 @@ Let $\bar{\alpha}_t = \prod_{i=0}^{t}{\alpha_i}$:
 \\\\
 This will give us a way to find a noisy image at step $t$ of the forward process, given the original image $x_0$ (we ignore the noise $\epsilon \sim \mathcal{N}_D\left(0, I\right)$):
 \begin{gather}
-  q\left(x_t | x_0\right) = \mathcal{N}\left(\sqrt{\bar{\alpha}_t} x_0, \left(1 - \bar{\alpha}_t\right)I\right)
+  q\left(x_t | x_0\right) = \mathcal{N}\left(\sqrt{\bar{\alpha}_t} x_0, \left(1 - \bar{\alpha}_t\right)I\right) \label{eq:quickforwardprocess}
 \end{gather}
 \\
 We now also know that $1 - \bar{\alpha}_t$ is the equivalent variance of the noise added to $x_0$ to obtain $x_t$ during the forward process. \cite{nichol2021improved}
 \\\\
 Choosing the variances $\beta_t$ is an important step when developing the forward process. \\
 Ho et al. \cite{ho2020denoising} chose to use a linear schedule starting from $\beta_1 = 10^{-4}$ and increasing linearly until $\beta_T = 0.02$ in order for them to be small compared to the pixel values that were in $\left[-1, 1\right]$. \cite{ho2020denoising} \\
-However we will see in section 3 that this is not the best choice, as this destroyed the images too quickly closer to the end of the process while providing little to sample quality, which made the model be sub-optimal for $64 \times 64$ and $32 \times 32$ images. \cite{nichol2021improved}
+However we will see in section \ref{improvements} that this is not the best choice, as this destroyed the images too quickly closer to the end of the process while providing little to sample quality, which made the model be sub-optimal for $64 \times 64$ and $32 \times 32$ images. \cite{nichol2021improved}
 \\\\
 Finally, Ho et al. \cite{ho2020denoising} chose $T = 1000$ in order to be able to compare their model with Sohl et al.'s \cite{sohldickstein2015deep} model, which also used $T = 1000$ for most image experiments. \\
-We will again see in section 3 that so many steps can make the sampling slow and that there are better choices. \cite{nichol2021improved}
+We will again see in section \ref{improvements} that so many steps can make the sampling slow and that there are better choices. \cite{nichol2021improved}
 \subsection{Reverse Process}
 
 As mentioned previously, with a correct choice of $\beta_t$, $x_T$ will become a sample of an isotropic Gaussian distribution over $\mathbb{R}^D$ as $T \rightarrow \infty$. \cite{nichol2021improved, sohldickstein2015deep} \\
@@ -215,15 +215,15 @@ Therefore, an estimation $p_\theta (x_{t-1} | x_t)$ of $q(x_{t-1}|x_t)$ is found
 \\\\
 The reverse process is defined as follows \cite{ho2020denoising}:
 \begin{gather}
-  p_{\theta}\left(x_0, ..., x_T\right) = p\left(x_T\right) \: \prod_{t=1}^T p_{\theta}\left(x_{t-1} | x_t\right)
+  p_{\theta}\left(x_0, ..., x_T\right) = p\left(x_T\right) \: \prod_{t=1}^T p_{\theta}\left(x_{t-1} | x_t\right) \label{eq:reverseprocess}
 \end{gather}
 where
 \begin{gather}
-  p_{\theta}\left(x_{t-1} | x_t\right) = \mathcal{N}\left(x_{t-1}; \mu_{\theta}\left(x_t, t\right), \Sigma_{\theta}\left(x_t, t\right)\right)
+  p_{\theta}\left(x_{t-1} | x_t\right) = \mathcal{N}\left(x_{t-1}; \mu_{\theta}\left(x_t, t\right), \Sigma_{\theta}\left(x_t, t\right)\right) \label{eq:reversestep}
 \end{gather}
 \\\\
-Equation \ref{eq:5} gives us the full reverse process, starting from the final image $x_T$ to the original image $x_0$. \\
-Equation \ref{eq:6} gives us the reverse process at step $t$, where we estimate the noise that was added to the image at step $t$ of the forward process in order to find the image $x_{t-1}$. \\
+Equation \ref{eq:reverseprocess} gives us the full reverse process, starting from the final image $x_T$ to the original image $x_0$. \\
+Equation \ref{eq:reversestep} gives us the reverse process at step $t$, where we estimate the noise that was added to the image at step $t$ of the forward process in order to find the image $x_{t-1}$. \\
 Two parameters must be estimated to find the reverse process at step $t$ (from $x_t$ to $x_{t-1}$): the mean $\mu_{\theta}\left(x_t, t\right)$ and the variance $\Sigma_{\theta}\left(x_t, t\right)$. \\
 At first, Ho et al. \cite{ho2020denoising} used neural networks to estimate both the mean and the variance, but explain that estimating the variance was not necessary as there was little difference between the estimated variance $\sigma_t^2 = \tilde{\beta}_t = \frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t}$ and the actual values $\sigma_t^2 = \beta_t$ \cite{ho2020denoising}. Thus they set $\Sigma_{\theta}\left(x_t, t\right) = \sigma_t^2 I = \beta_t I$. \\
 As for the mean, it is estimated using a neural network trained to optimise a variational lower bound ($VLB$) of the negative log likelihood $\mathbb{E}\left[- \log p_{\theta} \left(x_0\right)\right]$. \cite{ho2020denoising}
@@ -300,7 +300,7 @@ Ho et al. \cite{ho2020denoising} define it as:
 Using Bayes' theorem, we find:
 
 \begin{align}
-  q\left(x_{t-1} | x_t, x_0\right) &= q\left(x_t | x_{t-1}, x_0\right) \frac{q\left(x_{t-1}| x_0\right)}{q\left(x_t | x_0\right)}
+  q\left(x_{t-1} | x_t, x_0\right) &= q\left(x_t | x_{t-1}, x_0\right) \frac{q\left(x_{t-1}| x_0\right)}{q\left(x_t | x_0\right)} \label{eq:ddpmbayes}
 \end{align}
   Assuming that $q\left(x_t | x_{t-1}, x_0\right) = \mathcal{N}\left(x_{t-1}; \tilde{\mu}_t \left(x_t, x_0\right), \tilde{\beta_t} I\right)$, then:
 \begin{align}
@@ -453,7 +453,7 @@ As for the second term $L_0$, the authors define $p_\theta(x_0 | x_1)$ as:
 This is a decoder for the last step in order to get pixel values between $\{0, 1, ..., 255 \}$ from the values in $[-1, 1]$ used for the neural network \cite{ho2020denoising,nichol2021improved} \\
 However the authors also ignored the entire term, giving us:
 \begin{equation}
-  L_{\text{simple}}(\theta) = \mathbb{E}_q \left[ \| \epsilon - \epsilon_\theta \|_2^2 \right]
+  L_{\text{simple}}(\theta) = \mathbb{E}_q \left[ \| \epsilon - \epsilon_\theta \|_2^2 \right] \label{eq:l_simple}
 \end{equation}
 \\\\
 \subsubsection{Model architecture}
@@ -591,11 +591,12 @@ Since we don't know the true data distribution $p(x)$, we can use the score func
   x_t &= x_{t-1} + \frac{\epsilon}{2} s_\theta (x_{t-1}) + \sqrt{\epsilon} z_t
 \end{align}
 There is however a problem with this method: the score function is well approximated at high density regions where there are a lot of data points but not at low density regions. \cite{song2020generative} \\
-Song and Ermon \cite{song2020generative} show this in figure \ref{} by comparing the real score function $\nabla_x \log p(x)$ and the estimated score function $s_\theta (x)$ for a mixture of two Gaussian distributions.
+Song and Ermon \cite{song2020generative} show this in figure \ref{fig:scores} by comparing the real score function $\nabla_x \log p(x)$ and the estimated score function $s_\theta (x)$ for a mixture of two Gaussian distributions.
 \begin{figure}[h]
   \begin{center}
     \includegraphics[width= 0.75\textwidth]{images/highlowdensity.png}
     \caption{Data scores represent the real score function $\nabla_x \log p(x)$ and estimated scores reperesent the estimated score function $s_\theta (x)$. We can see that the regions in the red rectangles are the darker high density regions where the score function is well approximated, while the lighter lower density regions outside the red rectangles were not well estimated. \cite{song2020generative}}
+    \label{fig:scores}
   \end{center}
 \end{figure}
 \\\\
@@ -603,11 +604,12 @@ This means that when sampling using Langevin dynamics, the samples will ultimate
 To correct this, Song and Ermon \cite{song2020generative} use annealed Langevin dynamics. \\
 The idea is to add noise to the data points in order to improve the score function estimation in low density regions. \cite{songblog} However adding too much noise will make the score function estimation worse in high density regions. \cite{songblog}. \\
 Therefore, they control the amount of noise added using a scale of differents standard deviations $\sigma_i$ with $i = 1, 2, ..., L$ such that $\sigma_1 < \sigma_2 < ... < \sigma_L$. \cite{songblog,song2020generative} \\
-To sample, the same Langevin dynamics method is used going from $i = L, L-1, ..., 1$ with $\sigma_i$ decreasing at each step. This is the annealed Langevin dynamics method they used, and the results can be seen in figure \ref{}, where we clearly see that the annealed Langevin dynamics samples are much more similar to the original data samples than the simple Langevin dynamics samples. \cite{songblog, song2020generative} \\ 
+To sample, the same Langevin dynamics method is used going from $i = L, L-1, ..., 1$ with $\sigma_i$ decreasing at each step. This is the annealed Langevin dynamics method they used, and the results can be seen in figure \ref{fig:langevin_samples}, where we clearly see that the annealed Langevin dynamics samples are much more similar to the original data samples than the simple Langevin dynamics samples. \cite{songblog, song2020generative} \\ 
 \begin{figure}[h]
   \begin{center}
     \includegraphics[width=\textwidth]{images/langevin_samples.png}
-    \caption{Left: Samples from data distribution. Middle: Samples from model using Langevin dynamics. Right: Samples from model using annealed Langevin dynamics. \cite{song2020generative}} 
+    \caption{Left: Samples from data distribution. Middle: Samples from model using Langevin dynamics. Right: Samples from model using annealed Langevin dynamics. \cite{song2020generative}}
+    \label{fig:langevin_samples}
   \end{center}
 \end{figure}
 \subsection{Noise Conditional Score Networks}
@@ -657,7 +659,7 @@ To sample from the model, Song and Ermon \cite{song2020generative} define an alg
 
 \subsection{Equivalence between DDPM and NCSN}
 Ho et al.'s DDPM paper \cite{ho2020denoising} showed that the DDPM model is equivalent to the NCSN model with denoising score matching and annealed Langevin dynamics. \\
-This can be seen by the fact that sampling algorithm \ref{} of the DDPM paper is in fact very similar to the sampling algorithm \ref{} of the NCSN paper, but rather than estimating a score, the DDPM model estimates the noise. \cite{ho2020denoising} \\
+This can be seen by the fact that sampling algorithm of the DDPM paper (\ref{alg:sampling}) is in fact very similar to the sampling algorithm of the NCSN paper (\ref{alg:ncsn}) but rather than estimating a score, the DDPM model estimates the noise. \cite{ho2020denoising} \\
 Similarly, the score function $s_\theta (x, \sigma)$ can be rewritten in terms of the DDPM's forward process as \cite{weng2021diffusion}:
 {
   \allowdisplaybreaks
@@ -672,13 +674,13 @@ Similarly, the score function $s_\theta (x, \sigma)$ can be rewritten in terms o
     &= - \frac{1}{1 - \bar{\alpha}_t}  \sqrt{1 - \bar{\alpha}_t} \epsilon_\theta \\
     &= - \frac{\epsilon_\theta}{\sqrt{1 - \bar{\alpha}_t}}
   \end{align}
-  We can see that this quantity is used in sampling algorithm \ref{} of the DDPM paper \cite{ho2020denoising}. 
+  We can see that this quantity is used in sampling algorithm of the DDPM paper (\ref{alg:sampling}) \cite{ho2020denoising}. 
 }
 
 
 
 \newpage
-\section{Improvements upon DDPMs}
+\section{Improvements upon DDPMs} \label{improvements}
 
 As mentioned previously, the DDPM paper \cite{ho2020denoising} had certain choices that limited its performance.\\
 Several papers \cite{nichol2021improved, song2022denoising} following it have improved upon the original DDPM in various ways.
@@ -739,7 +741,7 @@ They had tried to reduce the number of sampling steps with the original fixed va
 
 \subsection{Denoising Diffusion Implicit Models (DDIMs)}
 As mentioned previously, the DDPM paper \cite{ho2020denoising} has a forward process and a reverse process which are both Markov processes. \\
-While the forward process can be easily calculated for a specific timestep $t$ with equation \ref{eq:}, the reverse process still requires 1000 timesteps in the case of Ho et al.'s \cite{ho2020denoising} model, and Nichol et al.'s model requires 100 and 4000 timesteps for sampling and training respectively. \cite{nichol2021improved} \\
+While the forward process can be easily calculated for a specific timestep $t$ with equation \ref{eq:quickforwardprocess}, the reverse process still requires 1000 timesteps in the case of Ho et al.'s \cite{ho2020denoising} model, and Nichol et al.'s model requires 100 and 4000 timesteps for sampling and training respectively. \cite{nichol2021improved} \\
 This is time-consuming and computationally expensive compared to GANs which only require one forward pass through the network rather than thousands to produce a sample. \cite{song2022denoising}
 \\\\
 To address this issue, Song et al. \cite{song2022denoising} introduced the Denoising Diffusion Implicit Models (DDIMs) in 2020. \\
@@ -761,7 +763,7 @@ It is interesting to note that when $\sigma_t^2 = (1 - \alpha_t)(1 - \bar{\alpha
 Song et al. \cite{song2022denoising} also note when $\sigma_t^2 = 0$, then $x_{t-1}$ is fixed and known in advance. \\
 Therefore, we can see that as Song et al. \cite{song2022denoising} state, the value of $\sigma$ controls the stochasticity (or more simply, the randomness) of the forward process.
 \\\\
-The authors use Bayes' rule similarly to the original DDPM paper \cite{ho2020denoising} in equation \ref{eq:}, but instead to find the forward process $q_\sigma(x_t | \, x_{t-1}, x_0)$:
+The authors use Bayes' rule similarly to the original DDPM paper \cite{ho2020denoising} in equation \ref{eq:ddpmbayes}, but instead to find the forward process $q_\sigma(x_t | \, x_{t-1}, x_0)$:
 \begin{align}
   q_{\sigma}(x_t | \, x_{t-1}, x_0) &= \frac{q_\sigma (x_{t-1} | \, x_t, x_0) \: q_\sigma (x_t | \, x_0)}{q_\sigma (x_{t-1} | \, x_0)}
 \end{align}
@@ -870,7 +872,7 @@ Dhariwal and Nichol \cite{dhariwal2021diffusion} gave two algorithms to train th
 \end{algorithm}
 
 \subsubsection{Classifier-free guidance}
-Despite the impressive performance of the \textit{ablated diffusion model} that used classifier guidance, Ho and Salimans made an improvement by using classifier-free guidance. \cite{ho2022classifierfree} \\
+Despite the impressive performance of the \textit{ablated diffusion model} (ADM) that used classifier guidance, Ho and Salimans made an improvement by using classifier-free guidance. \cite{ho2022classifierfree} \\
 Classifier guidance requires a classifier to be trained on noisy images. This means that not only does it requires training a classifier in addition to the generative model, but it also requires the classifier to be trained on noisy images for which pre-trained classifiers do not generally exist \cite{ho2022classifierfree}. \\
 Therefore, Ho and Salimans \cite{ho2022classifierfree} introduced a classifier-free guidance method which does not require a trained classifier at all. 
 \\\\
@@ -909,7 +911,7 @@ For low resolution images, the authors use added Gaussian noise and use Gaussian
 \end{figure}
 \\
 As a result, the authors achieve an FID of $4.88$ on ImageNet $256 \times 256$ with a CDM, where the first model generates a $32 \times 32$ image, the second model upsamples it to $64 \times 64$ and the third model upsamples it to $256 \times 256$ \cite{ho2021cascaded}. \\
-As an example,\textit{Imagen} \cite{saharia2022photorealistic} from Google is a popular cascaded diffusion model to efficiently generate high-resolution images. \\
+As an example, \textit{Imagen} \cite{saharia2022photorealistic} from Google is a popular cascaded diffusion model that can efficiently generate high-resolution images. \\
 \subsection{Latent Diffusion Models}
 Latent Diffusion Models (LDMs) were introduced by Rombach et al. in their paper \textit{High-Resolution Image Synthesis with Latent Diffusion Models} \cite{rombach2022highresolution}. \\
 Rather than do the forward and reverse processes in the pixel space, the authors propose to do them in the latent space in order to speed up the computation by reducing the dimensionality of the data. \cite{rombach2022highresolution} \\
@@ -924,7 +926,7 @@ Once the forward process and reverse process are done in the latent space, the d
 \begin{align}
   \tilde{x} &= \mathcal{D}(\tilde{z})
 \end{align}
-From the training objective \ref{}, we get a new training objective for LDMs \cite{rombach2022highresolution}:
+From the training objective \ref{eq:l_simple}, we get a new training objective for LDMs \cite{rombach2022highresolution}:
 \begin{align}
   L_{\text{LDM}} &= \mathbb{E}_{\mathcal{E}(x), \epsilon \sim \mathcal{N}(0, I), t} \left[ \| \epsilon - \epsilon_\theta (z_t, t) \|_2^2 \right]
 \end{align}
@@ -934,7 +936,7 @@ From the training objective \ref{}, we get a new training objective for LDMs \ci
     \caption{Latent Diffusion processes \cite{rombach2022highresolution}}
   \end{center}
 \end{figure}
-\\
+\\\\
 In terms of results, Rombach et al. \cite{rombach2022highresolution} managed to achieve an FID of 3.60 on ImageNet $256 \times 256$ with 271 days of training on a Nvidia V100 GPU, which is better than the 3.85 FID achieved by Dhariwal and Nichol \cite{dhariwal2021diffusion} with their ADM-G and ADM-U (guidance and upsampling) which required 349 days of training on a V100 \cite{rombach2022highresolution}.
 \\\\
 An example of a current LDM is \textit{Stable Diffusion} \cite{stablediffusion, rombach2022highresolution}, which has become very popular nowadays and is easily available for use to the general public.
@@ -956,7 +958,9 @@ Finally, the output is passed through a linear layer and then reshaped back in o
   \end{center}
 \end{figure}
 \\\\
-Compared to the previous experiments on class-conditioned ImageNet $256 \times 256$, the DiT model has the best FID of them all with $2.27$ \cite{peebles2023scalable}, showing that the DiT brings significant improvement to sample quality. \\
+Compared to the previous experiments on class-conditioned ImageNet $256 \times 256$, the DiT model has the best FID of them all with $2.27$ \cite{peebles2023scalable}, showing that the DiT brings significant improvement to sample quality.
+\\\\
+Newer models such as \textit{Sora} \cite{videoworldsimulators2024} and \textit{Stable Diffusion 3} use this new DiT architecture and have achieved impressive visual results.
 
 \newpage
 \section{Implementation}
@@ -986,6 +990,11 @@ This means that the model is not so complex but still takes a long time to train
 \end{figure}
 \newpage
 \section{Conclusion}
+Throughout this report, we analysed Denoising Diffusion Probabilistic Models (DDPMs) in detail by covering their mathematical foundation, which includes the two Markovian processes and the simplified training objective. Additionally, we explored the U-Net architecture employed in training these models. \\
+The score-based generative model was also analysed, particularly its use of score matching to estimate the score of the data distribution, and demonstrated its equivalence to DDPMs. \\
+Several improvements to DDPMs were discussed, notably Denoising Diffusion Implicit Models (DDIMs) and the guidance methods, both playing a crucial role in simultaneously improving sample quality and speeding up the sampling process. \\
+Subsequently, we explored the present and the future of diffusion models, especially the Diffusion Transformer (DiT) architecture which is now becoming more popular for models available to the public. \\
+Finally, a straightforward implementation of a DDPM for the MNIST dataset implemented using Python and PyTorch was presented, together with some samples generated by the model. \\
 
 \newpage
 \appendix

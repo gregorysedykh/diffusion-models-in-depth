@@ -1,9 +1,11 @@
 format: jb-book
 root: root
 chapters:
+- file: abstract
 - file: intro
 - file: ddpm
-  sections:
-    - file: forward
-    - file: reverse
+  # sections:
+    # - file: forward
+#     - file: reverse
+- file: appendixA
 

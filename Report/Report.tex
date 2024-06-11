@@ -103,7 +103,7 @@ Overall, the reader will be able to understand the theory, visualise the model, 
 
 \newpage
 \section{Introduction}
-Diffusion models have gained widespread popularity since 2020, as models such as \textit{DALL-E}, \textit{Stable Diffusion}~\cite{stablediffusion,rombach2022highresolution} and Midjourney have proven to be capable of generating high-quality images given a text prompt. Furthermore, OpenAI's recent announcement of \textit{Sora} has shown that diffusion models have now also become highly capable of generating minute long high-definition videos from a text prompt~\cite{videoworldsimulators2024}.
+Diffusion models have gained widespread popularity since 2020, as models such as \textit{DALL-E}, \textit{Stable Diffusion}~\cite{stablediffusion,rombach2022highresolution} and \textit{Midjourney} have proven to be capable of generating high-quality images given a text prompt. Furthermore, OpenAI's recent announcement of \textit{Sora} has shown that diffusion models have now also become highly capable of generating minute long high-definition videos from a text prompt~\cite{videoworldsimulators2024}.
 
 These models date back to 2015, where the idea of a diffusion model appeared, based on diffusion processes used in thermodynamics~\cite{sohldickstein2015deep}. \\ 
 Denoising Diffusion Probabilistic Models (DDPMs) were a development of the original diffusion probabilistic model introduced in 2015~\cite{ho2020denoising}. \\
@@ -126,7 +126,7 @@ The reverse process' objective is to ``invert'' the forward process and learn ho
 
 The forward process is a Markov process that starts from the original image $x_0$ and adds Gaussian noise during $T$ steps which results in a more noisy image $x_t$~\cite{ho2020denoising}. \\
 At each step $t \in \left[1, T\right]$, the noise added has variance $\beta_t \in \{ \beta_1, \dots, \beta_T \}$. \\ 
-This process is defined by $q$ which is a probability distribution that takes as input an image $x_{t}$ and outputs its likelihood.
+This process is defined by $q$ which is a probability distribution that takes as input an image $x_{t}$ and outputs its likelihood:
 \begin{align}
   q: \mathbb{R}^D \rightarrow [0, 1]
 \end{align}
@@ -160,7 +160,7 @@ This property is due to the fact that the space of Gaussian distributions is clo
 Let $\alpha_t = 1 - \beta_t$, then:
 \begin{align*}
   x_t &\sim \mathcal{N}\left(\sqrt{1 - \beta_t} x_{t-1}, \beta_t I\right) \\
-  x_t &= \sqrt{1 - \beta_t} x_{t-1} + \sqrt{\beta_t }I \epsilon_{t-1} \qquad \epsilon_{t - 1} \sim \mathcal{N}_D \left(0, I\right) \\
+  x_t &= \sqrt{1 - \beta_t} x_{t-1} + \sqrt{\beta_t } \epsilon_{t-1} \qquad \epsilon_{t - 1} \sim \mathcal{N}_D \left(0, I\right) \\
   &= \sqrt{\alpha_t} x_{t-1} + \sqrt{1 - \alpha_t} \epsilon_{t - 1}
 \end{align*}
 From this, we can apply it again to $x_{t-1}$ and obtain:
@@ -201,12 +201,12 @@ We now also know that $1 - \bar{\alpha}_t$ is the equivalent variance of the noi
 
 Choosing the variances $\beta_t$ is an important step when developing the forward process. \\
 Ho et al.~\cite{ho2020denoising} chose to use a linear schedule starting from $\beta_1 = 10^{-4}$ and increasing linearly until $\beta_T = 0.02$ in order for them to be small compared to the pixel values that were in $\left[-1, 1\right]$. \\
-However we will see in section \ref{improvements} that this is not the best choice, as this destroys the images too quickly closer to the end of the process while adding little to sample quality, which made the model be sub-optimal for $64 \times 64$ and $32 \times 32$ images~\cite{nichol2021improved}.
+However we will see in section \ref{improvements} that this is not the best choice, as this destroys the images too quickly closer to the end of the process while adding little to sample quality, which made the model sub-optimal for $64 \times 64$ and $32 \times 32$ images~\cite{nichol2021improved}.
 
 Finally, Ho et al.~\cite{ho2020denoising} chose $T = 1000$ in order to be able to compare their model with Sohl et al.'s~\cite{sohldickstein2015deep} model, which also used $T = 1000$ for most image experiments. \\
 We will again see in section \ref{improvements} that so many steps can make the sampling slow and that there exist better choices~\cite{nichol2021improved}.
 \subsection{Reverse Process}
-As mentioned previously, with a correct choice of $\beta_t$, $x_T$ will become the sample of an isotropic Gaussian distribution over $\mathbb{R}^D$ as $T \rightarrow \infty$~\cite{nichol2021improved, sohldickstein2015deep} . \\
+As mentioned previously, with a correct choice of $\beta_t$, $x_T$ will become the sample of an isotropic Gaussian distribution over $\mathbb{R}^D$ as $T \rightarrow \infty$~\cite{nichol2021improved, sohldickstein2015deep}. \\
 This should mean that we can take a sample $x_T \sim \mathcal{N}_D \left(0, I\right)$ and reverse the forward process to obtain the original image $x_0$. 
 However, this means that we need to use the entire dataset in order to figure out $q\left(x_{t-1} | x_t\right)$, which in practice cannot be done~\cite{nichol2021improved}. \\
 Therefore, an estimation $p_\theta (x_{t-1} | x_t)$ of $q(x_{t-1}|x_t)$ is found using a trained neural network (see \ref{subsubsec:model_architecture}), with $\theta$ the parameters of the neural network~\cite{nichol2021improved}.
@@ -242,22 +242,22 @@ where $X, Z$ are jointly distributed random variables with distribution $p_\thet
 
 This gives us:
 \begin{gather}
-  VLB = \log p_{\theta}\left(x_0\right) - D_{KL}\left(q\left(x_{1:T}|x_0\right) \| p_{\theta}\left(x_{1:T}|x_0\right)\right)
+  VLB = \log p_{\theta}\left(x_0\right) - D_{KL}\left(q\left(x_{1:T}|x_0\right) \| \, p_{\theta}\left(x_{1:T}|x_0\right)\right)
 \end{gather}
 Since we need to minimise the loss with the negative log likelihood, we write:
 \begin{gather}
-  - VLB = - \log p_{\theta}\left(x_0\right) + D_{KL}\left(q\left(x_{1:T}|x_0\right) \| p_{\theta}\left(x_{1:T}|x_0\right)\right)
+  - VLB = - \log p_{\theta}\left(x_0\right) + D_{KL}\left(q\left(x_{1:T}|x_0\right) \| \, p_{\theta}\left(x_{1:T}|x_0\right)\right)
 \end{gather}
 We know that the Kullback-Leibler divergence $D_{KL}$ is non-negative, which means that we can write:
 \begin{align}
-  - \log p_{\theta}\left(x_0\right) &\leq - \log p_{\theta}\left(x_0\right) + D_{KL}\left(q\left(x_{1:T}|x_0\right) \| p_{\theta}\left(x_{1:T}|x_0\right)\right) \\[10pt]
+  - \log p_{\theta}\left(x_0\right) &\leq - \log p_{\theta}\left(x_0\right) + D_{KL}\left(q\left(x_{1:T}|x_0\right) \| \, p_{\theta}\left(x_{1:T}|x_0\right)\right) \\[10pt]
   &= - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{1:T}|x_0\right)}\right] \\[10pt]
   &= - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{\frac{p_{\theta}\left(x_0, x_{1:T}\right)}{p_{\theta}\left(x_0\right)}}\right] \\[10pt]
   &= - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{\frac{p_{\theta}\left(x_{0:T}\right)}{p_{\theta}\left(x_0\right)}}\right] \\[10pt]
   &= - \log p_{\theta}\left(x_0\right) + \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{0:T}\right)} + \log {p_{\theta}\left(x_0\right)}\right] \\[10pt]
   &= \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{0:T}\right)}\right]
 \end{align}
-so that we obtain that:
+so we obtain that:
 \begin{align}
   - \log p_{\theta}\left(x_0\right) \leq \mathbb{E}_q \left[\log \frac{q\left(x_{1:T}|x_0\right)}{p_{\theta}\left(x_{0:T}\right)}\right]
 \end{align}
@@ -277,7 +277,7 @@ Ho et al.~\cite{ho2020denoising} reformulate the loss in order to reduce varianc
   &= \mathbb{E}_q \left[-\log\left(p \left(x_T\right)\right) + \sum_{t \geq 1} \log \frac{q\left(x_t | x_{t-1}\right)}{p_{\theta}\left(x_{t-1} | x_t\right)}\right] \\
   &= \mathbb{E}_q \left[-\log\left(p \left(x_T\right)\right) + \log \frac{q\left(x_1 | x_0\right)}{p_{\theta}\left(x_0 | x_1\right)} + \sum_{t \geq 2} \log \frac{q\left(x_t | x_{t-1}\right)}{p_{\theta}\left(x_{t-1} | x_t\right)}\right] \\
   &= \mathbb{E}_q \left[-\log\left(p \left(x_T\right)\right) + \log \frac{q\left(x_1 | x_0\right)}{p_{\theta}\left(x_0 | x_1\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right) q\left(x_t | x_0\right)}{{q\left(x_{t-1} | x_0\right)} p_{\theta}\left(x_{t-1} | x_t\right)}\right] \label{eq:conditionedq}\\
-  &= \mathbb{E}_q \left[-\log\left(p \left(x_T\right)\right) + \log \frac{q\left(x_1 | x_0\right)}{p_{\theta}\left(x_0 | x_1\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right)}{p_{\theta}\left(x_{t-1} | x_t\right)} + \sum_{k \geq 2} \log \frac{q\left(x_t | x_0\right)}{q\left(x_{t-1} | x_0\right)}\right] \\
+  &= \mathbb{E}_q \left[-\log\left(p \left(x_T\right)\right) + \log \frac{q\left(x_1 | x_0\right)}{p_{\theta}\left(x_0 | x_1\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right)}{p_{\theta}\left(x_{t-1} | x_t\right)} + \sum_{t \geq 2} \log \frac{q\left(x_t | x_0\right)}{q\left(x_{t-1} | x_0\right)}\right] \\
   &= \mathbb{E}_q \left[-\log\left(p \left(x_T\right)\right) + \log \frac{q\left(x_1 | x_0\right)}{p_{\theta}\left(x_0 | x_1\right)} + \log \frac{q\left(x_T | x_0\right)}{q\left(x_1 | x_0\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right)}{p_{\theta}\left(x_{t-1} | x_t\right)}\right] \\
   &= \mathbb{E}_q \left[-\log\left(p \left(x_T\right)\right) + \log \frac{q\left(x_T | x_0\right)}{p_{\theta}\left(x_0 | x_1\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right)}{p_{\theta}\left(x_{t-1} | x_t\right)}\right] \\
   &= \mathbb{E}_q \left[- \log\left(p_{\theta}\left(x_0 | x_1\right)\right) + \log \frac{q\left(x_T | x_0\right)}{p_{\theta}\left(x_T\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right)}{p_{\theta}\left(x_{t-1} | x_t\right)}\right] \\
@@ -290,7 +290,7 @@ This formulation of the loss can be split up into 3 parts:
   L_T &= D_{KL}\left(q\left(x_T | x_0\right) \| \: p\left(x_T\right)\right) \label{eq:lT}\\
   L_{1:T-1} &= \sum_{t \geq 2} D_{KL}\left(q\left(x_{t-1} | x_t, x_0\right) \| \: p_{\theta}\left(x_{t-1} | x_t\right)\right) \\
   L_0 &=  - \log\left(p_{\theta}\left(x_0 | x_1\right)\right) \\
-  \text{so that } L_{VLB} &= L_T + L_{1:T-1} + L_0
+  \text{so that} \qquad L_{VLB} &= L_T + L_{1:T-1} + L_0
 \end{align}
 \\
 It is worth noting that at equation (\ref{eq:conditionedq}), the terms of $q$ are conditioned on $x_0$; this is in order to be able to easily compute the forward process posteriors, as they are much easier to find given the original image $x_0$. \\
@@ -298,19 +298,18 @@ Ho et al.~\cite{ho2020denoising} define it as:
 \begin{gather}
   q\left(x_{t-1} | x_t, x_0\right) = \mathcal{N}\left(x_{t-1}; \tilde{\mu}_t \left(x_t, x_0\right), \tilde{\beta_t} I\right)
 \end{gather}
-
 Using Bayes' theorem, we find:
-
 \begin{align}
   q\left(x_{t-1} | x_t, x_0\right) &= q\left(x_t | x_{t-1}, x_0\right) \frac{q\left(x_{t-1}| x_0\right)}{q\left(x_t | x_0\right)} \label{eq:ddpmbayes}
 \end{align}
-  Assuming that $q\left(x_t | x_{t-1}, x_0\right) = \mathcal{N}\left(x_{t-1}; \tilde{\mu}_t \left(x_t, x_0\right), \tilde{\beta_t} I\right)$, then:
+
+Assuming that $q\left(x_t | x_{t-1}, x_0\right) = \mathcal{N}\left(x_{t-1}; \tilde{\mu}_t \left(x_t, x_0\right), \tilde{\beta_t} I\right)$, then:
 \begin{align}
-  q\left(x_{t-1} | x_t, x_0\right) = \mathcal{N} & \left(x_t; \sqrt{1 - \beta_t}x_{t-1}, \beta_t I\right) \frac{\mathcal{N}\left(\sqrt{\bar{\alpha}_{t-1}} x_0, \left(1 - \bar{\alpha}_{t-1}\right)I\right)}{\mathcal{N}\left(\sqrt{\bar{\alpha}_t} x_0, \left(1 - \bar{\alpha}_t\right)I\right)} \\[15pt]
+  q\left(x_{t-1} | x_t, x_0\right) = \mathcal{N} & \left(x_t; \sqrt{1 - \beta_t}x_{t-1}, \beta_t I\right) \frac{\mathcal{N}\left(\sqrt{\bar{\alpha}_{t-1}} x_0, \left(1 - \bar{\alpha}_{t-1}\right)I\right)}{\mathcal{N}\left(\sqrt{\bar{\alpha}_t} x_0, \left(1 - \bar{\alpha}_t\right)I\right)} \label{eq:fpposterios} \\[15pt]
   = \frac{1}{\sqrt{2 \pi \left(1 - \bar{\alpha}_t\right) \left(1 - \bar{\alpha}_{t-1}\right) \left(\sqrt{1 - \beta_t}\right)}} & \, e^{- \frac{1}{2} \left(\frac{\left(x_t - \sqrt{1 - \beta_t}x_{t-1}\right)^2}{\beta_t} + \frac{\left(x_{t-1} - \sqrt{\bar{\alpha}_{t-1}}x_0\right)^2}{1 - \bar{\alpha}_{t-1}} - \frac{\left(x_t - \sqrt{\alpha}_t x_0\right)^2}{1 - \bar{\alpha}_{t}}\right)} \label{eq:bayeseq}
 \end{align}
 
-\textit{Note}: we rewrote $q\left(x_t | x_{t-1}, x_0\right)$ as $q\left(x_t | x_{t-1}\right)$ (\ref{eq:forwardstep}) since $x_0$ adds no new information not already \indent \indent present in $x_{t-1}$.
+\textit{Note}: we rewrote $q\left(x_t | x_{t-1}, x_0\right)$ as $q\left(x_t | x_{t-1}\right)$ (\ref{eq:forwardstep}) in equation (\ref{eq:fpposterios}) since $x_0$ adds no new information not already present in $x_{t-1}$.
 
 We can ignore the constant factor in front of (\ref{eq:bayeseq}) and thus obtain:
 \begin{align}
@@ -397,8 +396,7 @@ The authors also rearrange $\tilde{\mu}(x_t, x_0)$ in order to remove the depend
   \end{align}
 }
 
-Another important point is that the term $L_T$ (\ref{eq:lT}) can be omitted since $q$ has no learnable parameters and with the fact that it will almost become a Gaussian distribution, the Kullback-Leibler Divergence \\
-$D_{KL}\left(q\left(x_T | x_0\right) \| \, p\left(x_T\right)\right)$ between a nearly Gaussian distribution and a Gaussian distribution $p\left(x_T\right) = \mathcal{N}\left(x_t; 0, I\right)$ will be close to 0~\cite{ho2020denoising}. \\
+Another important point is that the term $L_T$ (\ref{eq:lT}) can be omitted since $q$ has no learnable parameters and together with the fact that it will almost become a Gaussian distribution, the Kullback-Leibler Divergence $D_{KL}\left(q\left(x_T | x_0\right) \| \, p\left(x_T\right)\right)$ between a nearly Gaussian distribution and a Gaussian distribution $p\left(x_T\right) = \mathcal{N}\left(x_t; 0, I\right)$ will be close to 0~\cite{ho2020denoising}. \\
 We thus find ourselves with:
 \begin{gather}
   L_{VLB} = \mathbb{E}_q \left[ \sum_{t \geq 2} D_{KL}\left(q\left(x_{t-1} | x_t, x_0\right) \| \, p_{\theta}\left(x_{t-1} | x_t\right)\right) - \log\left(p_{\theta}\left(x_0 | x_1\right)\right) \right]
@@ -525,7 +523,7 @@ However they mention another formulation of the DDPM model that is equivalent: a
 \subsection{Score matching}
 This formulation uses score matching~\cite{hyvarinen2005}, either denoising score matching~\cite{vincent2010denoising} or sliced score matching~\cite{song2019sliced}. \\
 Essentially, score matching avoids optimizing the likelihood which can sometimes be difficult to find because of normalisation constants, and instead optimises a score function which is the gradient of the log-likelihood. \\
-Suppose we have a probability density function $p_\theta (x)$ that models an i.i.d. dataset $\{x_i\}_{i=1}^N$ of the p.d.f. $p(x)$. 
+Suppose we have a probability density function $p_\theta (x)$ that models an i.i.d.\ dataset $\{x_i\}_{i=1}^N$ of the p.d.f. $p(x)$. 
 
 Let $f_\theta (x)$ be a real valued function which is an unnormalized density function and $Z_\theta = \int e^{-f_\theta (x)} dx$ be the normalisation constant such that $\int p_\theta (x) \; dx = 1$, where $p_\theta(x)$ is defined as:
 \begin{align}
@@ -597,7 +595,7 @@ Song and Ermon~\cite{song2020generative} show this in figure~\ref{fig:scores} by
 \begin{figure}[h]
   \begin{center}
     \includegraphics[width= 0.75\textwidth]{images/highlowdensity.png}
-    \caption{Data scores represent the real score function $\nabla_x \log p(x)$ and estimated scores reperesent the estimated score function $s_\theta (x)$. We can see that the regions in the red rectangles are the darker high density regions where the score function is well approximated, while the lighter lower density regions outside the red rectangles were not well estimated~\cite{song2020generative}}.\label{fig:scores}
+    \caption{Data scores represent the real score function $\nabla_x \log p(x)$ and estimated scores reperesent the estimated score function $s_\theta (x)$. We can see that the regions in the red rectangles are the darker high density regions where the score function is well approximated, while the lighter lower density regions outside the red rectangles were not well estimated~\cite{song2020generative}.}\label{fig:scores}
   \end{center}
 \end{figure}
 
@@ -625,9 +623,9 @@ Song and Ermon~\cite{song2020generative} then define the Noise Conditional Score
   s_\theta : \mathbb{R}^D &\times \mathbb{R} \rightarrow \mathbb{R}^D \\
   s_\theta (x, \sigma) &\approx \nabla_x \log q_\sigma (x) \qquad \forall \sigma \in \{ \sigma_1, \sigma_2, \ldots, \sigma_L \}
 \end{align}
-To train the NCSN, the authors chose denoising score matching~\cite{vincent2010denoising} as its goal is to estimate the score function of a noised data distribution while being quicker than sliced score matching~\cite{song2020generative, song2019sliced}.
+To train the NCSN, the authors chose denoising score matching~\cite{vincent2010denoising} as its goal is to estimate the score function of a noised data distribution while also being quicker than sliced score matching~\cite{song2020generative, song2019sliced}.
 
-Let $q_\sigma (\tilde{x} | x) = \mathcal{N}(\tilde{x} | x, \sigma^2, I)$ be the noise distribution that noised the data point $x$ to get the noised data point $\tilde{x}$. \\
+Let $q_\sigma (\tilde{x} | x) = \mathcal{N}(\tilde{x} | x, \sigma^2, I)$ be the noise distribution that noises the data point $x$ to get the noised data point $\tilde{x}$. \\
 Its score function is given by~\cite{song2020generative}:
 \begin{align}
   \nabla_{\tilde{x}} \log q_\sigma (\tilde{x} | x) &= - \frac{\tilde{x} - x}{\sigma^2} 
@@ -698,13 +696,13 @@ For this, they used an interpolation approach, where they parametrised the varia
 \begin{align}
   \Sigma_\theta (x_t, t) &= \exp \left( v \log \beta_t + (1 - v) \log \tilde{\beta}_t \right)
 \end{align}
-As the simplified training objective $L_{\text{simple}}$ used in the original DDPM paper \cite{ho2020denoising} did not include the variance, Nichol et al.~\cite{nichol2021improved} introduced a new training objective $L_{\text{hybrid}}$, defined as:
+As the simplified training objective $L_{\text{simple}}$ used in the original DDPM paper~\cite{ho2020denoising} did not include the variance, Nichol et al.~\cite{nichol2021improved} introduced a new training objective $L_{\text{hybrid}}$, defined as:
 \begin{align}
   L_{\text{hybrid}} &= L_{\text{simple}} + \lambda L_{\text{VLB}}
 \end{align}
 with $\lambda = 0.001$ in order to keep $L_{\text{simple}}$ as the main training objective~\cite{nichol2021improved}.
 
-At first, they found that the hybrid objective $L_{\text{hybrid}}$ achieved a better log-likelihoods and was easier to optimise than just $L_{\text{VLB}}$, contrary to what they had expected~\cite{nichol2021improved}. \\
+At first, they found that the hybrid objective $L_{\text{hybrid}}$ achieved a better log-likelihood and was easier to optimise than just $L_{\text{VLB}}$, contrary to what they had expected~\cite{nichol2021improved}. \\
 However, they obtained the best log-likelihoods by optimising $L_{\text{VLB}}$ directly but with importance samping, which is a technique where samples of a difficult distribution are taken from a distribution that is easier to compute and then the original distribution is approximated by weighted samples~\cite{nichol2021improved}.
 
 They defined it as:
@@ -717,7 +715,7 @@ Another change that Nichol et al.~\cite{nichol2021improved} made was to use a co
 They explain this change by the fact that towards the end of the forward process, the image is already very noisy and yet more noise is added while not really improving the model, particularly for $32 \times 32$ and $64 \times 64$ images~\cite{nichol2021improved}. \\
 In effect, the input images are destroyed by noise very quickly close to the start of the noising process. Nichol and Dhariwal~\cite{nichol2021improved} found that up to 20\% of the reverse process could be skipped while losing very little image quality and that therefore the last noising steps are redundant. 
 
-The cosine schedule they used adds noise at a slower rate throughout the process, in particular at the beginning and the end. \\
+The cosine schedule they use adds noise at a slower rate throughout the process, in particular at the beginning and the end. \\
 They define the cosine schedule as:
 \begin{align}
   f(t) &= \cos \left( \frac{\frac{t}{T} + s}{1 + s} \cdot \frac{\pi}{2} \right)^2 \\
@@ -749,7 +747,7 @@ This is time-consuming and computationally expensive compared to GANs which only
 To address this issue, Song et al.~\cite{song2022denoising} introduced the Denoising Diffusion Implicit Models (DDIMs) in 2020. \\
 The main objective of DDIMs was to accelerate sampling by making the forward process non-Markovian, which would allow the reverse process to require less iterations~\cite{song2022denoising}.
 
-Song et al. \cite{song2022denoising} define a family $\mathcal{Q}$ of forward processes. Each forward process in $\mathcal{Q}$ is indexed by $\sigma  = \{ \sigma_1, \sigma_2, \ldots, \sigma_T \} \in \mathbb{R}^T_{\geq 0}$, where $\sigma_t$ is the standard deviation of the noise added at timestep $t$:
+Song et al.~\cite{song2022denoising} define a family $\mathcal{Q}$ of forward processes. Each forward process in $\mathcal{Q}$ is indexed by $\sigma  = \{ \sigma_1, \sigma_2, \ldots, \sigma_T \} \in \mathbb{R}^T_{\geq 0}$, where $\sigma_t$ is the standard deviation of the noise added at timestep $t$:
 \begin{align}
   q_{\sigma}(x_{1:T}| \, x_0) &= q_{\sigma}(x_T | \, x_0) \prod_{t=2}^{T} q_{\sigma}(x_{t-1}| \, x_t, x_0)
 \end{align}
@@ -809,9 +807,9 @@ This means that the optimal solution for $J_\sigma$ is the same as the optimal s
 
 In order to speed up the sampling process, Song et al.~\cite{song2022denoising} skip some timesteps in the reverse process. \\
 To do this, the forward process is redefined on a subset of timesteps of size $S$, $\left\{ x_{\tau_1}, \dots, x_{\tau_S} \right\}$ and such that $q(x_{\tau_i} | \, x_0) = \mathcal{N}(\sqrt{\alpha_{\tau_i}} x_0, (1 - \alpha_{\tau_i})I)$ \\
-Since this is a subset of the timesteps, the training can be done all timesteps and the sampling can be done on the subset~\cite{song2022denoising}.
+Since this is a subset of the timesteps, the training can be done for all timesteps and the sampling can be done on just the subset~\cite{song2022denoising}.
 
-With the same amount of training timesteps $T = 1000$ and the same training objective as the DDPM paper~\cite{ho2020denoising}, Song et al.~\cite{song2022denoising} were able to achieve solid FID scores on CIFAR-10~\cite{cifar10} and CelebA~\cite{liu2015faceattributes} datasets, with far fewer sampling timesteps, ranging from $10$ to $100$ timesteps~\cite{song2022denoising}. \\
+With the same amount of training timesteps $T = 1000$ and the same training objective as the DDPM paper~\cite{ho2020denoising}, Song et al.~\cite{song2022denoising} were able to achieve solid FID scores on CIFAR-10~\cite{cifar10} and CelebA~\cite{liu2015faceattributes} datasets with far fewer sampling timesteps, ranging from $10$ to $100$ timesteps~\cite{song2022denoising}. \\
 A new hyperparameter $\eta \in \mathbb{R}_+$ is introduced to control the interpolation between the DDPM $\sigma$ and the deterministic $\sigma$ of the DDIM~\cite{song2022denoising}:
 \begin{align}
   \sigma_{\tau_i} (\eta) &= \eta \sqrt{\frac{1 - \alpha_{\tau_{i-1}}}{1 - \alpha_{\tau_i}}} \sqrt{1 - \frac{\alpha_{\tau_i}}{\alpha_{\tau_{i-1}}}}
@@ -832,7 +830,7 @@ Recall that when sampling from a DDPM or a DDIM, we start with an image of Gauss
 In this case it is helpful to guide the denoising process towards whatever we specified.
 \subsubsection{Classifier guidance}
 Classifier guidance was introduced by Dhariwal and Nichol in their \textit{Diffusion Models Beat GANs on Image Synthesis} paper~\cite{dhariwal2021diffusion} in order to improve the samples generated. \\
-To do this, they trained a classifier $p_\Phi (y \, | \, x_t, t)$ on noisy images~\cite{dhariwal2021diffusion} since pre-trained classifiers were are generally trained on dataset images and not on noised ones. \\
+To do this, they trained a classifier $p_\Phi (y \, | \, x_t, t)$ on noisy images~\cite{dhariwal2021diffusion} since pre-trained classifiers are generally trained on dataset images and not on noised images. \\
 The reverse process is then guided towards a class $y$ using the gradient $\nabla_{x_t} \log p_\Phi (y \, | \, x_t, t)$~\cite{dhariwal2021diffusion}.
 The authors prove~\cite{dhariwal2021diffusion} that if we have a reverse process such as that from the DDPM $p_\theta (x_t, x_{t+1})$, to condition it on class $y$, we can sample from the following process instead:
 \begin{align}
@@ -873,9 +871,9 @@ Dhariwal and Nichol \cite{dhariwal2021diffusion} gave two algorithms to train th
 \end{algorithm}
 
 \subsubsection{Classifier-free guidance}
-Despite the impressive performance of the \textit{ablated diffusion model} (ADM) that used classifier guidance, Ho and Salimans made an improvement by using classifier-free guidance. \cite{ho2022classifierfree} \\
-Classifier guidance requires a classifier to be trained on noisy images. This means that not only does it requires training a classifier in addition to the generative model, but it also requires the classifier to be trained on noisy images for which pre-trained classifiers do not generally exist~\cite{ho2022classifierfree}. \\
-Therefore, Ho and Salimans \cite{ho2022classifierfree} introduced a classifier-free guidance method which does not require a trained classifier at all. 
+Despite the impressive performance of the \textit{ablated diffusion model} (ADM) that used classifier guidance, Ho and Salimans made an improvement by using classifier-free guidance~\cite{ho2022classifierfree}. \\
+Classifier guidance requires a classifier to be trained on noisy images. This means that not only does it require training a classifier in addition to the generative model, but it also requires the classifier to be trained on noisy images for which pre-trained classifiers do not generally exist~\cite{ho2022classifierfree}. \\
+Therefore, Ho and Salimans~\cite{ho2022classifierfree} introduced a classifier-free guidance method which does not require a trained classifier at all. 
 
 The authors use an unconditional diffusion model $q(x_t)$ and a conditional diffusion model $q(x_t \, | \, y)$ where $y$ is the class label~\cite{ho2022classifierfree, luo2022understanding}. \\
 Starting from equation (\ref{eq:classifier_guidance}):
@@ -893,10 +891,10 @@ However it isn't necessary to train a conditional model and an unconditional mod
 \subsection{Cascaded Diffusion Models}
 Training a diffusion model on high-resolution images is computationally expensive and therefore time-consuming. \\
 To address this, Ho et al.~\cite{ho2021cascaded} introduced the cascaded diffusion model (CDM) which is essentially a pipeline of diffusion models where the first one generates a low-resolution image and the subsequent ones are trained to upsample the image to a higher resolution. \\
-This method is much faster than training a single diffusion model on the high-resolution image as most of the important features for sampling are already present in the low-resolution image which are fast to train, whereas training at bigger resolutions doesn't add much more detail compared to the computation costs~\cite{ho2021cascaded}.
+This method is much faster than training a single diffusion model on high-resolution images as most of the important features for sampling are already present in the low-resolution images which are fast to train, whereas training at bigger resolutions doesn't add much more detail considering the computation costs~\cite{ho2021cascaded}.
 
 As mentioned, the first model is trained to generate an image as we have seen before. The subsequent models are trained using what Ho et al.\ call conditioning augmentation, a type of data augmentation, where the model is given a lower-resolution image and is trained on modified versions of the image to generate a higher-resolution and overall higher-quality image~\cite{ho2021cascaded}. \\
-For low resolution images, the authors use added Gaussian noise and use Gaussian blurring for higher resolution images~\cite{ho2021cascaded}.
+For low-resolution images, the authors use added Gaussian noise and use Gaussian blurring for higher resolution images~\cite{ho2021cascaded}.
 \begin{figure}[h]
   \begin{center}
     \includegraphics[width=0.8\textwidth]{images/cascadedUnet.png}
@@ -914,8 +912,8 @@ As a result, the authors achieve an FID of $4.88$ on ImageNet $256 \times 256$ w
 As an example, \textit{Imagen}~\cite{saharia2022photorealistic} from Google is a popular cascaded diffusion model that can efficiently generate high-resolution images.
 \subsection{Latent Diffusion Models}
 Latent Diffusion Models (LDMs) were introduced by Rombach et al.\ in their paper \textit{High-Resolution Image Synthesis with Latent Diffusion Models}~\cite{rombach2022highresolution}. \\
-Rather than do the forward and reverse processes in the pixel space, the authors propose to do them in the latent space in order to speed up the computation by reducing the dimensionality of the data~\cite{rombach2022highresolution}. \\
-In order to do this, a Variational Autoencoder (VAE) is used to first encode the image $x$ into a latent representation $z$. The forward process is then applied to the latent representation $z$ until we obtain $z_T$~\cite{rombach2022highresolution}.
+Rather than do the forward and reverse processes in pixel space, the authors propose to do them in latent space in order to speed up the computation by reducing the dimensionality of the data~\cite{rombach2022highresolution}. \\
+In order to do this, a Variational Autoencoder (VAE)~\cite{kingma2022autoencoding} is used to first encode the image $x$ into a latent representation $z$. The forward process is then applied to the latent representation $z$ until we obtain $z_T$~\cite{rombach2022highresolution}.
 As for the reverse process, the model (a U-Net in their paper) will denoise the latent representation $z_T$ until we obtain $\tilde{z}$ which is then passed through the decoder of the VAE to obtain the denoised image $\tilde{x}$~\cite{rombach2022highresolution}.
 This means that given an image $x$, the encoder $\mathcal{E}$ will encode $x$ into a latent representation $z$:
 \begin{align}
@@ -936,7 +934,7 @@ From the training objective (\ref{eq:l_simple}), we get a new training objective
   \end{center}
 \end{figure}
 
-In terms of results, Rombach et al.~\cite{rombach2022highresolution} managed to achieve an FID of 3.60 on ImageNet $256 \times 256$ with 271 days of training on a Nvidia V100 GPU, which is better than the 3.85 FID achieved by Dhariwal and Nichol~\cite{dhariwal2021diffusion} with their ADM-G and ADM-U (guidance and upsampling) which required 349 days of training on a V100~\cite{rombach2022highresolution}.
+In terms of results, Rombach et al.~\cite{rombach2022highresolution} managed to achieve an FID of 3.60 on ImageNet $256 \times 256$ with 271 days of training on a Nvidia V100 GPU, which is better than the 3.85 FID achieved by Dhariwal and Nichol~\cite{dhariwal2021diffusion} with their ADM-G and ADM-U (guidance and upsampling) models which required 349 days of training on a V100~\cite{rombach2022highresolution}.
 
 An example of a current LDM is \textit{Stable Diffusion}~\cite{stablediffusion, rombach2022highresolution}, which has become very popular nowadays and is easily available for use to the general public.
 
@@ -965,11 +963,11 @@ Newer models such as \textit{Sora}~\cite{videoworldsimulators2024} and \textit{S
 \section{Implementation}
 A simple implementation of a DDPM for the MNIST dataset in PyTorch is given in the Jupyter notebook \texttt{DMID.ipynb}. The code aims to be as close as possible to the original DDPM paper~\cite{ho2020denoising}. It can be run on a CPU or a CUDA-enabled GPU.
 
-The code provides an explanation and implementation of a U-Net architecture similar to the original one. \\
-Ho et al.\ used a self-attention block not only between the two ResNet-like blocks in the bottleneck, but also at the encoder and decoder stages at $16 \times 16$ resolution images. They trained the model as such for CIFAR-10, CelebA-HQ and LSUN dataset~\cite{ho2020denoising}. \\
+The code provides an explanation and an implementation of a U-Net architecture similar to the original one. \\
+Ho et al.\ used a self-attention block not only between the two ResNet-like blocks in the bottleneck, but also at the encoder and decoder stages at $16 \times 16$ resolution image steps. They trained the model as such for CIFAR-10, CelebA-HQ and LSUN datasets~\cite{ho2020denoising}. \\
 \texttt{DMID.ipynb} contains a model without self-attention blocks as this visually gave worse results on the MNIST dataset, possibly because of overfitting.
 
-The forward process uses the linear noising schedule $\beta$ and the reverse process uses the same $1000$ timesteps from the original DDPM paper~\cite{ho2020denoising}, however the code is easily modifiable to use a different noising schedule (e.g. cosine noising schedule) and a different number of timesteps. Similarly, a learning rate of $10^{-4}$ was used as it was found to work well for the MNIST dataset but this can also be changed to the original $2 \times 10^{-4}$ learning rate.
+The forward process uses the linear noising schedule $\beta$ and the reverse process uses the same $1000$ timesteps from the original DDPM paper~\cite{ho2020denoising}, however the code is easily modifiable to use a different noising schedule (e.g.\ cosine noising schedule) and a different number of timesteps. Similarly, a learning rate of $10^{-4}$ was used as it was found to work well for the MNIST dataset but this can also be changed to the original $2 \times 10^{-4}$ learning rate.
 \begin{figure}[h]
   \begin{center}
     \includegraphics[width=\textwidth]{images/forward.png}
@@ -979,7 +977,7 @@ The forward process uses the linear noising schedule $\beta$ and the reverse pro
 \\
 The model contains 7'339'297 parameters, much less than Ho et al.'s CIFAR-10 model which has 35.7 mln parameters and the CelebA-HQ model with its 114 mln parameters~\cite{ho2020denoising}. \\
 On an Apple M2 Pro chip using MPS, training takes around 70s per epoch for $1000$ timesteps and $32 \times 32$ MNIST images and sampling 1 image takes around 13.4s. \\
-This means that the model is not so complex but still takes a long time to train and sample from without significant resources like a TPU v3-8 used by Ho et al.~\cite{ho2020denoising}. 
+This means that the model is not so complex but still takes a long time to train and sample from without significant resources such as a TPU v3-8 used by Ho et al.~\cite{ho2020denoising}. 
 \newpage
 \begin{figure}[h]
   \begin{center}
@@ -993,7 +991,7 @@ This means that the model is not so complex but still takes a long time to train
 Throughout this report, we analysed Denoising Diffusion Probabilistic Models (DDPMs) in detail by covering their mathematical foundation, which includes the two Markovian processes and the simplified training objective. Additionally, we explored the U-Net architecture employed in training these models. \\
 The score-based generative model was also analysed, particularly its use of score matching to estimate the score of the data distribution, and demonstrated its equivalence to DDPMs. \\
 Several improvements to DDPMs were discussed, notably Denoising Diffusion Implicit Models (DDIMs) and the guidance methods, both playing a crucial role in simultaneously improving sample quality and speeding up the sampling process. \\
-Subsequently, we explored the present and the future of diffusion models, especially the Diffusion Transformer (DiT) architecture which is now becoming more popular for models available to the public. \\
+Subsequently, we explored the present and the future of diffusion models, especially the Diffusion Transformer (DiT) architecture which is now becoming increasingly popular for models available to the public. \\
 Finally, a straightforward implementation of a DDPM for the MNIST dataset implemented using Python and PyTorch was presented, together with some samples generated by the model.
 
 \newpage

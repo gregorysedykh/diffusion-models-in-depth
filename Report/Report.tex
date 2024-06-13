@@ -19,7 +19,7 @@
 
 \hypersetup{citecolor=blue}
 
-\addbibresource{sources.bib}
+\addbibresource{references.bib}
 \setlength{\bibitemsep}{5pt}
 
 \pgfplotsset{compat=1.16}
@@ -280,7 +280,7 @@ Ho et al.~\cite{ho2020denoising} reformulate the loss in order to reduce varianc
   &= \mathbb{E}_q \left[-\log\left(p \left(x_T\right)\right) + \log \frac{q\left(x_1 | x_0\right)}{p_{\theta}\left(x_0 | x_1\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right)}{p_{\theta}\left(x_{t-1} | x_t\right)} + \sum_{t \geq 2} \log \frac{q\left(x_t | x_0\right)}{q\left(x_{t-1} | x_0\right)}\right] \\
   &= \mathbb{E}_q \left[-\log\left(p \left(x_T\right)\right) + \log \frac{q\left(x_1 | x_0\right)}{p_{\theta}\left(x_0 | x_1\right)} + \log \frac{q\left(x_T | x_0\right)}{q\left(x_1 | x_0\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right)}{p_{\theta}\left(x_{t-1} | x_t\right)}\right] \\
   &= \mathbb{E}_q \left[-\log\left(p \left(x_T\right)\right) + \log \frac{q\left(x_T | x_0\right)}{p_{\theta}\left(x_0 | x_1\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right)}{p_{\theta}\left(x_{t-1} | x_t\right)}\right] \\
-  &= \mathbb{E}_q \left[- \log\left(p_{\theta}\left(x_0 | x_1\right)\right) + \log \frac{q\left(x_T | x_0\right)}{p_{\theta}\left(x_T\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right)}{p_{\theta}\left(x_{t-1} | x_t\right)}\right] \\
+  &= \mathbb{E}_q \left[- \log\left(p_{\theta}\left(x_0 | x_1\right)\right) + \log \frac{q\left(x_T | x_0\right)}{p \left(x_T\right)} + \sum_{t \geq 2} \log \frac{q\left(x_{t-1} | x_t, x_0\right)}{p_{\theta}\left(x_{t-1} | x_t\right)}\right] \\
   &= \mathbb{E}_q \: \Bigg[ D_{KL}\left(q\left(x_T | x_0\right) \| \: p\left(x_T\right)\right) \Bigg.  \\
   &\qquad \qquad \Bigg. + \sum_{t \geq 2} D_{KL}\left(q\left(x_{t-1} | x_t, x_0\right) \| \: p_{\theta}\left(x_{t-1} | x_t\right)\right) - \log\left(p_{\theta}\left(x_0 | x_1\right)\right) \Bigg] \notag
 \end{align}

@@ -4,8 +4,6 @@
 
 _Gregory Sedykh_
 
-[Book](https://gregorysedykh.github.io/diffusion-models-in-depth)
-
 [Report](Report/Report.pdf)
 
 [Implementation](DMID.ipynb)

@@ -1,0 +1,171 @@
+\begin{thebibliography}{30}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{{\tt #1}}\fi
+
+\bibitem[AI()]{stablediffusion}
+Stability AI.
+\newblock URL \url{https://github.com/Stability-AI/stablediffusion}.
+
+\bibitem[Rombach et~al.(2021)Rombach, Blattmann, Lorenz, Esser, and Ommer]{rombach2022highresolution}
+Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Bj{\"{o}}rn Ommer.
+\newblock High-resolution image synthesis with latent diffusion models.
+\newblock {\em CoRR}, abs/2112.10752, 2021, 2112.10752.
+\newblock URL \url{https://arxiv.org/abs/2112.10752}.
+
+\bibitem[Brooks et~al.(2024)Brooks, Peebles, Homes, DePue, Guo, Jing, Schnurr, Taylor, Luhman, Luhman, Ng, Wang, and Ramesh]{videoworldsimulators2024}
+Tim Brooks, Bill Peebles, Connor Homes, Will DePue, Yufei Guo, Li~Jing, David Schnurr, Joe Taylor, Troy Luhman, Eric Luhman, Clarence Wing~Yin Ng, Ricky Wang, and Aditya Ramesh.
+\newblock Video generation models as world simulators, 2024.
+\newblock URL \url{https://openai.com/research/video-generation-models-as-world-simulators}.
+
+\bibitem[Sohl{-}Dickstein et~al.(2015)Sohl{-}Dickstein, Weiss, Maheswaranathan, and Ganguli]{sohldickstein2015deep}
+Jascha Sohl{-}Dickstein, Eric~A. Weiss, Niru Maheswaranathan, and Surya Ganguli.
+\newblock Deep unsupervised learning using nonequilibrium thermodynamics.
+\newblock {\em CoRR}, abs/1503.03585, 2015, 1503.03585.
+\newblock URL \url{http://arxiv.org/abs/1503.03585}.
+
+\bibitem[Ho et~al.(2020)Ho, Jain, and Abbeel]{ho2020denoising}
+Jonathan Ho, Ajay Jain, and Pieter Abbeel.
+\newblock Denoising diffusion probabilistic models.
+\newblock {\em CoRR}, abs/2006.11239, 2020, 2006.11239.
+\newblock URL \url{https://arxiv.org/abs/2006.11239}.
+
+\bibitem[Nichol and Dhariwal(2021)]{nichol2021improved}
+Alex Nichol and Prafulla Dhariwal.
+\newblock Improved denoising diffusion probabilistic models.
+\newblock {\em CoRR}, abs/2102.09672, 2021, 2102.09672.
+\newblock URL \url{https://arxiv.org/abs/2102.09672}.
+
+\bibitem[Dhariwal and Nichol(2021)]{dhariwal2021diffusion}
+Prafulla Dhariwal and Alex Nichol.
+\newblock Diffusion models beat gans on image synthesis.
+\newblock {\em CoRR}, abs/2105.05233, 2021, 2105.05233.
+\newblock URL \url{https://arxiv.org/abs/2105.05233}.
+
+\bibitem[Kingma and Welling(2022)]{kingma2022autoencoding}
+Diederik~P Kingma and Max Welling.
+\newblock Auto-encoding variational bayes, 2022, 1312.6114.
+\newblock URL \url{https://arxiv.org/abs/1312.6114}.
+
+\bibitem[Song et~al.(2020)Song, Meng, and Ermon]{song2022denoising}
+Jiaming Song, Chenlin Meng, and Stefano Ermon.
+\newblock Denoising diffusion implicit models.
+\newblock {\em CoRR}, abs/2010.02502, 2020, 2010.02502.
+\newblock URL \url{https://arxiv.org/abs/2010.02502}.
+
+\bibitem[Ronneberger et~al.(2015)Ronneberger, Fischer, and Brox]{ronneberger2015unet}
+Olaf Ronneberger, Philipp Fischer, and Thomas Brox.
+\newblock U-net: Convolutional networks for biomedical image segmentation.
+\newblock {\em CoRR}, abs/1505.04597, 2015, 1505.04597.
+\newblock URL \url{http://arxiv.org/abs/1505.04597}.
+
+\bibitem[Zagoruyko and Komodakis(2016)]{zagoruyko2017wide}
+Sergey Zagoruyko and Nikos Komodakis.
+\newblock Wide residual networks.
+\newblock {\em CoRR}, abs/1605.07146, 2016, 1605.07146.
+\newblock URL \url{http://arxiv.org/abs/1605.07146}.
+
+\bibitem[Lai et~al.(2022)Lai, Sun, Tian, Ding, Wu, and Wang]{lai2022rethinking}
+Zhitong Lai, Haichao Sun, Rui Tian, Nannan Ding, Zhiguo Wu, and Yanjie Wang.
+\newblock Rethinking skip connections in encoder-decoder networks for monocular depth estimation, 2022, 2208.13441.
+\newblock URL \url{https://arxiv.org/abs/2208.13441}.
+
+\bibitem[Wu and He(2018)]{wu2018group}
+Yuxin Wu and Kaiming He.
+\newblock Group normalization, 2018, 1803.08494.
+\newblock URL \url{http://arxiv.org/abs/1803.08494}.
+
+\bibitem[Salimans and Kingma(2016)]{salimans2016weight}
+Tim Salimans and Diederik~P. Kingma.
+\newblock Weight normalization: {A} simple reparameterization to accelerate training of deep neural networks.
+\newblock {\em CoRR}, abs/1602.07868, 2016, 1602.07868.
+\newblock URL \url{http://arxiv.org/abs/1602.07868}.
+
+\bibitem[Vaswani et~al.(2017)Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser, and Polosukhin]{vaswani2023attention}
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan~N. Gomez, Lukasz Kaiser, and Illia Polosukhin.
+\newblock Attention is all you need.
+\newblock {\em CoRR}, abs/1706.03762, 2017, 1706.03762.
+\newblock URL \url{http://arxiv.org/abs/1706.03762}.
+
+\bibitem[Hyvarinen(2005)]{hyvarinen2005}
+Aapo Hyvarinen.
+\newblock Estimation of non-normalized statistical models by score matching, 2005.
+\newblock URL \url{https://jmlr.org/papers/volume6/hyvarinen05a/hyvarinen05a.pdf}.
+
+\bibitem[Vincent(2010)]{vincent2010denoising}
+Pascal Vincent.
+\newblock A connection between score matching and denoising autoencoders, 2010.
+\newblock URL \url{https://www.iro.umontreal.ca/~vincentp/Publications/smdae_techreport.pdf}.
+
+\bibitem[Song et~al.(2019)Song, Garg, Shi, and Ermon]{song2019sliced}
+Yang Song, Sahaj Garg, Jiaxin Shi, and Stefano Ermon.
+\newblock Sliced score matching: {A} scalable approach to density and score estimation.
+\newblock {\em CoRR}, abs/1905.07088, 2019, 1905.07088.
+\newblock URL \url{http://arxiv.org/abs/1905.07088}.
+
+\bibitem[Luo(2022)]{luo2022understanding}
+Calvin Luo.
+\newblock Understanding diffusion models: A unified perspective, 2022, 2208.11970.
+\newblock URL \url{https://arxiv.org/abs/2208.11970}.
+
+\bibitem[Song and Ermon(2019)]{song2020generative}
+Yang Song and Stefano Ermon.
+\newblock Generative modeling by estimating gradients of the data distribution.
+\newblock {\em CoRR}, abs/1907.05600, 2019, 1907.05600.
+\newblock URL \url{http://arxiv.org/abs/1907.05600}.
+
+\bibitem[Welling and Teh(2011)]{WelTeh2011a}
+Max Welling and Yee~Whye Teh.
+\newblock Bayesian learning via stochastic gradient langevin dynamics, 2011.
+\newblock URL \url{https://www.stats.ox.ac.uk/~teh/research/compstats/WelTeh2011a.pdf}.
+
+\bibitem[Song(2021)]{songblog}
+Yang Song.
+\newblock Blog post: Generative modeling by estimating gradients of the data distribution, 2021.
+\newblock URL \url{https://yang-song.net/blog/2021/score/}.
+
+\bibitem[Weng(2021)]{weng2021diffusion}
+Lilian Weng.
+\newblock What are diffusion models?
+\newblock {\em lilianweng.github.io}, Jul 2021.
+\newblock URL \url{https://lilianweng.github.io/posts/2021-07-11-diffusion-models/}.
+
+\bibitem[Krizhevsky et~al.(2024)Krizhevsky, Nair, and Hinton]{cifar10}
+Alex Krizhevsky, Vinod Nair, and Geoffrey Hinton.
+\newblock Cifar-10 (canadian institute for advanced research).
+\newblock 2024.
+\newblock URL \url{http://www.cs.toronto.edu/~kriz/cifar.html}.
+
+\bibitem[van~den Oord et~al.(2016)van~den Oord, Kalchbrenner, Vinyals, Espeholt, Graves, and Kavukcuoglu]{oord2016conditional}
+A{\"{a}}ron van~den Oord, Nal Kalchbrenner, Oriol Vinyals, Lasse Espeholt, Alex Graves, and Koray Kavukcuoglu.
+\newblock Conditional image generation with pixelcnn decoders.
+\newblock {\em CoRR}, abs/1606.05328, 2016, 1606.05328.
+\newblock URL \url{http://arxiv.org/abs/1606.05328}.
+
+\bibitem[Liu et~al.(2015)Liu, Luo, Wang, and Tang]{liu2015faceattributes}
+Ziwei Liu, Ping Luo, Xiaogang Wang, and Xiaoou Tang.
+\newblock Deep learning face attributes in the wild.
+\newblock In {\em Proceedings of International Conference on Computer Vision (ICCV)}, 12 2015.
+
+\bibitem[Ho and Salimans(2022)]{ho2022classifierfree}
+Jonathan Ho and Tim Salimans.
+\newblock Classifier-free diffusion guidance, 2022, 2207.12598.
+\newblock URL \url{https://arxiv.org/abs/2207.12598}.
+
+\bibitem[Ho et~al.(2021)Ho, Saharia, Chan, Fleet, Norouzi, and Salimans]{ho2021cascaded}
+Jonathan Ho, Chitwan Saharia, William Chan, David~J. Fleet, Mohammad Norouzi, and Tim Salimans.
+\newblock Cascaded diffusion models for high fidelity image generation.
+\newblock {\em CoRR}, abs/2106.15282, 2021, 2106.15282.
+\newblock URL \url{https://arxiv.org/abs/2106.15282}.
+
+\bibitem[Saharia et~al.(2022)Saharia, Chan, Saxena, Li, Whang, Denton, Ghasemipour, Ayan, Mahdavi, Lopes, Salimans, Ho, Fleet, and Norouzi]{saharia2022photorealistic}
+Chitwan Saharia, William Chan, Saurabh Saxena, Lala Li, Jay Whang, Emily Denton, Seyed Kamyar~Seyed Ghasemipour, Burcu~Karagol Ayan, S.~Sara Mahdavi, Rapha~Gontijo Lopes, Tim Salimans, Jonathan Ho, David~J Fleet, and Mohammad Norouzi.
+\newblock Photorealistic text-to-image diffusion models with deep language understanding, 2022, 2205.11487.
+\newblock URL \url{https://arxiv.org/abs/2205.11487}.
+
+\bibitem[Peebles and Xie(2023)]{peebles2023scalable}
+William Peebles and Saining Xie.
+\newblock Scalable diffusion models with transformers, 2023, 2212.09748.
+\newblock URL \url{https://arxiv.org/abs/2212.09748}.
+
+\end{thebibliography}

@@ -4,6 +4,6 @@
 
 _Gregory Sedykh_
 
-[Report](Report/Report.pdf)
+[Report](Report/ReportFormatted.pdf)
 
 [Implementation](DMID.ipynb)
